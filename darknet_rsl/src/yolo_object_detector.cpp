@@ -1,31 +1,27 @@
 #include "yolo_object_detector.h"
 
-extern "C" {
-  #include "box.h"
-}
-
-// initialize YOLO functions that are called in this script
-extern "C" RosBox_ *demo_yolo();
-//extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
-
-const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
-                       "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
-                         "potted plant", "sheep", "sofa", "train", "tv monitor" };
-const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
-
-cv::Mat camImageCopy_;
-
-// define parameters
+//! Camera related parameters.
 std::string cameraTopicName_;
 const std::string opencvWindow_ = "YOLO object detection";
 int frameWidth_;
 int frameHeight_;
 int frameArea_;
-int frameCount_ = 0;
+int frameCount_;
+
+//! Class labels.
+const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
+                       "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
+                         "potted plant", "sheep", "sofa", "train", "tv monitor" };
+const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
+
+// initialize YOLO functions that are called in this script
+extern "C" RosBox_ *demo_yolo();
+//extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
 
 // define a function that will replace CvVideoCapture.
 // This function is called in yolo_kernels and allows YOLO to receive the ROS image
 // message as an IplImage
+cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
 {
    IplImage* ROS_img = new IplImage(camImageCopy_);

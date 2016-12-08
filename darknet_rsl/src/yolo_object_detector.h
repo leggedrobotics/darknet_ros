@@ -24,6 +24,10 @@
 #include <darknet_rsl/bbox.h>
 #include <string>
 
+extern "C" {
+  #include "box.h"
+}
+
 class YoloObjectDetector
 {
  public:
