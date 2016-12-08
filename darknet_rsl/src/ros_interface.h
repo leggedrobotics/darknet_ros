@@ -9,7 +9,7 @@
 IplImage* get_Ipl_image(void);
 
 typedef struct {
-  float x, y, w, h;
+  float x, y, w, h, prob;
   int num, Class;
 } ROS_box;
 

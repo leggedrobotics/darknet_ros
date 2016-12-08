@@ -12,6 +12,7 @@
 #include <math.h>
 #include <darknet_rsl/bbox_array.h>
 #include <darknet_rsl/bbox.h>
+#include <string>
 
 extern "C" {
   #include "box.h"
@@ -111,7 +112,9 @@ private:
          cv::Point topLeftCorner = cv::Point(xmin, ymin);
          cv::Point botRightCorner = cv::Point(xmax, ymax);
          cv::rectangle(input_frame, topLeftCorner, botRightCorner, bbox_color, 2);
-         cv::putText(input_frame, class_label, cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
+         std::ostringstream probability;
+         probability << class_boxes[i].prob;
+         cv::putText(input_frame, class_label + " (" + probability.str() + ")", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
                      1.0, bbox_color, 2.0);
       }
    }
@@ -140,6 +143,7 @@ private:
              {
                 _class_bboxes[j].push_back(_boxes[i]);
                 _class_obj_count[j]++;
+                std::cout << class_labels[_boxes[i].Class] << " (" << _boxes->prob << ")" << std::endl;
              }
           }
        }
