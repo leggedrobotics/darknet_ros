@@ -48,30 +48,30 @@ IplImage* get_ipl_image()
 
 class YoloObjectDetector
 {
-   ros::NodeHandle _nh;
-   image_transport::ImageTransport _it;
-   image_transport::Subscriber _image_sub;
-   ros::Publisher _found_object_pub;
-   ros::Publisher _bboxes_pub;
-   std::vector< std::vector<RosBox_> > _class_bboxes;
-   std::vector<int> _class_obj_count;
-   std::vector<cv::Scalar> _bbox_colors;
-   darknet_rsl::bbox_array _bbox_results_msg;
-   RosBox_* _boxes;
+   ros::NodeHandle nodeHandle_;
+   image_transport::ImageTransport imageTransport_;
+   image_transport::Subscriber imageSubscriber_;
+   ros::Publisher objectPublisher_;
+   ros::Publisher bboxesPublisher_;
+   std::vector< std::vector<RosBox_> > rosBoxes_;
+   std::vector<int> rosBoxCounter_;
+   std::vector<cv::Scalar> rosBoxColors_;
+   darknet_rsl::bbox_array bboxesResults_;
+   RosBox_* boxes_;
 
 public:
-   YoloObjectDetector() : _it(_nh), _class_bboxes(numClasses_), _class_obj_count(numClasses_, 0), _bbox_colors(numClasses_)
+   YoloObjectDetector() : imageTransport_(nodeHandle_), rosBoxes_(numClasses_), rosBoxCounter_(numClasses_, 0), rosBoxColors_(numClasses_)
    {
       int incr = floor(255/numClasses_);
       for (int i = 0; i < numClasses_; i++)
       {
-         _bbox_colors[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
+         rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
       }
 
-      _image_sub = _it.subscribe(cameraTopicName_, 1,
+      imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1,
 	                       &YoloObjectDetector::cameraCallback,this);
-      _found_object_pub = _nh.advertise<std_msgs::Int8>("found_object", 1);
-      _bboxes_pub = _nh.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
+      objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
+      bboxesPublisher_ = nodeHandle_.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
 
       cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
    }
@@ -82,32 +82,32 @@ public:
    }
 
 private:
-   void drawBBoxes(cv::Mat &input_frame, std::vector<RosBox_> &class_boxes, int &class_obj_count,
+   void drawBBoxes(cv::Mat &input_frame, std::vector<RosBox_> &classboxes_, int &class_obj_count,
 		   cv::Scalar &bbox_color, const std::string &class_label)
    {
       darknet_rsl::bbox bbox_result;
 
       for (int i = 0; i < class_obj_count; i++)
       {
-         int xmin = (class_boxes[i].x - class_boxes[i].w/2)*frameWidth_;
-         int ymin = (class_boxes[i].y - class_boxes[i].h/2)*frameHeight_;
-         int xmax = (class_boxes[i].x + class_boxes[i].w/2)*frameWidth_;
-         int ymax = (class_boxes[i].y + class_boxes[i].h/2)*frameHeight_;
+         int xmin = (classboxes_[i].x - classboxes_[i].w/2)*frameWidth_;
+         int ymin = (classboxes_[i].y - classboxes_[i].h/2)*frameHeight_;
+         int xmax = (classboxes_[i].x + classboxes_[i].w/2)*frameWidth_;
+         int ymax = (classboxes_[i].y + classboxes_[i].h/2)*frameHeight_;
 
          bbox_result.Class = class_label;
-         bbox_result.probability = class_boxes[i].prob;
+         bbox_result.probability = classboxes_[i].prob;
          bbox_result.xmin = xmin;
          bbox_result.ymin = ymin;
          bbox_result.xmax = xmax;
          bbox_result.ymax = ymax;
-         _bbox_results_msg.bboxes.push_back(bbox_result);
+         bboxesResults_.bboxes.push_back(bbox_result);
 
          // draw bounding box of first object found
          cv::Point topLeftCorner = cv::Point(xmin, ymin);
          cv::Point botRightCorner = cv::Point(xmax, ymax);
          cv::rectangle(input_frame, topLeftCorner, botRightCorner, bbox_color, 2);
          std::ostringstream probability;
-         probability << class_boxes[i].prob;
+         probability << classboxes_[i].prob;
          cv::putText(input_frame, class_label + " (" + probability.str() + ")", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
                      1.0, bbox_color, 2.0);
       }
@@ -118,10 +118,10 @@ private:
       cv::Mat input_frame = full_frame.clone();
 
       // run yolo and get bounding boxes for objects
-      _boxes = demo_yolo();
+      boxes_ = demo_yolo();
 
       // get the number of bounding boxes found
-      int num = _boxes[0].num;
+      int num = boxes_[0].num;
 
       // if at least one bbox found, draw box
       if (num > 0  && num <= 100)
@@ -133,11 +133,11 @@ private:
        {
           for (int j = 0; j < numClasses_; j++)
           {
-             if (_boxes[i].Class == j)
+             if (boxes_[i].Class == j)
              {
-                _class_bboxes[j].push_back(_boxes[i]);
-                _class_obj_count[j]++;
-                std::cout << classLabels_[_boxes[i].Class] << " (" << _boxes->prob << ")" << std::endl;
+                rosBoxes_[j].push_back(boxes_[i]);
+                rosBoxCounter_[j]++;
+                std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_->prob << ")" << std::endl;
              }
           }
        }
@@ -145,27 +145,27 @@ private:
        // send message that an object has been detected
        std_msgs::Int8 msg;
        msg.data = 1;
-       _found_object_pub.publish(msg);
+       objectPublisher_.publish(msg);
 
        for (int i = 0; i < numClasses_; i++)
        {
-         if (_class_obj_count[i] > 0) drawBBoxes(input_frame, _class_bboxes[i],
-                                                 _class_obj_count[i], _bbox_colors[i], classLabels_[i]);
+         if (rosBoxCounter_[i] > 0) drawBBoxes(input_frame, rosBoxes_[i],
+                                                 rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
        }
-       _bboxes_pub.publish(_bbox_results_msg);
-       _bbox_results_msg.bboxes.clear();
+       bboxesPublisher_.publish(bboxesResults_);
+       bboxesResults_.bboxes.clear();
       }
       else
       {
         std_msgs::Int8 msg;
         msg.data = 0;
-        _found_object_pub.publish(msg);
+        objectPublisher_.publish(msg);
       }
 
       for (int i = 0; i < numClasses_; i++)
       {
-         _class_bboxes[i].clear();
-         _class_obj_count[i] = 0;
+         rosBoxes_[i].clear();
+         rosBoxCounter_[i] = 0;
       }
 
       cv::imshow(opencvWindow_, input_frame);
