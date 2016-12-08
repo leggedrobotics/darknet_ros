@@ -98,6 +98,7 @@ if (CUDA_FOUND)
 
 	cuda_add_executable(${PROJECT_NAME}
 	  src/yolo_object_detector.cpp
+	  src/yolo_object_detector_node.cpp
 	
 	  src/gemm.c                    src/utils.c
 	  src/cuda.c                    src/deconvolutional_layer.c
@@ -185,6 +186,7 @@ else()
 	
 	add_executable(${PROJECT_NAME}
 	  src/yolo_object_detector.cpp
+	  src/yolo_object_detector_node.cpp
 	
 	  src/gemm.c                    src/utils.c
 	  src/cuda.c                    src/deconvolutional_layer.c
