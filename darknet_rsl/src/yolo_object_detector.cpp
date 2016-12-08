@@ -82,20 +82,20 @@ public:
    }
 
 private:
-   void drawBBoxes(cv::Mat &input_frame, std::vector<RosBox_> &classboxes_, int &class_obj_count,
-		   cv::Scalar &bbox_color, const std::string &class_label)
+   void drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
+		   cv::Scalar &rosBoxColor, const std::string &objectLabel)
    {
       darknet_rsl::bbox bbox_result;
 
-      for (int i = 0; i < class_obj_count; i++)
+      for (int i = 0; i < numberOfObjects; i++)
       {
-         int xmin = (classboxes_[i].x - classboxes_[i].w/2)*frameWidth_;
-         int ymin = (classboxes_[i].y - classboxes_[i].h/2)*frameHeight_;
-         int xmax = (classboxes_[i].x + classboxes_[i].w/2)*frameWidth_;
-         int ymax = (classboxes_[i].y + classboxes_[i].h/2)*frameHeight_;
+         int xmin = (rosBoxes[i].x - rosBoxes[i].w/2)*frameWidth_;
+         int ymin = (rosBoxes[i].y - rosBoxes[i].h/2)*frameHeight_;
+         int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
+         int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
 
-         bbox_result.Class = class_label;
-         bbox_result.probability = classboxes_[i].prob;
+         bbox_result.Class = objectLabel;
+         bbox_result.probability = rosBoxes[i].prob;
          bbox_result.xmin = xmin;
          bbox_result.ymin = ymin;
          bbox_result.xmax = xmax;
@@ -105,17 +105,17 @@ private:
          // draw bounding box of first object found
          cv::Point topLeftCorner = cv::Point(xmin, ymin);
          cv::Point botRightCorner = cv::Point(xmax, ymax);
-         cv::rectangle(input_frame, topLeftCorner, botRightCorner, bbox_color, 2);
+         cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
          std::ostringstream probability;
-         probability << classboxes_[i].prob;
-         cv::putText(input_frame, class_label + " (" + probability.str() + ")", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
-                     1.0, bbox_color, 2.0);
+         probability << rosBoxes[i].prob;
+         cv::putText(inputFrame, objectLabel + " (" + probability.str() + ")", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
+                     1.0, rosBoxColor, 2.0);
       }
    }
 
-   void runYOLO(cv::Mat &full_frame)
+   void runYolo(cv::Mat &fullFrame)
    {
-      cv::Mat input_frame = full_frame.clone();
+      cv::Mat input_frame = fullFrame.clone();
 
       // run yolo and get bounding boxes for objects
       boxes_ = demo_yolo();
@@ -149,7 +149,7 @@ private:
 
        for (int i = 0; i < numClasses_; i++)
        {
-         if (rosBoxCounter_[i] > 0) drawBBoxes(input_frame, rosBoxes_[i],
+         if (rosBoxCounter_[i] > 0) drawBoxes(input_frame, rosBoxes_[i],
                                                  rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
        }
        bboxesPublisher_.publish(bboxesResults_);
@@ -194,7 +194,7 @@ private:
 
          if (frameCount_ == 0)
          {
-            runYOLO(cam_image->image);
+            runYolo(cam_image->image);
             frameWidth_ = cam_image->image.size().width;
             frameHeight_ = cam_image->image.size().height;
          }
