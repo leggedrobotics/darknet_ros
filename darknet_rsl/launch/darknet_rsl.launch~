@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="darknet_rsl" type="darknet_rsl" name="darknet_rsl" output="screen">
+    <param name="cfg_path" 		value="$(find darknet_rsl)/cfg/tiny-yolo.cfg" />
+    <param name="weights_path" 		value="$(find darknet_rsl)/weights/tiny-yolo.weights" />
+    <param name="camera_topic_name" 	value="/camera/image_raw" />
+    <param name="object_threshold" 	value="0.2" />
+  </node>
+</launch>

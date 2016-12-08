@@ -22,11 +22,6 @@ extern "C" {
 extern "C" ROS_box *demo_yolo();
 extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
 
-// define demo_yolo inputs
-char *cfg = "/home/markob/any_ws/src/darknet_rsl/darknet_rsl/cfg/tiny-yolo.cfg";
-char *weights = "/home/markob/any_ws/src/darknet_rsl/darknet_rsl/weights/tiny-yolo.weights";
-float thresh = 0.2;
-
 const std::string class_labels[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
 		     	             "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
 		                     "potted plant", "sheep", "sofa", "train", "tv monitor" };
@@ -35,7 +30,7 @@ const int num_classes = sizeof(class_labels)/sizeof(class_labels[0]);
 cv::Mat cam_image_copy;
 
 // define parameters
-const std::string CAMERA_TOPIC_NAME = "/camera/image_raw";
+std::string CAMERA_TOPIC_NAME;
 //const std::string CAMERA_WIDTH_PARAM = "/camera/image_width";
 //const std::string CAMERA_HEIGHT_PARAM = "/camera/image_height";
 const std::string OPENCV_WINDOW = "YOLO object detection";
@@ -215,6 +210,17 @@ private:
 int main(int argc, char** argv)
 {
    ros::init(argc, argv, "ros_interface");
+
+   std::string param;
+   float thresh;
+   ros::param::get("/darknet_rsl/object_threshold", thresh);
+   ros::param::get("/darknet_rsl/camera_topic_name", CAMERA_TOPIC_NAME);
+   ros::param::get("/darknet_rsl/weights_path", param);
+   char *weights = new char[param.length() + 1];
+   strcpy(weights, param.c_str());
+   ros::param::get("/darknet_rsl/cfg_path", param);
+   char *cfg = new char[param.length() + 1];
+   strcpy(cfg, param.c_str());
 
    //ros::param::get(CAMERA_WIDTH_PARAM, FRAME_W);
    //ros::param::get(CAMERA_HEIGHT_PARAM, FRAME_H);
