@@ -6,11 +6,11 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/gpu/gpu.hpp>
 
-IplImage* get_Ipl_image(void);
+IplImage* get_ipl_image(void);
 
 typedef struct {
   float x, y, w, h, prob;
   int num, Class;
-} ROS_box;
+} RosBox_;
 
 #endif

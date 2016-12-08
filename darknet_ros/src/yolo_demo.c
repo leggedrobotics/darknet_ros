@@ -34,7 +34,7 @@ static float demo_thresh = 0;
 
 void *fetch_in_thread(void *ptr)
 {
-    IplImage* ROS_img = get_Ipl_image();
+    IplImage* ROS_img = get_ipl_image();
     in = get_image_from_stream(ROS_img);
     //in = get_image_from_stream(cap);
     in_s = resize_image(in, net.w, net.h);

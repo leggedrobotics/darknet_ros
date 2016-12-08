@@ -18,7 +18,7 @@ extern "C" {
 }
 
 // initialize YOLO functions that are called in this script
-extern "C" ROS_box *demo_yolo();
+extern "C" RosBox_ *demo_yolo();
 extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
 
 // define demo_yolo inputs
@@ -46,7 +46,7 @@ int FRAME_COUNT = 0;
 // define a function that will replace CvVideoCapture.
 // This function is called in yolo_kernels and allows YOLO to receive the ROS image
 // message as an IplImage
-IplImage* get_Ipl_image()
+IplImage* get_ipl_image()
 {
    IplImage* ROS_img = new IplImage(cam_image_copy);
    return ROS_img;
@@ -59,11 +59,11 @@ class yoloObjectDetector
    image_transport::Subscriber _image_sub;
    ros::Publisher _found_object_pub;
    ros::Publisher _bboxes_pub;
-   std::vector< std::vector<ROS_box> > _class_bboxes;
+   std::vector< std::vector<RosBox_> > _class_bboxes;
    std::vector<int> _class_obj_count;
    std::vector<cv::Scalar> _bbox_colors;
    darknet_ros::bbox_array _bbox_results_msg;
-   ROS_box* _boxes;
+   RosBox_* _boxes;
 
 public:
    yoloObjectDetector() : _it(_nh), _class_bboxes(num_classes), _class_obj_count(num_classes, 0), _bbox_colors(num_classes)
@@ -88,7 +88,7 @@ public:
    }
 
 private:
-   void drawBBoxes(cv::Mat &input_frame, std::vector<ROS_box> &class_boxes, int &class_obj_count,
+   void drawBBoxes(cv::Mat &input_frame, std::vector<RosBox_> &class_boxes, int &class_obj_count,
 		   cv::Scalar &bbox_color, const std::string &class_label)
    {
       darknet_ros::bbox bbox_result;

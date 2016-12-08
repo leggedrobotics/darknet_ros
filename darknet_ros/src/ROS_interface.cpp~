@@ -14,7 +14,7 @@ char *weights = "/home/markob/git/darknet/tiny-yolo.weights";
 float thresh = 0.2;
 const std::string CAMERA_TOPIC_NAME = "/usb_cam/image_raw";
 
-IplImage* get_Ipl_image()
+IplImage* get_ipl_image()
 {
    IplImage* ROS_img = new IplImage(cam_image_copy);
    return ROS_img;

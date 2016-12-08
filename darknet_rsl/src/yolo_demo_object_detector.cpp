@@ -33,11 +33,11 @@ static image det_s;
 static float fps = 0;
 static float demo_thresh = 0;
 
-static ROS_box *ROI_boxes;
+static RosBox_ *ROI_boxes;
 
 void *fetch_in_thread(void *ptr)
 {
-  IplImage* ROS_img = get_Ipl_image();
+  IplImage* ROS_img = get_ipl_image();
   in = ipl_to_image(ROS_img);
   delete ROS_img;
   ROS_img = NULL;
@@ -133,12 +133,12 @@ extern "C" void load_network(char *cfgfile, char *weightfile, float thresh)
   int j;
 
   boxes = (box *)calloc(l.side*l.side*l.n, sizeof(box));
-  ROI_boxes = (ROS_box *)calloc(l.side*l.side*l.n, sizeof(ROS_box));
+  ROI_boxes = (RosBox_ *)calloc(l.side*l.side*l.n, sizeof(RosBox_));
   probs = (float **)calloc(l.side*l.side*l.n, sizeof(float *));
   for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
 }
 
-extern "C" ROS_box *demo_yolo()
+extern "C" RosBox_ *demo_yolo()
 {
   pthread_t fetch_thread;
   pthread_t detect_thread;

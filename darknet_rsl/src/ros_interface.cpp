@@ -14,7 +14,7 @@ char *weights = "/home/markob/any_ws/src/darknet_rsl/darknet_rsl/weights/tiny-yo
 float thresh = 0.2;
 const std::string CAMERA_TOPIC_NAME = "/camera/image_raw";
 
-IplImage* get_Ipl_image(void)
+IplImage* get_ipl_image(void)
 {
    IplImage* ROS_img = new IplImage(cam_image_copy);
    return ROS_img;

@@ -38,7 +38,7 @@ static float demo_thresh = 0;
 
 void *fetch_in_thread(void *ptr)
 {
-   IplImage* ROS_img = get_Ipl_image();
+   IplImage* ROS_img = get_ipl_image();
    in = ipl_to_image(ROS_img);
    delete ROS_img;
    ROS_img = NULL;

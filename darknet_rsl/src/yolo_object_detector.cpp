@@ -19,82 +19,80 @@ extern "C" {
 }
 
 // initialize YOLO functions that are called in this script
-extern "C" ROS_box *demo_yolo();
+extern "C" RosBox_ *demo_yolo();
 extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
 
-const std::string class_labels[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
+const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
 		     	             "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
 		                     "potted plant", "sheep", "sofa", "train", "tv monitor" };
-const int num_classes = sizeof(class_labels)/sizeof(class_labels[0]);
+const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
 
-cv::Mat cam_image_copy;
+cv::Mat camImageCopy_;
 
 // define parameters
-std::string CAMERA_TOPIC_NAME;
-//const std::string CAMERA_WIDTH_PARAM = "/camera/image_width";
-//const std::string CAMERA_HEIGHT_PARAM = "/camera/image_height";
-const std::string OPENCV_WINDOW = "YOLO object detection";
-int FRAME_W;
-int FRAME_H;
-int FRAME_AREA;
-int FRAME_COUNT = 0;
+std::string cameraTopicName_;
+const std::string opencvWindow_ = "YOLO object detection";
+int frameWidth_;
+int frameHeight_;
+int frameArea_;
+int frameCount_ = 0;
 
 // define a function that will replace CvVideoCapture.
 // This function is called in yolo_kernels and allows YOLO to receive the ROS image
 // message as an IplImage
-IplImage* get_Ipl_image()
+IplImage* get_ipl_image()
 {
-   IplImage* ROS_img = new IplImage(cam_image_copy);
+   IplImage* ROS_img = new IplImage(camImageCopy_);
    return ROS_img;
 }
 
-class yoloObjectDetector
+class YoloObjectDetector
 {
    ros::NodeHandle _nh;
    image_transport::ImageTransport _it;
    image_transport::Subscriber _image_sub;
    ros::Publisher _found_object_pub;
    ros::Publisher _bboxes_pub;
-   std::vector< std::vector<ROS_box> > _class_bboxes;
+   std::vector< std::vector<RosBox_> > _class_bboxes;
    std::vector<int> _class_obj_count;
    std::vector<cv::Scalar> _bbox_colors;
    darknet_rsl::bbox_array _bbox_results_msg;
-   ROS_box* _boxes;
+   RosBox_* _boxes;
 
 public:
-   yoloObjectDetector() : _it(_nh), _class_bboxes(num_classes), _class_obj_count(num_classes, 0), _bbox_colors(num_classes)
+   YoloObjectDetector() : _it(_nh), _class_bboxes(numClasses_), _class_obj_count(numClasses_, 0), _bbox_colors(numClasses_)
    {
-      int incr = floor(255/num_classes);
-      for (int i = 0; i < num_classes; i++)
+      int incr = floor(255/numClasses_);
+      for (int i = 0; i < numClasses_; i++)
       {
          _bbox_colors[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
       }
 
-      _image_sub = _it.subscribe(CAMERA_TOPIC_NAME, 1,
-	                       &yoloObjectDetector::cameraCallback,this);
+      _image_sub = _it.subscribe(cameraTopicName_, 1,
+	                       &YoloObjectDetector::cameraCallback,this);
       _found_object_pub = _nh.advertise<std_msgs::Int8>("found_object", 1);
       _bboxes_pub = _nh.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
 
-      cv::namedWindow(OPENCV_WINDOW, cv::WINDOW_NORMAL);
+      cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
    }
 
-   ~yoloObjectDetector()
+   ~YoloObjectDetector()
    {
-      cv::destroyWindow(OPENCV_WINDOW);
+      cv::destroyWindow(opencvWindow_);
    }
 
 private:
-   void drawBBoxes(cv::Mat &input_frame, std::vector<ROS_box> &class_boxes, int &class_obj_count,
+   void drawBBoxes(cv::Mat &input_frame, std::vector<RosBox_> &class_boxes, int &class_obj_count,
 		   cv::Scalar &bbox_color, const std::string &class_label)
    {
       darknet_rsl::bbox bbox_result;
 
       for (int i = 0; i < class_obj_count; i++)
       {
-         int xmin = (class_boxes[i].x - class_boxes[i].w/2)*FRAME_W;
-         int ymin = (class_boxes[i].y - class_boxes[i].h/2)*FRAME_H;
-         int xmax = (class_boxes[i].x + class_boxes[i].w/2)*FRAME_W;
-         int ymax = (class_boxes[i].y + class_boxes[i].h/2)*FRAME_H;
+         int xmin = (class_boxes[i].x - class_boxes[i].w/2)*frameWidth_;
+         int ymin = (class_boxes[i].y - class_boxes[i].h/2)*frameHeight_;
+         int xmax = (class_boxes[i].x + class_boxes[i].w/2)*frameWidth_;
+         int ymax = (class_boxes[i].y + class_boxes[i].h/2)*frameHeight_;
 
          bbox_result.Class = class_label;
          bbox_result.probability = class_boxes[i].prob;
@@ -133,13 +131,13 @@ private:
         // split bounding boxes by class
        for (int i = 0; i < num; i++)
        {
-          for (int j = 0; j < num_classes; j++)
+          for (int j = 0; j < numClasses_; j++)
           {
              if (_boxes[i].Class == j)
              {
                 _class_bboxes[j].push_back(_boxes[i]);
                 _class_obj_count[j]++;
-                std::cout << class_labels[_boxes[i].Class] << " (" << _boxes->prob << ")" << std::endl;
+                std::cout << classLabels_[_boxes[i].Class] << " (" << _boxes->prob << ")" << std::endl;
              }
           }
        }
@@ -149,10 +147,10 @@ private:
        msg.data = 1;
        _found_object_pub.publish(msg);
 
-       for (int i = 0; i < num_classes; i++)
+       for (int i = 0; i < numClasses_; i++)
        {
          if (_class_obj_count[i] > 0) drawBBoxes(input_frame, _class_bboxes[i],
-                                                 _class_obj_count[i], _bbox_colors[i], class_labels[i]);
+                                                 _class_obj_count[i], _bbox_colors[i], classLabels_[i]);
        }
        _bboxes_pub.publish(_bbox_results_msg);
        _bbox_results_msg.bboxes.clear();
@@ -164,13 +162,13 @@ private:
         _found_object_pub.publish(msg);
       }
 
-      for (int i = 0; i < num_classes; i++)
+      for (int i = 0; i < numClasses_; i++)
       {
          _class_bboxes[i].clear();
          _class_obj_count[i] = 0;
       }
 
-      cv::imshow(OPENCV_WINDOW, input_frame);
+      cv::imshow(opencvWindow_, input_frame);
       cv::waitKey(3);
    }
 
@@ -192,16 +190,16 @@ private:
 
       if (cam_image)
       {
-         cam_image_copy = cam_image->image.clone();
+         camImageCopy_ = cam_image->image.clone();
 
-         if (FRAME_COUNT == 0)
+         if (frameCount_ == 0)
          {
             runYOLO(cam_image->image);
-            FRAME_W = cam_image->image.size().width;
-            FRAME_H = cam_image->image.size().height;
+            frameWidth_ = cam_image->image.size().width;
+            frameHeight_ = cam_image->image.size().height;
          }
-         //FRAME_COUNT++;
-         if (FRAME_COUNT == 1) FRAME_COUNT = 0;
+         //frameCount_++;
+         if (frameCount_ == 1) frameCount_ = 0;
       }
       return;
    }
@@ -214,7 +212,7 @@ int main(int argc, char** argv)
    std::string param;
    float thresh;
    ros::param::get("/darknet_rsl/object_threshold", thresh);
-   ros::param::get("/darknet_rsl/camera_topic_name", CAMERA_TOPIC_NAME);
+   ros::param::get("/darknet_rsl/camera_topic_name", cameraTopicName_);
    ros::param::get("/darknet_rsl/weights_path", param);
    char *weights = new char[param.length() + 1];
    strcpy(weights, param.c_str());
@@ -222,12 +220,9 @@ int main(int argc, char** argv)
    char *cfg = new char[param.length() + 1];
    strcpy(cfg, param.c_str());
 
-   //ros::param::get(CAMERA_WIDTH_PARAM, FRAME_W);
-   //ros::param::get(CAMERA_HEIGHT_PARAM, FRAME_H);
-
    load_network(cfg, weights, thresh);
 
-   yoloObjectDetector yod;
+   YoloObjectDetector yod;
    ros::spin();
    return 0;
 }
