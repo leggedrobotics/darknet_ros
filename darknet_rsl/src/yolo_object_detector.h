@@ -34,7 +34,7 @@ class YoloObjectDetector
   /*!
    * Constructor.
    */
-  YoloObjectDetector(std::string cameraTopicName);
+  YoloObjectDetector(ros::NodeHandle nh);
 
   /*!
    * Destructor.
@@ -60,7 +60,6 @@ class YoloObjectDetector
    */
   void runYolo(cv::Mat &fullFrame);
 
-
   /*!
    * Callback of camera.
    * @param[in] msg image pointer.
@@ -84,4 +83,10 @@ class YoloObjectDetector
   std::vector<cv::Scalar> rosBoxColors_;
   darknet_rsl::bbox_array bboxesResults_;
   RosBox_* boxes_;
+
+  //! Camera related parameters.
+  std::string cameraTopicName_;
+  const std::string opencvWindow_;
+  int frameWidth_;
+  int frameHeight_;
 };
