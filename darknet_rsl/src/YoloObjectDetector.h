@@ -1,5 +1,5 @@
 /*
- * yolo_object_detector.hpp
+ * YoloObjectDetector.h
  *
  *  Created on: Dec 08, 2016
  *      Author: Marko, Bjelonic

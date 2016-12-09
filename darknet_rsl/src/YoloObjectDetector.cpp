@@ -1,4 +1,4 @@
-#include "yolo_object_detector.h"
+#include "YoloObjectDetector.h"
 
 //! Initialize YOLO functions that are called in this script.
 extern "C" RosBox_ *demo_yolo();

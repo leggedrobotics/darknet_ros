@@ -12,8 +12,8 @@ ros_interface.cpp replaces the darknet.c executable and acts as the ROS entry po
 
 To use: Modify ros_interface.cpp with the correct path to your yolo-tiny.weights and change the /usb_cam/image_raw topic to your camera topic.  Compile normally with catkin_make and run with "rosrun darknet_ros ros_interface".
 
-NEW: yolo_object_detector.cpp gives you full control of the output of YOLO.  This ROS node extracts the bounding box coordinates from the YOLO source code and annotates the images itself.  It publishes two topics: /found_object displays "1" or "0" corresponding to whether or not an object has been detected, and /YOLO_bboxes displays the class label that was detected followed by the bbox coordinates [xmin, ymin, xmax, ymax]. 
+NEW: YoloObjectDetector.cpp gives you full control of the output of YOLO.  This ROS node extracts the bounding box coordinates from the YOLO source code and annotates the images itself.  It publishes two topics: /found_object displays "1" or "0" corresponding to whether or not an object has been detected, and /YOLO_bboxes displays the class label that was detected followed by the bbox coordinates [xmin, ymin, xmax, ymax]. 
 
-To use: Modify yolo_object_detector.cpp with the correct path to your yolo-tiny.weights and yolo-tiny.cfg file, change the /usb_cam/image_raw topic to your camera topic, and change the class_labels[] array with your desired labels.  Run with "rosrun darknet_ros yolo_object_detector".
+To use: Modify YoloObjectDetector.cpp with the correct path to your yolo-tiny.weights and yolo-tiny.cfg file, change the /usb_cam/image_raw topic to your camera topic, and change the class_labels[] array with your desired labels.  Run with "rosrun darknet_ros yolo_object_detector".
 
 

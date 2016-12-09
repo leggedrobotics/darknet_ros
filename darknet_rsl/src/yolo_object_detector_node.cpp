@@ -7,7 +7,7 @@
  */
 
 #include <ros/ros.h>
-#include "yolo_object_detector.h"
+#include "YoloObjectDetector.h"
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "ros_interface");
