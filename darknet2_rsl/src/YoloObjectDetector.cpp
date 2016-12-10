@@ -181,6 +181,15 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     runYolo(cam_image->image);
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
+
+    //int frameWidth = cam_image->image.size().width;
+    //int frameHeight = cam_image->image.size().height;
+    //cv::Rect myRoi((int)(frameWidth*0.14), (int)(frameHeight*0.01), (int)(frameWidth*0.75), (int)(frameHeight*0.99));
+    //cv::Mat cropedImage = cam_image->image(myRoi);
+    //frameWidth_ = cropedImage.size().width;
+    //frameHeight_ = cropedImage.size().height;
+    //camImageCopy_ = cropedImage.clone();
+    //runYolo(cropedImage);
   }
   return;
 }
