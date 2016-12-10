@@ -12,7 +12,7 @@ extern "C" {
 #include <sys/time.h>
 }
 
-#define FRAMES 3
+#define FRAMES 1
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui.hpp"
@@ -121,12 +121,17 @@ extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, fl
 	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
 	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
 
-
+	cvNamedWindow("YOLO V2", CV_WINDOW_NORMAL);
+	cvMoveWindow("YOLO V2", 0, 0);
+	cvResizeWindow("YOLO V2", 1352, 1013);
 }
 
-//extern "C" void demo_yolo(char *cfgfile, char *weightfile, float thresh)
 extern "C" void demo_yolo()
 {
+	int j;
+	char *prefix = 0;
+	int frame_skip = 20;
+	int delay = frame_skip;
 	pthread_t fetch_thread;
 	pthread_t detect_thread;
 
@@ -140,28 +145,35 @@ extern "C" void demo_yolo()
 	det = in;
 	det_s = in_s;
 
+	for(j = 0; j < FRAMES/2; ++j){
+		fetch_in_thread(0);
+		detect_in_thread(0);
+		disp = det;
+		det = in;
+		det_s = in_s;
+	}
+
 	struct timeval tval_before, tval_after, tval_result;
 	gettimeofday(&tval_before, NULL);
 	if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
 	if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
-	show_image(disp, "YOLO");
+	show_image(disp, "YOLO V2");
 	free_image(disp);
 	cvWaitKey(1);
 	pthread_join(fetch_thread, 0);
 	pthread_join(detect_thread, 0);
 
-    disp  = det;
-    det   = in;
-    det_s = in_s;
+	disp  = det;
+	det   = in;
+	det_s = in_s;
+	free_image(in);
+	free_image(in_s);
+	free_image(disp);
 
-    free_image(in);
-    free_image(in_s);
-    free_image(disp);
-
-    gettimeofday(&tval_after, NULL);
-    timersub(&tval_after, &tval_before, &tval_result);
-    float curr = 1000000.f/((long int)tval_result.tv_usec);
-    fps = .9*fps + .1*curr;
+	gettimeofday(&tval_after, NULL);
+	timersub(&tval_after, &tval_before, &tval_result);
+	float curr = 1000000.f/((long int)tval_result.tv_usec);
+	fps = .9*fps + .1*curr;
 
 }
 #else
