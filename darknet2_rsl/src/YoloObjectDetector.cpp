@@ -2,7 +2,7 @@
 
 //! Initialize YOLO functions that are called in this script.
 extern "C" RosBox_ *demo_yolo();
-extern "C" void load_network(char *cfgfile, char *weightfile, float thresh);
+extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
 
 /*!
  * This function is called in yolo_kernels and allows YOLO to receive the ROS image.
@@ -27,10 +27,10 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
      rosBoxes_(numClasses_),
      rosBoxCounter_(numClasses_, 0),
      rosBoxColors_(numClasses_),
-     opencvWindow_("YOLO object detection")
+     opencvWindow_("YOLO V2 object detection")
 {
   // Initialize name of camera topic.
-  ros::param::get("/darknet_rsl/camera_topic_name", cameraTopicName_);
+  ros::param::get("/darknet2_rsl/camera_topic_name", cameraTopicName_);
 
   // Initialize color of bounding boxes of different object classes.
   int incr = floor(255/numClasses_);
@@ -49,7 +49,10 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   ros::param::get("/darknet2_rsl/cfg_path", param);
   char *cfg = new char[param.length() + 1];
   strcpy(cfg, param.c_str());
-  load_network(cfg, weights, thresh);
+  ros::param::get("/darknet2_rsl/data_path", param);
+  char *data = new char[param.length() + 1];
+  strcpy(data, param.c_str());
+  load_network(cfg, weights, data, thresh);
 
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
@@ -57,6 +60,8 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   bboxesPublisher_ = nodeHandle_.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
 
   cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
+  cv::moveWindow(opencvWindow_, 0, 0);
+  cv::resizeWindow(opencvWindow_, 1352, 1013);
 }
 
 YoloObjectDetector::~YoloObjectDetector()
@@ -89,8 +94,8 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
      cv::Point botRightCorner = cv::Point(xmax, ymax);
      cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
      std::ostringstream probability;
-     probability << rosBoxes[i].prob;
-     cv::putText(inputFrame, objectLabel + " (" + probability.str() + ")", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
+     probability << rosBoxes[i].prob*100;
+     cv::putText(inputFrame, objectLabel + " (" + probability.str() + "%)", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
                  1.0, rosBoxColor, 2.0);
   }
 }
@@ -119,7 +124,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
          {
             rosBoxes_[j].push_back(boxes_[i]);
             rosBoxCounter_[j]++;
-            std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_->prob << ")" << std::endl;
+            std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_->prob*100 << "%)" << std::endl;
          }
       }
    }

@@ -191,10 +191,9 @@ else()
 	add_executable(${PROJECT_NAME}
 	  src/YoloObjectDetector.cpp
 	  src/yolo_object_detector_node.cpp
-	  src/yolo_obj_detector.c
 	  src/yolo_demo_object_detector.cpp
 	
-	  src/gemm.c 			src/utils.c 
+	  src/gemm.c 			src/utils.c
 	  src/cuda.c			src/convolutional_layer.c 
 	  src/list.c 			src/image.c
 	  src/activations.c		src/im2col.c
@@ -209,19 +208,19 @@ else()
 	  src/route_layer.c 		src/writing.c
 	  src/box.c			src/nightmare.c
 	  src/normalization_layer.c 	src/avgpool_layer.c 
-	  src/reorg_layer.c		src/dice.c 
-	  src/voxel.c 			src/region_layer.c
+	  src/coco.c 			src/dice.c 
+	  src/yolo.c 			src/coco_demo.c
 	  src/layer.c			src/compare.c 
 	  src/classifier.c 		src/local_layer.c
  	  src/swag.c 			src/shortcut_layer.c 
 	  src/activation_layer.c	src/rnn_layer.c 
 	  src/gru_layer.c		src/rnn.c
 	  src/rnn_vid.c			src/crnn_layer.c
-	  src/super.c 			src/tag.c 
+	  src/voxel.c			src/tag.c 
 	  src/cifar.c 			src/go.c 
 	  src/batchnorm_layer.c 	src/art.c
-	   		
-	   			 	
+	  src/region_layer.c 		src/reorg_layer.c 
+	  src/super.c		 	
 	)
 
 	target_link_libraries(ros_interface
