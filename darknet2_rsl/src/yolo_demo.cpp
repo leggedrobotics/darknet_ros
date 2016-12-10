@@ -96,9 +96,9 @@ double get_wall_time()
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-extern "C" void load_network(char *cfgfile, char *weightfile, float thresh)
+extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh)
 {
-	image **alphabet = load_alphabet();
+	image **alphabet = load_alphabet_with_file(datafile);
 	demo_alphabet = alphabet;
 	demo_thresh = thresh;
 	printf("Demo\n");

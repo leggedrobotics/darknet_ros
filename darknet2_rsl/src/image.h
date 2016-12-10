@@ -72,6 +72,7 @@ image copy_image(image p);
 image load_image(char *filename, int w, int h, int c);
 image load_image_color(char *filename, int w, int h);
 image **load_alphabet();
+image **load_alphabet_with_file(char *datafile);
 
 float get_pixel(image m, int x, int y, int c);
 float get_pixel_extend(image m, int x, int y, int c);
