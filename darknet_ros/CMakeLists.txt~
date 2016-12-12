@@ -26,7 +26,7 @@ generate_messages(
 set(
     CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
-    -O3 -gencode arch=compute_61,code=sm_61
+    -O3 -gencode arch=compute_53,code=sm_53
     )
 
 add_definitions(-DGPU -DOPENCV)

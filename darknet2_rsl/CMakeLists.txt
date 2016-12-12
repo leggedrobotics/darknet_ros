@@ -4,19 +4,24 @@ project(darknet2_rsl)
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)
 	find_package(CUDA REQUIRED)
-	message(STATUS "CUDA Version: " ${CUDA_VERSION_STRINGS})
-	message(STATUS "CUDA Libararies: " ${CUDA_LIBRARIES})
-	include_directories(SYSTEM ${CUDA_INCLUDE_DIRS})
-	list(APPEND LIBRARIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusparse_LIBRARY})
-	list(APPEND CUDA_NVCC_FLAGS "-std=c++11;-O2;-Xcompiler \"-fPIC\" ")
-	list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_20,code=compute_20 ")
-	list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_30,code=compute_30 ")
-	list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_35,code=compute_35 ")
-	list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_50,code=compute_50 ")
-	list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_52,code=compute_52 ")
-	set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+	#message(STATUS "CUDA Version: " ${CUDA_VERSION_STRINGS})
+	#message(STATUS "CUDA Libararies: " ${CUDA_LIBRARIES})
+	#include_directories(SYSTEM ${CUDA_INCLUDE_DIRS})
+	#list(APPEND LIBRARIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusparse_LIBRARY})
+	#list(APPEND CUDA_NVCC_FLAGS "-std=c++11;-O2;-Xcompiler \"-fPIC\" ")
+	#list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_20,code=compute_20 ")
+	#list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_30,code=compute_30 ")
+	#list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_35,code=compute_35 ")
+	#list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_50,code=compute_50 ")
+	#list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_52,code=compute_52 ")
+	#set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+	set(
+		CUDA_NVCC_FLAGS
+		${CUDA_NVCC_FLAGS};
+		-O3 -gencode arch=compute_61,code=sm_61
+	)
 	add_definitions(-DGPU)
-	cuda_include_directories(src)
+	#cuda_include_directories(src)
 else()
 	list(APPEND LIBRARIES "m")
 endif()
@@ -48,12 +53,14 @@ catkin_package(
 	CATKIN_DEPENDS message_runtime
 )
 
-include_directories(
-	src
-	${catkin_INCLUDE_DIRS}
-)
 
 if (CUDA_FOUND)
+	include_directories(
+		/usr/local/cuda/include
+		src
+		${catkin_INCLUDE_DIRS}
+	)
+
 	link_directories(
   		/usr/local/cuda/lib64
 	)
@@ -163,6 +170,11 @@ if (CUDA_FOUND)
 	   ${catkin_LIBRARIES}
 	)
 else()
+	include_directories(
+		src
+		${catkin_INCLUDE_DIRS}
+	)
+
 	add_executable(ros_interface 
 		src/ros_interface.cpp
 		src/yolo_demo.cpp
