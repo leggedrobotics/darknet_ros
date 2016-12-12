@@ -177,6 +177,10 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
   if (cam_image)
   {
+    //cv::Point2f src_center(cam_image->image.cols/2.0F, cam_image->image.rows/2.0F);
+    //cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+    //cv::Mat dst;
+    //cv::warpAffine(cam_image->image, dst, rot_mat, cam_image->image.size());
     camImageCopy_ = cam_image->image.clone();
     runYolo(cam_image->image);
     frameWidth_ = cam_image->image.size().width;
