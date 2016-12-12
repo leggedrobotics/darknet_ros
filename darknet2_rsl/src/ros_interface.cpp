@@ -9,9 +9,9 @@ extern "C" void demo_yolo();
 extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
 
 cv::Mat cam_image_copy;
-char *cfg = "/home/markob/any_ws/src/darknet_rsl/darknet2_rsl/cfg/tiny-yolo-voc.cfg";
-char *weights = "/home/markob/any_ws/src/darknet_rsl/darknet2_rsl/weights/tiny-yolo-voc.weights";
-char *data = "/home/markob/any_ws/src/darknet_rsl/darknet2_rsl/data";
+char *cfg = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet2_rsl/cfg/tiny-yolo-voc.cfg";
+char *weights = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet2_rsl/weights/tiny-yolo-voc.weights";
+char *data = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet2_rsl/data";
 float thresh = 0.2;
 const std::string CAMERA_TOPIC_NAME = "/camera/image_raw";
 

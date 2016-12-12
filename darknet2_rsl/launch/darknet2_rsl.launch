@@ -1,7 +1,7 @@
 <launch>
   <node pkg="darknet2_rsl" type="darknet2_rsl" name="darknet2_rsl" output="screen">
-    <param name="cfg_path" 		value="$(find darknet2_rsl)/cfg/yolo-voc.cfg" />
-    <param name="weights_path" 		value="$(find darknet2_rsl)/weights/yolo-voc.weights" />
+    <param name="cfg_path" 		value="$(find darknet2_rsl)/cfg/tiny-yolo-voc.cfg" />
+    <param name="weights_path" 		value="$(find darknet2_rsl)/weights/tiny-yolo-voc.weights" />
     <param name="data_path" 		value="$(find darknet2_rsl)/data" />
     <param name="camera_topic_name" 	value="/camera/image_raw" />
     <param name="object_threshold" 	value="0.2" />
