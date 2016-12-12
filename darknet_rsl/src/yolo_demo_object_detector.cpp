@@ -1,3 +1,9 @@
+#ifdef GPU
+#include "cuda_runtime.h"
+#include "curand.h"
+#include "cublas_v2.h"
+#endif
+
 #include "ros_interface.h"
 #include <iostream>
 
