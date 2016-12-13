@@ -57,7 +57,7 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
-  bboxesPublisher_ = nodeHandle_.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
+  bboxesPublisher_ = nodeHandle_.advertise<darknet2_rsl::bbox_array>("YOLO_bboxes", 1);
 
   cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
   cv::moveWindow(opencvWindow_, 0, 0);
@@ -72,7 +72,7 @@ YoloObjectDetector::~YoloObjectDetector()
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
    cv::Scalar &rosBoxColor, const std::string &objectLabel)
 {
-  darknet_rsl::bbox bbox_result;
+  darknet2_rsl::bbox bbox_result;
 
   for (int i = 0; i < numberOfObjects; i++)
   {
