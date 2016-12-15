@@ -108,17 +108,17 @@ void *detect_in_thread(void *ptr)
       {
         float x_center = (xmin+xmax)/2;
         float y_center = (ymin+ymax)/2;
-        float bbox_width = xmax - xmin;
-        float bbox_height = ymax - ymin;
+        float BoundingBox_width = xmax - xmin;
+        float BoundingBox_height = ymax - ymin;
 
         // define bounding box
-        // bbox must be 1% size of frame (3.2x2.4 pixels)
-        if (bbox_width > 0.01 && bbox_height > 0.01)
+        // BoundingBox must be 1% size of frame (3.2x2.4 pixels)
+        if (BoundingBox_width > 0.01 && BoundingBox_height > 0.01)
         {
           ROI_boxes[count].x = x_center;
           ROI_boxes[count].y = y_center;
-          ROI_boxes[count].w = bbox_width;
-          ROI_boxes[count].h = bbox_height;
+          ROI_boxes[count].w = BoundingBox_width;
+          ROI_boxes[count].h = BoundingBox_height;
           ROI_boxes[count].Class = j;
           ROI_boxes[count].prob = probs[i][j];
           count++;

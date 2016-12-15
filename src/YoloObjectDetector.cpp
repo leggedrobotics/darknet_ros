@@ -57,7 +57,7 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
-  bboxesPublisher_ = nodeHandle_.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
+  boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_rsl::BoundingBoxes>("YOLO_BoundingBoxes", 1);
 
   cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
   cv::moveWindow(opencvWindow_, 0, 0);
@@ -72,7 +72,7 @@ YoloObjectDetector::~YoloObjectDetector()
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
    cv::Scalar &rosBoxColor, const std::string &objectLabel)
 {
-  darknet_rsl::bbox bbox_result;
+  darknet_rsl::BoundingBox boundingBox;
 
   for (int i = 0; i < numberOfObjects; i++)
   {
@@ -81,13 +81,13 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
      int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
      int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
 
-     bbox_result.Class = objectLabel;
-     bbox_result.probability = rosBoxes[i].prob;
-     bbox_result.xmin = xmin;
-     bbox_result.ymin = ymin;
-     bbox_result.xmax = xmax;
-     bbox_result.ymax = ymax;
-     bboxesResults_.bboxes.push_back(bbox_result);
+     boundingBox.Class = objectLabel;
+     boundingBox.probability = rosBoxes[i].prob;
+     boundingBox.xmin = xmin;
+     boundingBox.ymin = ymin;
+     boundingBox.xmax = xmax;
+     boundingBox.ymax = ymax;
+     boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
 
      // draw bounding box of first object found
      cv::Point topLeftCorner = cv::Point(xmin, ymin);
@@ -110,7 +110,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
   // get the number of bounding boxes found
   int num = boxes_[0].num;
 
-  // if at least one bbox found, draw box
+  // if at least one BoundingBox found, draw box
   if (num > 0  && num <= 100)
   {
     std::cout << "# Objects: " << num << std::endl;
@@ -139,8 +139,8 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
      if (rosBoxCounter_[i] > 0) drawBoxes(input_frame, rosBoxes_[i],
                                              rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
    }
-   bboxesPublisher_.publish(bboxesResults_);
-   bboxesResults_.bboxes.clear();
+   boundingBoxesPublisher_.publish(boundingBoxesResults_);
+   boundingBoxesResults_.boundingBoxes.clear();
   }
   else
   {
@@ -197,5 +197,3 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   }
   return;
 }
-
-

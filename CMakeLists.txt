@@ -28,8 +28,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
 	FILES
-	bbox.msg
-	bbox_array.msg
+	BoundingBox.msg
+	BoundingBoxes.msg
 )
 
 generate_messages(
@@ -46,7 +46,7 @@ catkin_package(
 if (CUDA_FOUND)
 	include_directories(
 		~/git/darknet/src
-		src
+		include
 		${catkin_INCLUDE_DIRS}
 	)
 
@@ -161,7 +161,7 @@ if (CUDA_FOUND)
 else()
 	include_directories(
 		~/git/darknet/src
-		src
+		include
 		${catkin_INCLUDE_DIRS}
 	)
 

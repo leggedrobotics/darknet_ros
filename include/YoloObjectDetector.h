@@ -20,8 +20,8 @@
 #include <pthread.h>
 #include <std_msgs/Int8.h>
 #include <math.h>
-#include <darknet_rsl/bbox_array.h>
-#include <darknet_rsl/bbox.h>
+#include <darknet_rsl/BoundingBoxes.h>
+#include <darknet_rsl/BoundingBox.h>
 #include <string>
 
 extern "C" {
@@ -75,13 +75,13 @@ class YoloObjectDetector
   //! ROS subscriber and publisher.
   image_transport::Subscriber imageSubscriber_;
   ros::Publisher objectPublisher_;
-  ros::Publisher bboxesPublisher_;
+  ros::Publisher boundingBoxesPublisher_;
 
   //! Detected objects.
   std::vector< std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
-  darknet_rsl::bbox_array bboxesResults_;
+  darknet_rsl::BoundingBoxes boundingBoxesResults_;
   RosBox_* boxes_;
 
   //! Camera related parameters.
