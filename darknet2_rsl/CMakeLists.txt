@@ -43,10 +43,9 @@ catkin_package(
 	CATKIN_DEPENDS message_runtime
 )
 
-
 if (CUDA_FOUND)
 	include_directories(
-		/usr/local/cuda/include
+		~/git/darknet/src
 		src
 		${catkin_INCLUDE_DIRS}
 	)
@@ -58,85 +57,84 @@ if (CUDA_FOUND)
 	cuda_add_executable(ros_interface 
 		src/ros_interface.cpp
 		src/yolo_demo.cpp
+		src/image_interface.c
 		
-		src/gemm.c 					src/utils.c
-		src/cuda.c					src/convolutional_layer.c 
-		src/list.c 					src/image.c
-		src/activations.c			src/im2col.c
-		src/col2im.c 				src/blas.c 
-		src/crop_layer.c 			src/dropout_layer.c
-		src/maxpool_layer.c			src/softmax_layer.c
-		src/data.c					src/matrix.c
-		src/network.c 				src/connected_layer.c
-		src/cost_layer.c			src/parser.c
-		src/option_list.c			src/tree.c 
-		src/detection_layer.c 		src/captcha.c
-		src/route_layer.c 			src/writing.c
-		src/box.c					src/nightmare.c
-		src/normalization_layer.c 	src/avgpool_layer.c 
-		src/coco.c 					src/dice.c 
-		src/yolo.c 					src/coco_demo.c
-		src/layer.c					src/compare.c 
-		src/classifier.c 			src/local_layer.c
-		src/swag.c 					src/shortcut_layer.c 
-		src/activation_layer.c		src/rnn_layer.c 
-		src/gru_layer.c				src/rnn.c
-		src/rnn_vid.c				src/crnn_layer.c
-		src/voxel.c					src/tag.c 
-		src/cifar.c 				src/go.c 
-		src/batchnorm_layer.c 		src/art.c
-		src/region_layer.c 			src/reorg_layer.c 
-		src/super.c	 	
+		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
+		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
+		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
+		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
+		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
+		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
+		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
+		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
+		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
+		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
+		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
+		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
+		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
+		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
+		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
+		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
+		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
+		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
+		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
+		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
+		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
+		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
+		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
+		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
+		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
+		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
+		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
+		~/git/darknet/src/super.c	 	
 	
-		src/convolutional_kernels.cu
-		src/activation_kernels.cu 		src/im2col_kernels.cu 
-		src/col2im_kernels.cu 			src/blas_kernels.cu 
-		src/crop_layer_kernels.cu 		src/dropout_layer_kernels.cu 
-		src/maxpool_layer_kernels.cu	src/avgpool_layer_kernels.cu
-		src/network_kernels.cu 			 
-		
+		~/git/darknet/src/convolutional_kernels.cu	~/git/darknet/src/network_kernels.cu
+		~/git/darknet/src/activation_kernels.cu 		~/git/darknet/src/im2col_kernels.cu 
+		~/git/darknet/src/col2im_kernels.cu 			~/git/darknet/src/blas_kernels.cu 
+		~/git/darknet/src/crop_layer_kernels.cu 		~/git/darknet/src/dropout_layer_kernels.cu 
+		~/git/darknet/src/maxpool_layer_kernels.cu	~/git/darknet/src/avgpool_layer_kernels.cu	
 	)
 
 	cuda_add_executable(${PROJECT_NAME}
 		src/YoloObjectDetector.cpp
 		src/yolo_object_detector_node.cpp
 		src/yolo_demo_object_detector.cpp
+		src/image_interface.c
 		
-		src/gemm.c 					src/utils.c
-		src/cuda.c					src/convolutional_layer.c 
-		src/list.c 					src/image.c
-		src/activations.c			src/im2col.c
-		src/col2im.c 				src/blas.c 
-		src/crop_layer.c 			src/dropout_layer.c
-		src/maxpool_layer.c			src/softmax_layer.c
-		src/data.c					src/matrix.c
-		src/network.c 				src/connected_layer.c
-		src/cost_layer.c			src/parser.c
-		src/option_list.c			src/tree.c 
-		src/detection_layer.c 		src/captcha.c
-		src/route_layer.c 			src/writing.c
-		src/box.c					src/nightmare.c
-		src/normalization_layer.c 	src/avgpool_layer.c 
-		src/coco.c 					src/dice.c 
-		src/yolo.c 					src/coco_demo.c
-		src/layer.c					src/compare.c 
-		src/classifier.c 			src/local_layer.c
-		src/swag.c 					src/shortcut_layer.c 
-		src/activation_layer.c		src/rnn_layer.c 
-		src/gru_layer.c				src/rnn.c
-		src/rnn_vid.c				src/crnn_layer.c
-		src/voxel.c					src/tag.c 
-		src/cifar.c 				src/go.c 
-		src/batchnorm_layer.c 		src/art.c
-		src/region_layer.c 			src/reorg_layer.c 
-		src/super.c  	
+		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
+		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
+		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
+		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
+		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
+		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
+		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
+		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
+		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
+		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
+		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
+		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
+		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
+		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
+		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
+		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
+		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
+		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
+		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
+		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
+		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
+		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
+		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
+		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
+		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
+		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
+		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
+		~/git/darknet/src/super.c	 	
 		
-		src/convolutional_kernels.cu
-		src/activation_kernels.cu 		src/im2col_kernels.cu 
-		src/col2im_kernels.cu 			src/blas_kernels.cu 
-		src/crop_layer_kernels.cu 		src/dropout_layer_kernels.cu 
-		src/maxpool_layer_kernels.cu	src/avgpool_layer_kernels.cu
-		src/network_kernels.cu 		
+		~/git/darknet/src/convolutional_kernels.cu	~/git/darknet/src/network_kernels.cu
+		~/git/darknet/src/activation_kernels.cu 		~/git/darknet/src/im2col_kernels.cu 
+		~/git/darknet/src/col2im_kernels.cu 			~/git/darknet/src/blas_kernels.cu 
+		~/git/darknet/src/crop_layer_kernels.cu 		~/git/darknet/src/dropout_layer_kernels.cu 
+		~/git/darknet/src/maxpool_layer_kernels.cu	~/git/darknet/src/avgpool_layer_kernels.cu	
 	)
 
 	target_link_libraries(ros_interface
@@ -149,6 +147,7 @@ if (CUDA_FOUND)
 	   curand
 	   ${catkin_LIBRARIES}
 	)
+
 	target_link_libraries(${PROJECT_NAME}
 	   m
 	   pthread
@@ -161,6 +160,7 @@ if (CUDA_FOUND)
 	)
 else()
 	include_directories(
+		~/git/darknet/src
 		src
 		${catkin_INCLUDE_DIRS}
 	)
@@ -168,70 +168,72 @@ else()
 	add_executable(ros_interface 
 		src/ros_interface.cpp
 		src/yolo_demo.cpp
+		src/image_interface.c
 		
-		src/gemm.c 					src/utils.c
-		src/cuda.c					src/convolutional_layer.c 
-		src/list.c 					src/image.c
-		src/activations.c			src/im2col.c
-		src/col2im.c 				src/blas.c 
-		src/crop_layer.c 			src/dropout_layer.c
-		src/maxpool_layer.c			src/softmax_layer.c
-		src/data.c					src/matrix.c
-		src/network.c 				src/connected_layer.c
-		src/cost_layer.c			src/parser.c
-		src/option_list.c			src/tree.c 
-		src/detection_layer.c 		src/captcha.c
-		src/route_layer.c 			src/writing.c
-		src/box.c					src/nightmare.c
-		src/normalization_layer.c 	src/avgpool_layer.c 
-		src/coco.c 					src/dice.c 
-		src/yolo.c 					src/coco_demo.c
-		src/layer.c					src/compare.c 
-		src/classifier.c 			src/local_layer.c
-		src/swag.c 					src/shortcut_layer.c 
-		src/activation_layer.c		src/rnn_layer.c 
-		src/gru_layer.c				src/rnn.c
-		src/rnn_vid.c				src/crnn_layer.c
-		src/voxel.c					src/tag.c 
-		src/cifar.c 				src/go.c 
-		src/batchnorm_layer.c 		src/art.c
-		src/region_layer.c 			src/reorg_layer.c 
-		src/super.c	 	
+		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
+		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
+		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
+		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
+		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
+		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
+		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
+		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
+		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
+		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
+		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
+		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
+		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
+		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
+		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
+		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
+		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
+		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
+		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
+		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
+		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
+		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
+		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
+		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
+		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
+		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
+		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
+		~/git/darknet/src/super.c	 	
 	)
 	
 	add_executable(${PROJECT_NAME}
 		src/YoloObjectDetector.cpp
 		src/yolo_object_detector_node.cpp
 		src/yolo_demo_object_detector.cpp
+		src/image_interface.c
 	
-		src/gemm.c 					src/utils.c
-		src/cuda.c					src/convolutional_layer.c 
-		src/list.c 					src/image.c
-		src/activations.c			src/im2col.c
-		src/col2im.c 				src/blas.c 
-		src/crop_layer.c 			src/dropout_layer.c
-		src/maxpool_layer.c			src/softmax_layer.c
-		src/data.c					src/matrix.c
-		src/network.c 				src/connected_layer.c
-		src/cost_layer.c			src/parser.c
-		src/option_list.c			src/tree.c 
-		src/detection_layer.c 		src/captcha.c
-		src/route_layer.c 			src/writing.c
-		src/box.c					src/nightmare.c
-		src/normalization_layer.c 	src/avgpool_layer.c 
-		src/coco.c 					src/dice.c 
-		src/yolo.c 					src/coco_demo.c
-		src/layer.c					src/compare.c 
-		src/classifier.c 			src/local_layer.c
-		src/swag.c 					src/shortcut_layer.c 
-		src/activation_layer.c		src/rnn_layer.c 
-		src/gru_layer.c				src/rnn.c
-		src/rnn_vid.c				src/crnn_layer.c
-		src/voxel.c					src/tag.c 
-		src/cifar.c 				src/go.c 
-		src/batchnorm_layer.c 		src/art.c
-		src/region_layer.c 			src/reorg_layer.c 
-		src/super.c  	
+		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
+		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
+		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
+		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
+		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
+		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
+		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
+		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
+		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
+		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
+		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
+		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
+		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
+		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
+		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
+		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
+		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
+		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
+		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
+		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
+		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
+		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
+		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
+		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
+		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
+		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
+		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
+		~/git/darknet/src/super.c  	
 	)
 
 	target_link_libraries(ros_interface
@@ -247,5 +249,4 @@ else()
 		stdc++
 		${catkin_LIBRARIES}
 	)
-
 endif()

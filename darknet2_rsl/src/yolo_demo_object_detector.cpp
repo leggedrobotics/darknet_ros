@@ -15,7 +15,7 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "image.h"
+#include "image_interface.h"
 #include <sys/time.h>
 }
 
@@ -30,7 +30,7 @@ extern "C" void draw_yolo(image im, int num, float thresh, box *boxes, float **p
 
 extern "C" char *voc_names;
 static image **demo_alphabet;
-extern "C" int demo_classes;
+int demo_classes = 20;
 
 static float **probs;
 static box *boxes;
