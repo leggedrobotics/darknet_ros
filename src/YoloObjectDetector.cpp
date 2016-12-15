@@ -30,7 +30,7 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
      opencvWindow_("YOLO V2 object detection")
 {
   // Initialize name of camera topic.
-  ros::param::get("/darknet2_rsl/camera_topic_name", cameraTopicName_);
+  ros::param::get("/darknet_rsl/camera_topic_name", cameraTopicName_);
 
   // Initialize color of bounding boxes of different object classes.
   int incr = floor(255/numClasses_);
@@ -42,14 +42,14 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   // Initialize deep network (darknet).
   std::string param;
   float thresh;
-  ros::param::get("/darknet2_rsl/object_threshold", thresh);
-  ros::param::get("/darknet2_rsl/weights_path", param);
+  ros::param::get("/darknet_rsl/object_threshold", thresh);
+  ros::param::get("/darknet_rsl/weights_path", param);
   char *weights = new char[param.length() + 1];
   strcpy(weights, param.c_str());
-  ros::param::get("/darknet2_rsl/cfg_path", param);
+  ros::param::get("/darknet_rsl/cfg_path", param);
   char *cfg = new char[param.length() + 1];
   strcpy(cfg, param.c_str());
-  ros::param::get("/darknet2_rsl/data_path", param);
+  ros::param::get("/darknet_rsl/data_path", param);
   char *data = new char[param.length() + 1];
   strcpy(data, param.c_str());
   load_network(cfg, weights, data, thresh);
@@ -57,7 +57,7 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
-  bboxesPublisher_ = nodeHandle_.advertise<darknet2_rsl::bbox_array>("YOLO_bboxes", 1);
+  bboxesPublisher_ = nodeHandle_.advertise<darknet_rsl::bbox_array>("YOLO_bboxes", 1);
 
   cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
   cv::moveWindow(opencvWindow_, 0, 0);
@@ -72,7 +72,7 @@ YoloObjectDetector::~YoloObjectDetector()
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
    cv::Scalar &rosBoxColor, const std::string &objectLabel)
 {
-  darknet2_rsl::bbox bbox_result;
+  darknet_rsl::bbox bbox_result;
 
   for (int i = 0; i < numberOfObjects; i++)
   {

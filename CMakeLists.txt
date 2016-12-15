@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(darknet2_rsl)
+project(darknet_rsl)
 
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)

@@ -10,7 +10,7 @@
 #include "YoloObjectDetector.h"
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "darknet2_rsl");
+  ros::init(argc, argv, "darknet_rsl");
   ros::NodeHandle nodeHandle("~");
 
   YoloObjectDetector yod(nodeHandle);
