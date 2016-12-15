@@ -98,7 +98,7 @@ if (CUDA_FOUND)
 	cuda_add_executable(${PROJECT_NAME}
 		src/YoloObjectDetector.cpp
 		src/yolo_object_detector_node.cpp
-		src/yolo_demo_object_detector.cpp
+		src/object_detector_demo.cpp
 		src/image_interface.c
 		
 		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
@@ -203,7 +203,7 @@ else()
 	add_executable(${PROJECT_NAME}
 		src/YoloObjectDetector.cpp
 		src/yolo_object_detector_node.cpp
-		src/yolo_demo_object_detector.cpp
+		src/object_detector_demo.cpp
 		src/image_interface.c
 	
 		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
