@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_rsl)
 
+# Define path of darknet folder here.
 set(DARKNET_PATH "/home/markob/git/darknet")
-add_definitions(-DDARKNET_FILE_PATH="/home/markob/git/darknet")
+add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)

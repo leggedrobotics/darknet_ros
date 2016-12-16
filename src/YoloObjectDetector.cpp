@@ -1,11 +1,30 @@
 #include "YoloObjectDetector.h"
 
+#ifdef DARKNET_FILE_PATH
+std::string darknetFilePath_ = DARKNET_FILE_PATH;
+#else
+#error Path of darknet repository is not defined in CMakeLists.txt.
+#endif
+
 //! Initialize YOLO functions that are called in this script.
+/*!
+ * Run YOLO and detect obstacles.
+ * @param[out] bounding box.
+ */
 extern "C" RosBox_ *demo_yolo();
+
+/*!
+ * Initialize darknet network of yolo.
+ * @param[in] cfgfile location of darknet's cfg file describing the layers of the network.
+ * @param[in] weightfile location of darknet's weights file setting the weights of the network.
+ * @param[in] datafile location of darknet's data file.
+ * @param[in] thresh threshold of the object detection (0 < thresh < 1).
+ */
 extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
 
 /*!
- * This function is called in yolo_kernels and allows YOLO to receive the ROS image.
+ * This function is called in yolo and allows YOLO to receive the ROS image.
+ * @param[out] current image of the camera.
  */
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
@@ -19,7 +38,6 @@ const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bo
     "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
     "potted plant", "sheep", "sofa", "train", "tv monitor" };
 const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
-
 
  YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
@@ -59,13 +77,13 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
 
   // Path to config file.
   ros::param::get("/darknet_rsl/cfg_model", cfgModel);
-  configPath = DARKNET_FILE_PATH;
+  configPath = darknetFilePath_;
   configPath += "/cfg/" + cfgModel;
   char *cfg = new char[configPath.length() + 1];
   strcpy(cfg, configPath.c_str());
 
   // Path to data folder.
-  dataPath = DARKNET_FILE_PATH;
+  dataPath = darknetFilePath_;
   dataPath += "/data";
   char *data = new char[dataPath.length() + 1];
   strcpy(data, dataPath.c_str());
