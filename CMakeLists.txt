@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_rsl)
 
+set(DARKNET_PATH "/home/markob/git/darknet")
+add_definitions(-DDARKNET_FILE_PATH="/home/markob/git/darknet")
+
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)
 	find_package(CUDA REQUIRED)
@@ -45,7 +48,7 @@ catkin_package(
 
 if (CUDA_FOUND)
 	include_directories(
-		~/git/darknet/src
+		${DARKNET_PATH}/src
 		include
 		${catkin_INCLUDE_DIRS}
 	)
@@ -59,40 +62,40 @@ if (CUDA_FOUND)
 		src/yolo_demo.cpp
 		src/image_interface.c
 		
-		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
-		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
-		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
-		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
-		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
-		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
-		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
-		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
-		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
-		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
-		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
-		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
-		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
-		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
-		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
-		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
-		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
-		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
-		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
-		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
-		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
-		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
-		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
-		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
-		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
-		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
-		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
-		~/git/darknet/src/super.c	 	
+		${DARKNET_PATH}/src/gemm.c 					${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/cuda.c					${DARKNET_PATH}/src/convolutional_layer.c 
+		${DARKNET_PATH}/src/list.c 					${DARKNET_PATH}/src/image.c
+		${DARKNET_PATH}/src/activations.c			${DARKNET_PATH}/src/im2col.c
+		${DARKNET_PATH}/src/col2im.c 				${DARKNET_PATH}/src/blas.c 
+		${DARKNET_PATH}/src/crop_layer.c 			${DARKNET_PATH}/src/dropout_layer.c
+		${DARKNET_PATH}/src/maxpool_layer.c			${DARKNET_PATH}/src/softmax_layer.c
+		${DARKNET_PATH}/src/data.c					${DARKNET_PATH}/src/matrix.c
+		${DARKNET_PATH}/src/network.c 				${DARKNET_PATH}/src/connected_layer.c
+		${DARKNET_PATH}/src/cost_layer.c				${DARKNET_PATH}/src/parser.c
+		${DARKNET_PATH}/src/option_list.c			${DARKNET_PATH}/src/tree.c 
+		${DARKNET_PATH}/src/detection_layer.c 		${DARKNET_PATH}/src/captcha.c
+		${DARKNET_PATH}/src/route_layer.c 			${DARKNET_PATH}/src/writing.c
+		${DARKNET_PATH}/src/box.c					${DARKNET_PATH}/src/nightmare.c
+		${DARKNET_PATH}/src/normalization_layer.c 	${DARKNET_PATH}/src/avgpool_layer.c 
+		${DARKNET_PATH}/src/coco.c 					${DARKNET_PATH}/src/dice.c 
+		${DARKNET_PATH}/src/yolo.c 					${DARKNET_PATH}/src/demo.c
+		${DARKNET_PATH}/src/layer.c					${DARKNET_PATH}/src/compare.c 
+		${DARKNET_PATH}/src/classifier.c 			${DARKNET_PATH}/src/local_layer.c
+		${DARKNET_PATH}/src/swag.c 					${DARKNET_PATH}/src/shortcut_layer.c 
+		${DARKNET_PATH}/src/activation_layer.c		${DARKNET_PATH}/src/rnn_layer.c 
+		${DARKNET_PATH}/src/gru_layer.c				${DARKNET_PATH}/src/rnn.c
+		${DARKNET_PATH}/src/rnn_vid.c				${DARKNET_PATH}/src/crnn_layer.c
+		${DARKNET_PATH}/src/voxel.c					${DARKNET_PATH}/src/tag.c 
+		${DARKNET_PATH}/src/cifar.c 					${DARKNET_PATH}/src/go.c 
+		${DARKNET_PATH}/src/batchnorm_layer.c 		${DARKNET_PATH}/src/art.c
+		${DARKNET_PATH}/src/region_layer.c 			${DARKNET_PATH}/src/reorg_layer.c 
+		${DARKNET_PATH}/src/super.c	 	
 	
-		~/git/darknet/src/convolutional_kernels.cu	~/git/darknet/src/network_kernels.cu
-		~/git/darknet/src/activation_kernels.cu 		~/git/darknet/src/im2col_kernels.cu 
-		~/git/darknet/src/col2im_kernels.cu 			~/git/darknet/src/blas_kernels.cu 
-		~/git/darknet/src/crop_layer_kernels.cu 		~/git/darknet/src/dropout_layer_kernels.cu 
-		~/git/darknet/src/maxpool_layer_kernels.cu	~/git/darknet/src/avgpool_layer_kernels.cu	
+		${DARKNET_PATH}/src/convolutional_kernels.cu	${DARKNET_PATH}/src/network_kernels.cu
+		${DARKNET_PATH}/src/activation_kernels.cu 	${DARKNET_PATH}/src/im2col_kernels.cu 
+		${DARKNET_PATH}/src/col2im_kernels.cu 		${DARKNET_PATH}/src/blas_kernels.cu 
+		${DARKNET_PATH}/src/crop_layer_kernels.cu 	${DARKNET_PATH}/src/dropout_layer_kernels.cu 
+		${DARKNET_PATH}/src/maxpool_layer_kernels.cu	${DARKNET_PATH}/src/avgpool_layer_kernels.cu	
 	)
 
 	cuda_add_executable(${PROJECT_NAME}
@@ -101,40 +104,40 @@ if (CUDA_FOUND)
 		src/object_detector_demo.cpp
 		src/image_interface.c
 		
-		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
-		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
-		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
-		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
-		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
-		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
-		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
-		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
-		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
-		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
-		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
-		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
-		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
-		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
-		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
-		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
-		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
-		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
-		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
-		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
-		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
-		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
-		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
-		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
-		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
-		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
-		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
-		~/git/darknet/src/super.c	 	
+		${DARKNET_PATH}/src/gemm.c 					${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/cuda.c					${DARKNET_PATH}/src/convolutional_layer.c 
+		${DARKNET_PATH}/src/list.c 					${DARKNET_PATH}/src/image.c
+		${DARKNET_PATH}/src/activations.c			${DARKNET_PATH}/src/im2col.c
+		${DARKNET_PATH}/src/col2im.c 				${DARKNET_PATH}/src/blas.c 
+		${DARKNET_PATH}/src/crop_layer.c 			${DARKNET_PATH}/src/dropout_layer.c
+		${DARKNET_PATH}/src/maxpool_layer.c			${DARKNET_PATH}/src/softmax_layer.c
+		${DARKNET_PATH}/src/data.c					${DARKNET_PATH}/src/matrix.c
+		${DARKNET_PATH}/src/network.c 				${DARKNET_PATH}/src/connected_layer.c
+		${DARKNET_PATH}/src/cost_layer.c				${DARKNET_PATH}/src/parser.c
+		${DARKNET_PATH}/src/option_list.c			${DARKNET_PATH}/src/tree.c 
+		${DARKNET_PATH}/src/detection_layer.c 		${DARKNET_PATH}/src/captcha.c
+		${DARKNET_PATH}/src/route_layer.c 			${DARKNET_PATH}/src/writing.c
+		${DARKNET_PATH}/src/box.c					${DARKNET_PATH}/src/nightmare.c
+		${DARKNET_PATH}/src/normalization_layer.c 	${DARKNET_PATH}/src/avgpool_layer.c 
+		${DARKNET_PATH}/src/coco.c 					${DARKNET_PATH}/src/dice.c 
+		${DARKNET_PATH}/src/yolo.c 					${DARKNET_PATH}/src/demo.c
+		${DARKNET_PATH}/src/layer.c					${DARKNET_PATH}/src/compare.c 
+		${DARKNET_PATH}/src/classifier.c 			${DARKNET_PATH}/src/local_layer.c
+		${DARKNET_PATH}/src/swag.c 					${DARKNET_PATH}/src/shortcut_layer.c 
+		${DARKNET_PATH}/src/activation_layer.c		${DARKNET_PATH}/src/rnn_layer.c 
+		${DARKNET_PATH}/src/gru_layer.c				${DARKNET_PATH}/src/rnn.c
+		${DARKNET_PATH}/src/rnn_vid.c				${DARKNET_PATH}/src/crnn_layer.c
+		${DARKNET_PATH}/src/voxel.c					${DARKNET_PATH}/src/tag.c 
+		${DARKNET_PATH}/src/cifar.c 					${DARKNET_PATH}/src/go.c 
+		${DARKNET_PATH}/src/batchnorm_layer.c 		${DARKNET_PATH}/src/art.c
+		${DARKNET_PATH}/src/region_layer.c 			${DARKNET_PATH}/src/reorg_layer.c 
+		${DARKNET_PATH}/src/super.c	 	
 		
-		~/git/darknet/src/convolutional_kernels.cu	~/git/darknet/src/network_kernels.cu
-		~/git/darknet/src/activation_kernels.cu 		~/git/darknet/src/im2col_kernels.cu 
-		~/git/darknet/src/col2im_kernels.cu 			~/git/darknet/src/blas_kernels.cu 
-		~/git/darknet/src/crop_layer_kernels.cu 		~/git/darknet/src/dropout_layer_kernels.cu 
-		~/git/darknet/src/maxpool_layer_kernels.cu	~/git/darknet/src/avgpool_layer_kernels.cu	
+		${DARKNET_PATH}/src/convolutional_kernels.cu	${DARKNET_PATH}/src/network_kernels.cu
+		${DARKNET_PATH}/src/activation_kernels.cu 	${DARKNET_PATH}/src/im2col_kernels.cu 
+		${DARKNET_PATH}/src/col2im_kernels.cu 		${DARKNET_PATH}/src/blas_kernels.cu 
+		${DARKNET_PATH}/src/crop_layer_kernels.cu 	${DARKNET_PATH}/src/dropout_layer_kernels.cu 
+		${DARKNET_PATH}/src/maxpool_layer_kernels.cu	${DARKNET_PATH}/src/avgpool_layer_kernels.cu	
 	)
 
 	target_link_libraries(ros_interface
@@ -160,7 +163,7 @@ if (CUDA_FOUND)
 	)
 else()
 	include_directories(
-		~/git/darknet/src
+		${DARKNET_PATH}/src
 		include
 		${catkin_INCLUDE_DIRS}
 	)
@@ -170,34 +173,34 @@ else()
 		src/yolo_demo.cpp
 		src/image_interface.c
 		
-		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
-		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
-		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
-		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
-		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
-		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
-		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
-		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
-		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
-		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
-		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
-		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
-		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
-		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
-		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
-		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
-		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
-		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
-		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
-		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
-		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
-		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
-		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
-		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
-		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
-		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
-		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
-		~/git/darknet/src/super.c	 	
+		${DARKNET_PATH}/src/gemm.c 					${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/cuda.c					${DARKNET_PATH}/src/convolutional_layer.c 
+		${DARKNET_PATH}/src/list.c 					${DARKNET_PATH}/src/image.c
+		${DARKNET_PATH}/src/activations.c			${DARKNET_PATH}/src/im2col.c
+		${DARKNET_PATH}/src/col2im.c 				${DARKNET_PATH}/src/blas.c 
+		${DARKNET_PATH}/src/crop_layer.c 			${DARKNET_PATH}/src/dropout_layer.c
+		${DARKNET_PATH}/src/maxpool_layer.c			${DARKNET_PATH}/src/softmax_layer.c
+		${DARKNET_PATH}/src/data.c					${DARKNET_PATH}/src/matrix.c
+		${DARKNET_PATH}/src/network.c 				${DARKNET_PATH}/src/connected_layer.c
+		${DARKNET_PATH}/src/cost_layer.c				${DARKNET_PATH}/src/parser.c
+		${DARKNET_PATH}/src/option_list.c			${DARKNET_PATH}/src/tree.c 
+		${DARKNET_PATH}/src/detection_layer.c 		${DARKNET_PATH}/src/captcha.c
+		${DARKNET_PATH}/src/route_layer.c 			${DARKNET_PATH}/src/writing.c
+		${DARKNET_PATH}/src/box.c					${DARKNET_PATH}/src/nightmare.c
+		${DARKNET_PATH}/src/normalization_layer.c 	${DARKNET_PATH}/src/avgpool_layer.c 
+		${DARKNET_PATH}/src/coco.c 					${DARKNET_PATH}/src/dice.c 
+		${DARKNET_PATH}/src/yolo.c 					${DARKNET_PATH}/src/demo.c
+		${DARKNET_PATH}/src/layer.c					${DARKNET_PATH}/src/compare.c 
+		${DARKNET_PATH}/src/classifier.c 			${DARKNET_PATH}/src/local_layer.c
+		${DARKNET_PATH}/src/swag.c 					${DARKNET_PATH}/src/shortcut_layer.c 
+		${DARKNET_PATH}/src/activation_layer.c		${DARKNET_PATH}/src/rnn_layer.c 
+		${DARKNET_PATH}/src/gru_layer.c				${DARKNET_PATH}/src/rnn.c
+		${DARKNET_PATH}/src/rnn_vid.c				${DARKNET_PATH}/src/crnn_layer.c
+		${DARKNET_PATH}/src/voxel.c					${DARKNET_PATH}/src/tag.c 
+		${DARKNET_PATH}/src/cifar.c 					${DARKNET_PATH}/src/go.c 
+		${DARKNET_PATH}/src/batchnorm_layer.c 		${DARKNET_PATH}/src/art.c
+		${DARKNET_PATH}/src/region_layer.c 			${DARKNET_PATH}/src/reorg_layer.c 
+		${DARKNET_PATH}/src/super.c	 	
 	)
 	
 	add_executable(${PROJECT_NAME}
@@ -206,34 +209,34 @@ else()
 		src/object_detector_demo.cpp
 		src/image_interface.c
 	
-		~/git/darknet/src/gemm.c 					~/git/darknet/src/utils.c
-		~/git/darknet/src/cuda.c					~/git/darknet/src/convolutional_layer.c 
-		~/git/darknet/src/list.c 					~/git/darknet/src/image.c
-		~/git/darknet/src/activations.c			~/git/darknet/src/im2col.c
-		~/git/darknet/src/col2im.c 				~/git/darknet/src/blas.c 
-		~/git/darknet/src/crop_layer.c 			~/git/darknet/src/dropout_layer.c
-		~/git/darknet/src/maxpool_layer.c			~/git/darknet/src/softmax_layer.c
-		~/git/darknet/src/data.c					~/git/darknet/src/matrix.c
-		~/git/darknet/src/network.c 				~/git/darknet/src/connected_layer.c
-		~/git/darknet/src/cost_layer.c			~/git/darknet/src/parser.c
-		~/git/darknet/src/option_list.c			~/git/darknet/src/tree.c 
-		~/git/darknet/src/detection_layer.c 		~/git/darknet/src/captcha.c
-		~/git/darknet/src/route_layer.c 			~/git/darknet/src/writing.c
-		~/git/darknet/src/box.c					~/git/darknet/src/nightmare.c
-		~/git/darknet/src/normalization_layer.c 	~/git/darknet/src/avgpool_layer.c 
-		~/git/darknet/src/coco.c 					~/git/darknet/src/dice.c 
-		~/git/darknet/src/yolo.c 					~/git/darknet/src/demo.c
-		~/git/darknet/src/layer.c					~/git/darknet/src/compare.c 
-		~/git/darknet/src/classifier.c 			~/git/darknet/src/local_layer.c
-		~/git/darknet/src/swag.c 					~/git/darknet/src/shortcut_layer.c 
-		~/git/darknet/src/activation_layer.c		~/git/darknet/src/rnn_layer.c 
-		~/git/darknet/src/gru_layer.c				~/git/darknet/src/rnn.c
-		~/git/darknet/src/rnn_vid.c				~/git/darknet/src/crnn_layer.c
-		~/git/darknet/src/voxel.c					~/git/darknet/src/tag.c 
-		~/git/darknet/src/cifar.c 				~/git/darknet/src/go.c 
-		~/git/darknet/src/batchnorm_layer.c 		~/git/darknet/src/art.c
-		~/git/darknet/src/region_layer.c 			~/git/darknet/src/reorg_layer.c 
-		~/git/darknet/src/super.c  	
+		${DARKNET_PATH}/src/gemm.c 					${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/cuda.c					${DARKNET_PATH}/src/convolutional_layer.c 
+		${DARKNET_PATH}/src/list.c 					${DARKNET_PATH}/src/image.c
+		${DARKNET_PATH}/src/activations.c			${DARKNET_PATH}/src/im2col.c
+		${DARKNET_PATH}/src/col2im.c 				${DARKNET_PATH}/src/blas.c 
+		${DARKNET_PATH}/src/crop_layer.c 			${DARKNET_PATH}/src/dropout_layer.c
+		${DARKNET_PATH}/src/maxpool_layer.c			${DARKNET_PATH}/src/softmax_layer.c
+		${DARKNET_PATH}/src/data.c					${DARKNET_PATH}/src/matrix.c
+		${DARKNET_PATH}/src/network.c 				${DARKNET_PATH}/src/connected_layer.c
+		${DARKNET_PATH}/src/cost_layer.c				${DARKNET_PATH}/src/parser.c
+		${DARKNET_PATH}/src/option_list.c			${DARKNET_PATH}/src/tree.c 
+		${DARKNET_PATH}/src/detection_layer.c 		${DARKNET_PATH}/src/captcha.c
+		${DARKNET_PATH}/src/route_layer.c 			${DARKNET_PATH}/src/writing.c
+		${DARKNET_PATH}/src/box.c					${DARKNET_PATH}/src/nightmare.c
+		${DARKNET_PATH}/src/normalization_layer.c 	${DARKNET_PATH}/src/avgpool_layer.c 
+		${DARKNET_PATH}/src/coco.c 					${DARKNET_PATH}/src/dice.c 
+		${DARKNET_PATH}/src/yolo.c 					${DARKNET_PATH}/src/demo.c
+		${DARKNET_PATH}/src/layer.c					${DARKNET_PATH}/src/compare.c 
+		${DARKNET_PATH}/src/classifier.c 			${DARKNET_PATH}/src/local_layer.c
+		${DARKNET_PATH}/src/swag.c 					${DARKNET_PATH}/src/shortcut_layer.c 
+		${DARKNET_PATH}/src/activation_layer.c		${DARKNET_PATH}/src/rnn_layer.c 
+		${DARKNET_PATH}/src/gru_layer.c				${DARKNET_PATH}/src/rnn.c
+		${DARKNET_PATH}/src/rnn_vid.c				${DARKNET_PATH}/src/crnn_layer.c
+		${DARKNET_PATH}/src/voxel.c					${DARKNET_PATH}/src/tag.c 
+		${DARKNET_PATH}/src/cifar.c 					${DARKNET_PATH}/src/go.c 
+		${DARKNET_PATH}/src/batchnorm_layer.c 		${DARKNET_PATH}/src/art.c
+		${DARKNET_PATH}/src/region_layer.c 			${DARKNET_PATH}/src/reorg_layer.c 
+		${DARKNET_PATH}/src/super.c  	
 	)
 
 	target_link_libraries(ros_interface

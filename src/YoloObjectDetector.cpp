@@ -39,19 +39,36 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
     rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
   }
 
-  // Initialize deep network (darknet).
-  std::string param;
+  // Initialize deep network of darknet.
+  std::string weightsPath;
+  std::string configPath;
+  std::string dataPath;
+  std::string cfgModel;
+  std::string weightsModel;
+
+  // Threshold of object detection.
   float thresh;
   ros::param::get("/darknet_rsl/object_threshold", thresh);
-  ros::param::get("/darknet_rsl/weights_path", param);
-  char *weights = new char[param.length() + 1];
-  strcpy(weights, param.c_str());
-  ros::param::get("/darknet_rsl/cfg_path", param);
-  char *cfg = new char[param.length() + 1];
-  strcpy(cfg, param.c_str());
-  ros::param::get("/darknet_rsl/data_path", param);
-  char *data = new char[param.length() + 1];
-  strcpy(data, param.c_str());
+
+  // Path to weights file.
+  ros::param::get("/darknet_rsl/weights_model", weightsModel);
+  ros::param::get("/darknet_rsl/weights_path", weightsPath);
+  weightsPath += "/" + weightsModel;
+  char *weights = new char[weightsPath.length() + 1];
+  strcpy(weights, weightsPath.c_str());
+
+  // Path to config file.
+  ros::param::get("/darknet_rsl/cfg_model", cfgModel);
+  configPath = DARKNET_FILE_PATH;
+  configPath += "/cfg/" + cfgModel;
+  char *cfg = new char[configPath.length() + 1];
+  strcpy(cfg, configPath.c_str());
+
+  // Path to data folder.
+  dataPath = DARKNET_FILE_PATH;
+  dataPath += "/data";
+  char *data = new char[dataPath.length() + 1];
+  strcpy(data, dataPath.c_str());
   load_network(cfg, weights, data, thresh);
 
   // Initialize publisher and subscriber.
