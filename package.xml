@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package>
    <name>darknet_rsl</name>
-   <version>0.0.0</version>
-   <description>darknet2 package</description>
-
+   <version>0.1.0</version>
+   <description>ROS package to use YOLO in ROS.</description>
    <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
-
-   <license>BSD</license>
+   <license>MIT</license>
+   <url type="marko.bjelonic@mavt.ethz.ch">https://bitbucket.org/ethz-asl-lr/darknet_rsl</url>
+   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
    <buildtool_depend>catkin</buildtool_depend>
    <build_depend>roscpp</build_depend>
