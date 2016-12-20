@@ -1,0 +1,11 @@
+# Check if objects in image
+
+# Goal definition
+sensor_msgs/Image image
+
+---
+# Result definition
+darknet_rsl_msgs/BoundingBoxes boundingBoxes
+
+---
+# Feedback definition
