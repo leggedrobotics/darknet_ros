@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_rsl)
 
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
 # Define path of darknet folder here.
 set(DARKNET_PATH "/home/markob/git/darknet")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
@@ -20,14 +22,18 @@ else()
 	list(APPEND LIBRARIES "m")
 endif()
 
+find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
-find_package(catkin REQUIRED COMPONENTS
-	cv_bridge
-	roscpp
-	rospy
-	std_msgs
-	darknet_rsl_msgs
-	image_transport
+find_package(catkin REQUIRED 
+	COMPONENTS
+		cv_bridge
+		roscpp
+		rospy
+		std_msgs
+		actionlib
+		darknet_rsl_msgs
+		image_transport
+		param_io
 )
 
 add_definitions(-DOPENCV)
@@ -36,16 +42,21 @@ catkin_package(
 	CATKIN_DEPENDS
 		cv_bridge
 		roscpp
+		actionlib
 		rospy
 		std_msgs
 		darknet_rsl_msgs
 		image_transport
+		param_io
+	DEPENDS
+    	boost
 )
 
 if (CUDA_FOUND)
 	include_directories(
 		${DARKNET_PATH}/src
 		include
+		${Boost_INCLUDE_DIRS}
 		${catkin_INCLUDE_DIRS}
 	)
 
@@ -144,6 +155,7 @@ if (CUDA_FOUND)
 	   cudart
 	   cublas
 	   curand
+	   ${Boost_LIBRARIES}
 	   ${catkin_LIBRARIES}
 	)
 
@@ -155,12 +167,14 @@ if (CUDA_FOUND)
 	   cudart
 	   cublas
 	   curand
+	   ${Boost_LIBRARIES}
 	   ${catkin_LIBRARIES}
 	)
 else()
 	include_directories(
 		${DARKNET_PATH}/src
 		include
+		${Boost_INCLUDE_DIRS}
 		${catkin_INCLUDE_DIRS}
 	)
 
@@ -239,6 +253,7 @@ else()
 		m
 		pthread
 		stdc++
+		${Boost_LIBRARIES}
 		${catkin_LIBRARIES}
 	)
 
@@ -246,6 +261,7 @@ else()
 		m
 		pthread
 		stdc++
+		${Boost_LIBRARIES}
 		${catkin_LIBRARIES}
 	)
 endif()

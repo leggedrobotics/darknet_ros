@@ -1,3 +1,11 @@
+// c++
+#include <algorithm>
+#include <limits>
+#include <math.h>
+
+// param io
+#include <param_io/get_param.hpp>
+
 #include "YoloObjectDetector.h"
 
 #ifdef DARKNET_FILE_PATH
@@ -93,6 +101,17 @@ const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
   boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_rsl_msgs::BoundingBoxes>("YOLO_BoundingBoxes", 1);
+
+  // Action servers.
+  checkForObjectsActionServer_.reset(
+      new CheckForObjectsActionServer(
+          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_rsl/action_name"),
+          false));
+  checkForObjectsActionServer_->registerGoalCallback(
+      boost::bind(&YoloObjectDetector::checkForObjectsActionGoalCB, this));
+  checkForObjectsActionServer_->registerPreemptCallback(
+      boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
+  checkForObjectsActionServer_->start();
 
   cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
   cv::moveWindow(opencvWindow_, 0, 0);
@@ -231,4 +250,21 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     //runYolo(cropedImage);
   }
   return;
+}
+
+void YoloObjectDetector::checkForObjectsActionGoalCB()
+{
+}
+
+void YoloObjectDetector::checkForObjectsActionPreemptCB()
+{
+  ROS_INFO("[DarknetHandler] Preempt check if human action.");
+  checkForObjectsActionServer_->setPreempted();
+}
+
+bool YoloObjectDetector::isCheckingForObjects() const
+{
+  return (ros::ok() &&
+      checkForObjectsActionServer_->isActive() &&
+          !checkForObjectsActionServer_->isPreemptRequested());
 }

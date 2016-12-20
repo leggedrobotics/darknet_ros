@@ -23,6 +23,8 @@
 #include <darknet_rsl_msgs/BoundingBoxes.h>
 #include <darknet_rsl_msgs/BoundingBox.h>
 #include <string>
+#include <actionlib/server/simple_action_server.h>
+#include <darknet_rsl_msgs/CheckForObjectsAction.h>
 
 extern "C" {
   #include "box.h"
@@ -66,8 +68,31 @@ class YoloObjectDetector
    */
   void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
 
+  /*!
+   * Check for objects action goal callback.
+   */
+  void checkForObjectsActionGoalCB();
+
+  /*!
+   * Check for objects action preempt callback.
+   */
+  void checkForObjectsActionPreemptCB();
+
+  /*!
+   * Check if a preempt for the check for objects action has been requested.
+   * @return false if preempt has been requested or inactive.
+   */
+  bool isCheckingForObjects() const;
+
+  //! Typedefs.
+  typedef actionlib::SimpleActionServer<darknet_rsl_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
+  typedef std::shared_ptr<CheckForObjectsActionServer> CheckForObjectsActionServerPtr;
+
   //! ROS node handle.
   ros::NodeHandle nodeHandle_;
+
+  //! Check for objects action server.
+  CheckForObjectsActionServerPtr checkForObjectsActionServer_;
 
   //! Advertise and subscribe to image topics.
   image_transport::ImageTransport imageTransport_;
