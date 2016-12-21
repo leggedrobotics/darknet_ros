@@ -76,7 +76,8 @@ bool YoloObjectDetector::readParameters()
   bool success = true;
 
   // Load common parameters.
-  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/camera_topic_name", cameraTopicName_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/camera_topic", cameraTopicName_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/view_image", viewImage_);
 
   return success;
 }
@@ -133,7 +134,7 @@ void YoloObjectDetector::init()
   // Action servers.
   checkForObjectsActionServer_.reset(
       new CheckForObjectsActionServer(
-          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_rsl/camera_action_name"),
+          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_rsl/camera_action"),
           false));
   checkForObjectsActionServer_->registerGoalCallback(
       boost::bind(&YoloObjectDetector::checkForObjectsActionGoalCB, this));
@@ -141,14 +142,20 @@ void YoloObjectDetector::init()
       boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
 
-  cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
-  cv::moveWindow(opencvWindow_, 0, 0);
-  cv::resizeWindow(opencvWindow_, 1352, 1013);
+  if(viewImage_)
+  {
+    cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
+    cv::moveWindow(opencvWindow_, 0, 0);
+    cv::resizeWindow(opencvWindow_, 1352, 1013);
+  }
 }
 
 YoloObjectDetector::~YoloObjectDetector()
 {
-  cv::destroyWindow(opencvWindow_);
+  if(viewImage_)
+  {
+    cv::destroyWindow(opencvWindow_);
+  }
 }
 
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
@@ -186,7 +193,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
 {
   ROS_INFO("[YoloObjectDetector] runYolo().");
 
-  cv::Mat input_frame = fullFrame.clone();
+  cv::Mat inputFrame = fullFrame.clone();
 
   // run yolo and get bounding boxes for objects
   boxes_ = demo_yolo();
@@ -220,7 +227,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
 
     for (int i = 0; i < numClasses_; i++)
     {
-      if (rosBoxCounter_[i] > 0) drawBoxes(input_frame, rosBoxes_[i],
+      if (rosBoxCounter_[i] > 0) drawBoxes(inputFrame, rosBoxes_[i],
                                              rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
     }
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
@@ -246,8 +253,11 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
      rosBoxCounter_[i] = 0;
   }
 
-  cv::imshow(opencvWindow_, input_frame);
-  cv::waitKey(3);
+  if(viewImage_)
+  {
+    cv::imshow(opencvWindow_, inputFrame);
+    cv::waitKey(3);
+  }
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)

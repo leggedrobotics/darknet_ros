@@ -132,9 +132,12 @@ class YoloObjectDetector
 
   //! Camera related parameters.
   std::string cameraTopicName_;
-  const std::string opencvWindow_;
   int frameWidth_;
   int frameHeight_;
+
+  //! Image view in opencv.
+  const std::string opencvWindow_;
+  bool viewImage_;
 };
 
 } /* namespace darknet_rsl*/

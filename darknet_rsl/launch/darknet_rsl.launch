@@ -1,18 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <launch>
-	<!-- Arguments -->
-	<arg name="yolo_model" 			default="tiny-yolo-voc"/>
-	<arg name="yolo_weights_path" 	default="$(find darknet_rsl)/weights"/>
-	<arg name="yolo_cfg_model" 		default="$(arg yolo_model).cfg"/>
-	<arg name="yolo_weights_model" 	default="$(arg yolo_model).weights"/>
+	<!-- Arguments to generate darknet network. -->
+	<arg name="yolo_model" 				default="tiny-yolo-voc"/>
+	<arg name="yolo_weights_path" 		default="$(find darknet_rsl)/weights"/>
+	<arg name="yolo_cfg_model" 			default="$(arg yolo_model).cfg"/>
+	<arg name="yolo_weights_model" 		default="$(arg yolo_model).weights"/>
+	
+	<!-- Name of camera topic -->
+	<arg name="camera_topic_name" 		default="/camera/image_raw"/>
+	
+	<!-- Name of CheckForObjectsAction (darknet_rsl_msgs) -->
+	<arg name="camera_action_name" 		default="/darknet/check_for_objects"/>
+	
+	<!-- Threshold of object detection -->
+	<arg name="yolo_object_threshold" 	default="0.2"/>
+	
+	<!-- Enable image view in opencv -->
+	<arg name="view_image_in_opencv" 	default="true"/>
 	
 	<!-- Start darknet and ros wrapper -->
 	<node pkg="darknet_rsl" type="darknet_rsl" name="darknet_rsl" output="screen">
 	  <param name="cfg_model" 			value="$(arg yolo_cfg_model)" />
 	  <param name="weights_model" 		value="$(arg yolo_weights_model)" />
 	  <param name="weights_path" 		value="$(arg yolo_weights_path)" />
-	  <param name="camera_topic_name" 	value="/camera/image_raw" />
-	  <param name="camera_action_name"	value="/darknet/check_for_objects" />
-	  <param name="object_threshold" 	value="0.2" />
+	  <param name="camera_topic" 		value="$(arg camera_topic_name)" />
+	  <param name="camera_action"		value="$(arg camera_action_name)" />
+	  <param name="object_threshold" 	value="$(arg yolo_object_threshold)" />
+	  <param name="view_image" 			value="$(arg view_image_in_opencv)" />
 	</node>
 	
 	<!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->
