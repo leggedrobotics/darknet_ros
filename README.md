@@ -12,4 +12,4 @@ Affiliation: Robotic Systems Lab, ETH Zurich**
 
 ## Citing
 
-The YOLO methods used in this software are described in the paper: [here](https://arxiv.org/abs/1506.02640).
+The YOLO methods used in this software are described in the paper: [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640).
