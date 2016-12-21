@@ -1,4 +1,12 @@
-#include "ros_interface.h"
+/*
+ * ros_interface.cpp
+ *
+ *  Created on: Dec 19, 2016
+ *      Author: Marko Bjelonic
+ *   Institute: ETH Zurich, Robotic Systems Lab
+ */
+
+#include "darknet_rsl/ros_interface.h"
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>

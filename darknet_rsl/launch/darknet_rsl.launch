@@ -11,7 +11,7 @@
 	  <param name="weights_model" 		value="$(arg yolo_weights_model)" />
 	  <param name="weights_path" 		value="$(arg yolo_weights_path)" />
 	  <param name="camera_topic_name" 	value="/camera/image_raw" />
-	  <param name="action_name"		 	value="/darknet/check_for_objects" />
+	  <param name="camera_action_name"	value="/darknet/check_for_objects" />
 	  <param name="object_threshold" 	value="0.2" />
 	</node>
 	

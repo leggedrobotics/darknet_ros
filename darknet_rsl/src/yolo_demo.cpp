@@ -1,10 +1,18 @@
+/*
+ * yolo_demo.cpp
+ *
+ *  Created on: Dec 19, 2016
+ *      Author: Marko Bjelonic
+ *   Institute: ETH Zurich, Robotic Systems Lab
+ */
+
 #ifdef GPU
 #include "cuda_runtime.h"
 #include "curand.h"
 #include "cublas_v2.h"
 #endif
 
-#include "ros_interface.h"
+#include "darknet_rsl/ros_interface.h"
 
 extern "C" {
 #include "network.h"
@@ -14,7 +22,7 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "image_interface.h"
+#include "darknet_rsl/image_interface.h"
 #include <sys/time.h>
 }
 

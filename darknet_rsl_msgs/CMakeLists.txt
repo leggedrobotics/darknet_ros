@@ -5,18 +5,18 @@ project(darknet_rsl_msgs)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED
-	COMPONENTS
+  COMPONENTS
     actionlib_msgs
     geometry_msgs
-		sensor_msgs
-		std_msgs
-		message_generation
+    sensor_msgs
+    std_msgs
+    message_generation
 )
 
 add_message_files(
-	FILES
-		BoundingBox.msg
-		BoundingBoxes.msg
+  FILES
+    BoundingBox.msg
+    BoundingBoxes.msg
 )
 
 add_action_files(
@@ -25,18 +25,18 @@ add_action_files(
 )
 
 generate_messages(
-	DEPENDENCIES
-		actionlib_msgs
-	  geometry_msgs
-		sensor_msgs
-	  std_msgs
+  DEPENDENCIES
+    actionlib_msgs
+    geometry_msgs
+    sensor_msgs
+    std_msgs
 )
 
 catkin_package(
   CATKIN_DEPENDS
     actionlib_msgs
     geometry_msgs
-		sensor_msgs
+    sensor_msgs
     message_runtime
     std_msgs
 )

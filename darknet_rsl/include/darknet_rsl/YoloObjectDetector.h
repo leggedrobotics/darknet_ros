@@ -1,34 +1,45 @@
 /*
  * YoloObjectDetector.h
  *
- *  Created on: Dec 08, 2016
- *      Author: Marko, Bjelonic
+ *  Created on: Dec 19, 2016
+ *      Author: Marko Bjelonic
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
 #pragma once
 
-#include "ros_interface.h"
-#include <ros/ros.h>
-#include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/Image.h>
-#include <geometry_msgs/Point.h>
+// c++
+#include <math.h>
+#include <string>
 #include <vector>
 #include <iostream>
 #include <pthread.h>
+
+// ROS
+#include <ros/ros.h>
 #include <std_msgs/Int8.h>
-#include <math.h>
+#include <actionlib/server/simple_action_server.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Image.h>
+#include <geometry_msgs/Point.h>
+#include <image_transport/image_transport.h>
+
+// ROS interface to darknet
+#include "darknet_rsl/ros_interface.h"
+
+// OpenCV
+#include <cv_bridge/cv_bridge.h>
+
+// darknet_rsl_msgs
 #include <darknet_rsl_msgs/BoundingBoxes.h>
 #include <darknet_rsl_msgs/BoundingBox.h>
-#include <string>
-#include <actionlib/server/simple_action_server.h>
 #include <darknet_rsl_msgs/CheckForObjectsAction.h>
 
 extern "C" {
   #include "box.h"
 }
+
+namespace darknet_rsl {
 
 class YoloObjectDetector
 {
@@ -44,6 +55,16 @@ class YoloObjectDetector
   ~YoloObjectDetector();
 
  private:
+  /*!
+   * Reads and verifies the ROS parameters.
+   * @return true if successful.
+   */
+  bool readParameters();
+
+  /*!
+   * Initialize the ROS connections.
+   */
+  void init();
 
   /*!
    * Draws the bounding boxes of the detected objects.
@@ -115,3 +136,5 @@ class YoloObjectDetector
   int frameWidth_;
   int frameHeight_;
 };
+
+} /* namespace darknet_rsl*/

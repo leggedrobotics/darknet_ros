@@ -1,3 +1,11 @@
+/*
+ * ros_interface.cpp
+ *
+ *  Created on: Dec 19, 2016
+ *      Author: Marko Bjelonic
+ *   Institute: ETH Zurich, Robotic Systems Lab
+ */
+
 #ifndef ros_interface
 #define ros_interface
 
