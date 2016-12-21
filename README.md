@@ -6,8 +6,9 @@ This is a ROS package developed for object detection in camera images. You only 
 
 The YOLO packages have been tested under ROS Indigo and Ubuntu 14.04. This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
 
-**Author: Marko Bjelonic, marko.bjelonic@mavt.ethz.ch
-Affiliation: Robotic Systems Lab, ETH Zurich**
+**Author: Marko Bjelonic, marko.bjelonic@mavt.ethz.ch**
+
+**Affiliation: Robotic Systems Lab, ETH Zurich**
 
 
 ## Citing
