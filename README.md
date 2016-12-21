@@ -14,3 +14,13 @@ The YOLO packages have been tested under ROS Indigo and Ubuntu 14.04. This is re
 ## Citing
 
 The YOLO methods used in this software are described in the paper: [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640).
+
+## Installation
+
+### Dependencies
+
+This software is built on the Robotic Operating System ([ROS]), which needs to be [installed](http://wiki.ros.org) first. Additionally, YOLO for ROS depends on following software:
+
+- [Darknet](https://github.com/pjreddie/darknet) (open source neural network framework written in C and CUDA)
+- [OpenCV](http://opencv.org/) (computer vision library),
+- [boost](http://www.boost.org/) (c++ library),
