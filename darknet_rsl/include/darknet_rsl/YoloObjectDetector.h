@@ -47,7 +47,7 @@ class YoloObjectDetector
   /*!
    * Constructor.
    */
-  YoloObjectDetector(ros::NodeHandle nh);
+  explicit YoloObjectDetector(ros::NodeHandle nh);
 
   /*!
    * Destructor.
