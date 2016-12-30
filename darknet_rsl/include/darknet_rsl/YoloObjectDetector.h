@@ -138,6 +138,7 @@ class YoloObjectDetector
   //! Image view in opencv.
   const std::string opencvWindow_;
   bool viewImage_;
+  int waitKeyDelay_;
 };
 
 } /* namespace darknet_rsl*/

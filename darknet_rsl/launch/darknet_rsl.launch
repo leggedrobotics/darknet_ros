@@ -19,6 +19,9 @@
 	<!-- Enable image view in opencv -->
 	<arg name="view_image_in_opencv" 	default="true"/>
 	
+	<!-- Delay for cv::waitkey(delay) in millisecons -->
+	<arg name="wait_key_delay_in_opencv" default="3"/>
+	
 	<!-- Start darknet and ros wrapper -->
 	<node pkg="darknet_rsl" type="darknet_rsl" name="darknet_rsl" output="screen">
 	  <param name="cfg_model" 			value="$(arg yolo_cfg_model)" />
@@ -28,6 +31,7 @@
 	  <param name="camera_action"		value="$(arg camera_action_name)" />
 	  <param name="object_threshold" 	value="$(arg yolo_object_threshold)" />
 	  <param name="view_image" 			value="$(arg view_image_in_opencv)" />
+	  <param name="wait_key_delay" 		value="$(arg wait_key_delay_in_opencv)" />
 	</node>
 	
 	<!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->

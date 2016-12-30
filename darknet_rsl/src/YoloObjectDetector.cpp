@@ -78,6 +78,7 @@ bool YoloObjectDetector::readParameters()
   // Load common parameters.
   success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/camera_topic", cameraTopicName_);
   success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/view_image", viewImage_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/wait_key_delay", waitKeyDelay_);
 
   return success;
 }
@@ -256,7 +257,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
   if(viewImage_)
   {
     cv::imshow(opencvWindow_, inputFrame);
-    cv::waitKey(3);
+    cv::waitKey(waitKeyDelay_);
   }
 }
 
