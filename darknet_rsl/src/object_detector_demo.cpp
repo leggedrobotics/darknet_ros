@@ -49,6 +49,7 @@ static image det  ;
 static image det_s;
 static float fps = 0;
 static float demo_thresh = 0;
+static float demo_hier_thresh = .5;
 
 static float *predictions[FRAMES];
 static int demo_index = 0;
@@ -84,7 +85,7 @@ void *detect_in_thread(void *ptr)
   if(l.type == DETECTION){
     get_detection_boxes(l, 1, 1, demo_thresh, probs, boxes, 0);
   } else if (l.type == REGION){
-    get_region_boxes(l, 1, 1, demo_thresh, probs, boxes, 0, 0);
+    get_region_boxes(l, 1, 1, demo_thresh, probs, boxes, 0, 0, demo_hier_thresh);
   } else {
     error("Last layer must produce detections\n");
   }
