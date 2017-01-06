@@ -25,21 +25,21 @@
 #include <image_transport/image_transport.h>
 
 // ROS interface to darknet
-#include "darknet_rsl/ros_interface.h"
+#include "darknet_ros/ros_interface.h"
 
 // OpenCV
 #include <cv_bridge/cv_bridge.h>
 
-// darknet_rsl_msgs
-#include <darknet_rsl_msgs/BoundingBoxes.h>
-#include <darknet_rsl_msgs/BoundingBox.h>
-#include <darknet_rsl_msgs/CheckForObjectsAction.h>
+// darknet_ros_msgs
+#include <darknet_ros_msgs/BoundingBoxes.h>
+#include <darknet_ros_msgs/BoundingBox.h>
+#include <darknet_ros_msgs/CheckForObjectsAction.h>
 
 extern "C" {
   #include "box.h"
 }
 
-namespace darknet_rsl {
+namespace darknet_ros {
 
 class YoloObjectDetector
 {
@@ -106,7 +106,7 @@ class YoloObjectDetector
   bool isCheckingForObjects() const;
 
   //! Typedefs.
-  typedef actionlib::SimpleActionServer<darknet_rsl_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
+  typedef actionlib::SimpleActionServer<darknet_ros_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
   typedef std::shared_ptr<CheckForObjectsActionServer> CheckForObjectsActionServerPtr;
 
   //! ROS node handle.
@@ -127,7 +127,7 @@ class YoloObjectDetector
   std::vector< std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
-  darknet_rsl_msgs::BoundingBoxes boundingBoxesResults_;
+  darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
   RosBox_* boxes_;
 
   //! Camera related parameters.
@@ -141,4 +141,4 @@ class YoloObjectDetector
   int waitKeyDelay_;
 };
 
-} /* namespace darknet_rsl*/
+} /* namespace darknet_ros*/

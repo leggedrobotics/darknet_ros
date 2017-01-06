@@ -5,7 +5,7 @@ sensor_msgs/Image image
 
 ---
 # Result definition
-darknet_rsl_msgs/BoundingBoxes boundingBoxes
+darknet_ros_msgs/BoundingBoxes boundingBoxes
 
 ---
 # Feedback definition

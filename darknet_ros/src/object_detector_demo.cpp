@@ -12,7 +12,7 @@
 #include "cublas_v2.h"
 #endif
 
-#include "darknet_rsl/ros_interface.h"
+#include "darknet_ros/ros_interface.h"
 #include <iostream>
 
 extern "C" {
@@ -23,7 +23,7 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "darknet_rsl/image_interface.h"
+#include "darknet_ros/image_interface.h"
 #include <sys/time.h>
 }
 

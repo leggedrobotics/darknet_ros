@@ -10,7 +10,7 @@
 #include <param_io/get_param.hpp>
 
 // yolo object detector
-#include "darknet_rsl/YoloObjectDetector.h"
+#include "darknet_ros/YoloObjectDetector.h"
 
 #ifdef DARKNET_FILE_PATH
 std::string darknetFilePath_ = DARKNET_FILE_PATH;
@@ -50,7 +50,7 @@ const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bo
     "potted plant", "sheep", "sofa", "train", "tv monitor" };
 const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
 
-namespace darknet_rsl {
+namespace darknet_ros {
 
  YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
@@ -76,9 +76,9 @@ bool YoloObjectDetector::readParameters()
   bool success = true;
 
   // Load common parameters.
-  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/camera_topic", cameraTopicName_);
-  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/view_image", viewImage_);
-  success = success && param_io::getParam(nodeHandle_, "/darknet_rsl/wait_key_delay", waitKeyDelay_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/camera_topic", cameraTopicName_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/view_image", viewImage_);
+  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/wait_key_delay", waitKeyDelay_);
 
   return success;
 }
@@ -103,17 +103,17 @@ void YoloObjectDetector::init()
 
   // Threshold of object detection.
   float thresh;
-  param_io::getParam(nodeHandle_,"/darknet_rsl/object_threshold", thresh);
+  param_io::getParam(nodeHandle_,"/darknet_ros/object_threshold", thresh);
 
   // Path to weights file.
-  param_io::getParam(nodeHandle_, "/darknet_rsl/weights_model", weightsModel);
-  param_io::getParam(nodeHandle_,"/darknet_rsl/weights_path", weightsPath);
+  param_io::getParam(nodeHandle_, "/darknet_ros/weights_model", weightsModel);
+  param_io::getParam(nodeHandle_,"/darknet_ros/weights_path", weightsPath);
   weightsPath += "/" + weightsModel;
   char *weights = new char[weightsPath.length() + 1];
   strcpy(weights, weightsPath.c_str());
 
   // Path to config file.
-  param_io::getParam(nodeHandle_,"/darknet_rsl/cfg_model", cfgModel);
+  param_io::getParam(nodeHandle_,"/darknet_ros/cfg_model", cfgModel);
   configPath = darknetFilePath_;
   configPath += "/cfg/" + cfgModel;
   char *cfg = new char[configPath.length() + 1];
@@ -130,12 +130,12 @@ void YoloObjectDetector::init()
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>("found_object", 1);
-  boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_rsl_msgs::BoundingBoxes>("YOLO_BoundingBoxes", 1);
+  boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>("YOLO_BoundingBoxes", 1);
 
   // Action servers.
   checkForObjectsActionServer_.reset(
       new CheckForObjectsActionServer(
-          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_rsl/camera_action"),
+          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_ros/camera_action"),
           false));
   checkForObjectsActionServer_->registerGoalCallback(
       boost::bind(&YoloObjectDetector::checkForObjectsActionGoalCB, this));
@@ -162,7 +162,7 @@ YoloObjectDetector::~YoloObjectDetector()
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
    cv::Scalar &rosBoxColor, const std::string &objectLabel)
 {
-  darknet_rsl_msgs::BoundingBox boundingBox;
+  darknet_ros_msgs::BoundingBox boundingBox;
 
   for (int i = 0; i < numberOfObjects; i++)
   {
@@ -242,7 +242,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
   if (isCheckingForObjects())
   {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
-    darknet_rsl_msgs::CheckForObjectsResult objectsActionResult;
+    darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
     objectsActionResult.boundingBoxes = boundingBoxesResults_;
     checkForObjectsActionServer_->setSucceeded(objectsActionResult,"Send bounding boxes.");
   }
@@ -328,4 +328,4 @@ bool YoloObjectDetector::isCheckingForObjects() const
           !checkForObjectsActionServer_->isPreemptRequested());
 }
 
-} /* namespace darknet_rsl*/
+} /* namespace darknet_ros*/

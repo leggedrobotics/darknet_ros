@@ -6,7 +6,7 @@
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
-#include "darknet_rsl/ros_interface.h"
+#include "darknet_ros/ros_interface.h"
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -17,9 +17,9 @@ extern "C" void demo_yolo();
 extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
 
 cv::Mat cam_image_copy;
-char *cfg = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet_rsl/cfg/tiny-yolo-voc.cfg";
-char *weights = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet_rsl/weights/tiny-yolo-voc.weights";
-char *data = "/home/bjelonicm/any_ws/src/darknet_rsl/darknet_rsl/data";
+char *cfg = "/home/bjelonicm/any_ws/src/darknet_ros/darknet_ros/cfg/tiny-yolo-voc.cfg";
+char *weights = "/home/bjelonicm/any_ws/src/darknet_ros/darknet_ros/weights/tiny-yolo-voc.weights";
+char *data = "/home/bjelonicm/any_ws/src/darknet_ros/darknet_ros/data";
 float thresh = 0.2;
 const std::string CAMERA_TOPIC_NAME = "/camera/image_raw";
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(darknet_rsl)
+project(darknet_ros)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 # set(DARKNET_PATH "/home/markob/git/darknet")
 find_path(DARKNET_PATH 
 	NAMES "README.md"
-	HINTS "$ENV{HOME}/darknet/" "$ENV{HOME}/git/darknet/" "$ENV{HOME}/catkin_ws/src/darknet/" "$ENV{HOME}/workspace/darknet_rsl/source/dependecies/darknet/")
+	HINTS "$ENV{HOME}/darknet/" "$ENV{HOME}/git/darknet/" "$ENV{HOME}/catkin_ws/src/darknet/" "$ENV{HOME}/workspace/darknet_ros/source/dependecies/darknet/")
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
@@ -35,7 +35,7 @@ find_package(catkin REQUIRED
     rospy
     std_msgs
     actionlib
-    darknet_rsl_msgs
+    darknet_ros_msgs
     image_transport
     param_io
 )
@@ -49,7 +49,7 @@ catkin_package(
     actionlib
     rospy
     std_msgs
-    darknet_rsl_msgs
+    darknet_ros_msgs
     image_transport
     param_io
   DEPENDS

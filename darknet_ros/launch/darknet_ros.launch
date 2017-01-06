@@ -3,14 +3,14 @@
 <launch>
 	<!-- Arguments to generate darknet network. -->
 	<arg name="yolo_model" 				default="tiny-yolo-voc"/>
-	<arg name="yolo_weights_path" 		default="$(find darknet_rsl)/weights"/>
+	<arg name="yolo_weights_path" 		default="$(find darknet_ros)/weights"/>
 	<arg name="yolo_cfg_model" 			default="$(arg yolo_model).cfg"/>
 	<arg name="yolo_weights_model" 		default="$(arg yolo_model).weights"/>
 	
 	<!-- Name of camera topic -->
 	<arg name="camera_topic_name" 		default="/camera/image_raw"/>
 	
-	<!-- Name of CheckForObjectsAction (darknet_rsl_msgs) -->
+	<!-- Name of CheckForObjectsAction (darknet_ros_msgs) -->
 	<arg name="camera_action_name" 		default="/darknet/check_for_objects"/>
 	
 	<!-- Threshold of object detection -->
@@ -23,7 +23,7 @@
 	<arg name="wait_key_delay_in_opencv" default="3"/>
 	
 	<!-- Start darknet and ros wrapper -->
-	<node pkg="darknet_rsl" type="darknet_rsl" name="darknet_rsl" output="screen">
+	<node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen">
 	  <param name="cfg_model" 			value="$(arg yolo_cfg_model)" />
 	  <param name="weights_model" 		value="$(arg yolo_weights_model)" />
 	  <param name="weights_path" 		value="$(arg yolo_weights_path)" />

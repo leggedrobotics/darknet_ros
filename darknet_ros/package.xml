@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>darknet_rsl</name>
+  <name>darknet_ros</name>
   <version>0.1.0</version>
   <description>ROS package to use YOLO in ROS.</description>
   <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
   <license>MIT</license>
-  <url type="marko.bjelonic@mavt.ethz.ch">https://bitbucket.org/ethz-asl-lr/darknet_rsl</url>
+  <url type="marko.bjelonic@mavt.ethz.ch">https://bitbucket.org/ethz-asl-lr/darknet_ros</url>
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -19,7 +19,7 @@
   <depend>cv_bridge</depend>
   <depend>sensor_msgs</depend>
   <depend>message_generation</depend>
-  <depend>darknet_rsl_msgs</depend>
+  <depend>darknet_ros_msgs</depend>
   <depend>actionlib</depend>
   <depend>param_io</depend>
   <depend>darknet</depend>
