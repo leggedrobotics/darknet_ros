@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>darknet_rsl</name>
   <version>0.1.0</version>
   <description>ROS package to use YOLO in ROS.</description>
@@ -9,31 +9,18 @@
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>boost</build_depend>
+  <depend>boost</depend>
    
-  <build_depend>roscpp</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>opencv2</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>darknet_rsl_msgs</build_depend>
-  <build_depend>actionlib</build_depend>
-  <build_depend>param_io</build_depend>
-
-  <run_depend>roscpp</run_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>opencv2</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>face_tracker</run_depend>
-  <run_depend>message_generation</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>darknet_rsl_msgs</run_depend>
-  <run_depend>actionlib</run_depend>
-  <run_depend>param_io</run_depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>opencv2</depend>
+  <depend>image_transport</depend>
+  <depend>cv_bridge</depend>
+  <depend>sensor_msgs</depend>
+  <depend>message_generation</depend>
+  <depend>darknet_rsl_msgs</depend>
+  <depend>actionlib</depend>
+  <depend>param_io</depend>
+  <depend>darknet</depend>
 </package>

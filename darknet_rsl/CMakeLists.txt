@@ -4,14 +4,18 @@ project(darknet_rsl)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Define path of darknet folder here.
-set(DARKNET_PATH "/home/markob/git/darknet")
+# set(DARKNET_PATH "/home/markob/git/darknet")
+find_path(DARKNET_PATH 
+	NAMES "README.md"
+	HINTS "$ENV{HOME}/darknet/" "$ENV{HOME}/git/darknet/" "$ENV{HOME}/catkin_ws/src/darknet/" "$ENV{HOME}/workspace/darknet_rsl/source/dependecies/darknet/")
+message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)
   find_package(CUDA REQUIRED)
-  message(STATUS "CUDA Version: " ${CUDA_VERSION_STRINGS})
-  message(STATUS "CUDA Libararies: " ${CUDA_LIBRARIES})
+  message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
+  message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
   set(
     CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
