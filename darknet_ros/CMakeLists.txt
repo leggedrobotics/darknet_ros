@@ -4,10 +4,9 @@ project(darknet_ros)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Define path of darknet folder here.
-# set(DARKNET_PATH "/home/markob/git/darknet")
 find_path(DARKNET_PATH
 	NAMES "README.md"
-	HINTS "$ENV{HOME}/darknet/" "$ENV{HOME}/git/darknet/" "$ENV{HOME}/catkin_ws/src/darknet/" "$ENV{HOME}/workspace/darknet_ros/source/dependecies/darknet/")
+	HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
