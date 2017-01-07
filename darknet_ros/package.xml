@@ -10,7 +10,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>boost</depend>
-   
+
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>std_msgs</depend>
@@ -22,5 +22,7 @@
   <depend>darknet_ros_msgs</depend>
   <depend>actionlib</depend>
   <depend>param_io</depend>
-  <depend>darknet</depend>
+
+  <!-- Test dependencies -->
+  <test_depend>rostest</test_depend>
 </package>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+  <!-- Name of CheckForObjectsAction (darknet_ros_msgs) -->
+	<arg name="camera_action_name" 		default="/darknet/check_for_objects"/>
+	
+	<!-- Arguments to generate darknet network. -->
+	<arg name="yolo_model" 				default="tiny-yolo-voc"/>
+
+	<!-- Threshold of object detection -->
+	<arg name="yolo_object_threshold" 	default="0.23"/>
+
+	<!-- Enable image view in opencv -->
+	<arg name="view_image_in_opencv" 	default="true"/>
+
+	<!-- Delay for cv::waitkey(delay) in millisecons -->
+	<arg name="wait_key_delay_in_opencv" default="5"/>
+
+  <include file="$(find darknet_ros)/launch/darknet_ros.launch">
+  	<arg name="yolo_model" 				value="$(arg yolo_model)"/>
+    <arg name="camera_action_name" 		value="$(arg camera_action_name)"/>
+	<arg name="yolo_object_threshold" 	value="$(arg yolo_object_threshold)"/>
+	<arg name="view_image_in_opencv" 	value="$(arg view_image_in_opencv)"/>
+	<arg name="wait_key_delay_in_opencv" value="$(arg wait_key_delay_in_opencv)"/>
+  </include>
+
+  <test pkg="darknet_ros" test-name="darknet_ros_object_detection" type="darknet_ros_object_detection-test" time-limit="500.0"/>
+</launch>

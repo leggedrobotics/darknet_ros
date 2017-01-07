@@ -268,3 +268,21 @@ else()
     ${catkin_LIBRARIES}
   )
 endif()
+
+#############
+## Testing ##
+#############
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+
+  # Start up.
+  add_rostest_gtest(${PROJECT_NAME}_object_detection-test
+    test/object_detection.test
+    test/test_main.cpp
+    test/ObjectDetection.cpp
+  )
+  target_link_libraries(${PROJECT_NAME}_object_detection-test
+    ${catkin_LIBRARIES}
+  )
+endif()
