@@ -9,6 +9,7 @@
 #ifndef ros_interface
 #define ros_interface
 
+// OpenCv
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>

@@ -12,7 +12,7 @@
 #include "cublas_v2.h"
 #endif
 
-#include "darknet_ros/ros_interface.h"
+#include "darknet_ros/YoloObjectDetector.h"
 #include <iostream>
 
 extern "C" {
@@ -56,11 +56,11 @@ static int demo_index = 0;
 static image images[FRAMES];
 static float *avg;
 
-static RosBox_ *ROI_boxes;
+static darknet_ros::RosBox_ *ROI_boxes;
 
 void *fetch_in_thread(void *ptr)
 {
-  IplImage* ROS_img = get_ipl_image();
+  IplImage* ROS_img = darknet_ros::get_ipl_image();
   in = ipl_to_image(ROS_img);
   delete ROS_img;
   ROS_img = NULL;
@@ -181,12 +181,12 @@ extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, fl
 	for(j = 0; j < FRAMES; ++j) images[j] = make_image(1,1,3);
 
 	boxes = (box *)calloc(l.w*l.h*l.n, sizeof(box));
-  ROI_boxes = (RosBox_ *)calloc(l.side*l.side*l.n, sizeof(RosBox_));
+  ROI_boxes = (darknet_ros::RosBox_ *)calloc(l.side*l.side*l.n, sizeof(darknet_ros::RosBox_));
 	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
 	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
 }
 
-extern "C" RosBox_ *demo_yolo()
+extern "C" darknet_ros::RosBox_ *demo_yolo()
 {
 	int j;
 	char *prefix = 0;

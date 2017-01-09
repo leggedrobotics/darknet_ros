@@ -21,39 +21,14 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #error Path of darknet repository is not defined in CMakeLists.txt.
 #endif
 
-/*!
- * Run YOLO and detect obstacles.
- * @param[out] bounding box.
- */
-extern "C" RosBox_ *demo_yolo();
+namespace darknet_ros {
 
-/*!
- * Initialize darknet network of yolo.
- * @param[in] cfgfile location of darknet's cfg file describing the layers of the network.
- * @param[in] weightfile location of darknet's weights file setting the weights of the network.
- * @param[in] datafile location of darknet's data file.
- * @param[in] thresh threshold of the object detection (0 < thresh < 1).
- */
-extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
-
-/*!
- * This function is called in yolo and allows YOLO to receive the ROS image.
- * @param[out] current image of the camera.
- */
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
 {
    IplImage* ROS_img = new IplImage(camImageCopy_);
    return ROS_img;
 }
-
-//! Class labels.
-const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
-    "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
-    "potted plant", "sheep", "sofa", "train", "tv monitor" };
-const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
-
-namespace darknet_ros {
 
  YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
