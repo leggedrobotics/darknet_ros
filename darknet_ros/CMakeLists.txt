@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_ros)
 
+# Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Define path of darknet folder here.
@@ -10,6 +11,7 @@ find_path(DARKNET_PATH
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
+# Find CUDA
 FIND_PACKAGE(CUDA)
 if (CUDA_FOUND)
   find_package(CUDA REQUIRED)
@@ -25,6 +27,17 @@ else()
   list(APPEND LIBRARIES "m")
 endif()
 
+# Find X11
+MESSAGE ( STATUS "Searching for X11..." )
+FIND_PACKAGE ( X11 REQUIRED )
+IF ( X11_FOUND )
+      INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
+      LINK_LIBRARIES ( ${X11_LIBRARIES} )
+      MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
+      MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
+ENDIF ( X11_FOUND )
+
+# Find rquired packeges
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED
@@ -39,6 +52,7 @@ find_package(catkin REQUIRED
     param_io
 )
 
+# Enable OPENCV in darknet
 add_definitions(-DOPENCV)
 
 catkin_package(
@@ -276,7 +290,7 @@ endif()
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
 
-  # Start up.
+  # Object detection in images.
   add_rostest_gtest(${PROJECT_NAME}_object_detection-test
     test/object_detection.test
     test/test_main.cpp
