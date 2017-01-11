@@ -180,7 +180,7 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
+void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
 {
   ROS_INFO("[YoloObjectDetector] runYolo().");
 
@@ -233,6 +233,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame)
   {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
     darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
+    objectsActionResult.id = id;
     objectsActionResult.boundingBoxes = boundingBoxesResults_;
     checkForObjectsActionServer_->setSucceeded(objectsActionResult,"Send bounding boxes.");
   }
@@ -281,7 +282,8 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
 {
   ROS_INFO("[YoloObjectDetector] Start check for objects action.");
 
-  sensor_msgs::Image imageAction = checkForObjectsActionServer_->acceptNewGoal()->image;
+  boost::shared_ptr<const darknet_ros_msgs::CheckForObjectsGoal> imageActionPtr = checkForObjectsActionServer_->acceptNewGoal();
+  sensor_msgs::Image imageAction = imageActionPtr->image;
 
   cv_bridge::CvImagePtr cam_image;
 
@@ -300,7 +302,7 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image);
+    runYolo(cam_image->image, imageActionPtr->id);
   }
   return;
 }

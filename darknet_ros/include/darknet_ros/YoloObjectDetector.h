@@ -111,7 +111,7 @@ class YoloObjectDetector
    * Run YOLO and detect obstacles.
    * @param[in] fullFrame image of current camera frame.
    */
-  void runYolo(cv::Mat &fullFrame);
+  void runYolo(cv::Mat &fullFrame, int id = 0);
 
   /*!
    * Callback of camera.
