@@ -6,9 +6,6 @@
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
-// param io
-#include <param_io/get_param.hpp>
-
 // yolo object detector
 #include "darknet_ros/YoloObjectDetector.h"
 
@@ -51,12 +48,10 @@ IplImage* get_ipl_image()
 
 bool YoloObjectDetector::readParameters()
 {
-  bool success = true;
-
   // Load common parameters.
-  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/camera_topic", cameraTopicName_);
-  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/view_image", viewImage_);
-  success = success && param_io::getParam(nodeHandle_, "/darknet_ros/wait_key_delay", waitKeyDelay_);
+  nodeHandle_.param("/darknet_ros/camera_topic", cameraTopicName_, std::string("/camera/image_raw"));
+  nodeHandle_.param("/darknet_ros/view_image", viewImage_, true);
+  nodeHandle_.param("/darknet_ros/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
   if(XOpenDisplay(NULL))
@@ -70,7 +65,7 @@ bool YoloObjectDetector::readParameters()
     viewImage_ = false;
   }
 
-  return success;
+  return true;
 }
 
 void YoloObjectDetector::init()
@@ -93,17 +88,17 @@ void YoloObjectDetector::init()
 
   // Threshold of object detection.
   float thresh;
-  param_io::getParam(nodeHandle_,"/darknet_ros/object_threshold", thresh);
+  nodeHandle_.param("/darknet_ros/object_threshold", thresh, (float)0.3);
 
   // Path to weights file.
-  param_io::getParam(nodeHandle_, "/darknet_ros/weights_model", weightsModel);
-  param_io::getParam(nodeHandle_,"/darknet_ros/weights_path", weightsPath);
+  nodeHandle_.param("/darknet_ros/weights_model", weightsModel, std::string("tiny-yolo-voc.weights"));
+  nodeHandle_.param("/darknet_ros/weights_path", weightsPath, std::string("/default"));
   weightsPath += "/" + weightsModel;
   char *weights = new char[weightsPath.length() + 1];
   strcpy(weights, weightsPath.c_str());
 
   // Path to config file.
-  param_io::getParam(nodeHandle_,"/darknet_ros/cfg_model", cfgModel);
+  nodeHandle_.param("/darknet_ros/cfg_model", cfgModel, std::string("tiny-yolo-voc.cfg"));
   configPath = darknetFilePath_;
   configPath += "/cfg/" + cfgModel;
   char *cfg = new char[configPath.length() + 1];
@@ -123,9 +118,11 @@ void YoloObjectDetector::init()
   boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>("YOLO_BoundingBoxes", 1);
 
   // Action servers.
+  std::string checkForObjectsActionName;
+  nodeHandle_.param("/darknet_ros/camera_action", checkForObjectsActionName, std::string("/darknet/check_for_objects"));
   checkForObjectsActionServer_.reset(
       new CheckForObjectsActionServer(
-          nodeHandle_, param_io::getParam<std::string>(nodeHandle_, "/darknet_ros/camera_action"),
+          nodeHandle_, checkForObjectsActionName,
           false));
   checkForObjectsActionServer_->registerGoalCallback(
       boost::bind(&YoloObjectDetector::checkForObjectsActionGoalCB, this));

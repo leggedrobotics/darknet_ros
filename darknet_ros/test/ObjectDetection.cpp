@@ -27,9 +27,6 @@
 // Actions.
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 
-// param io
-#include <param_io/get_param.hpp>
-
 typedef actionlib::SimpleActionClient<darknet_ros_msgs::CheckForObjectsAction> CheckForObjectsActionClient;
 typedef std::shared_ptr<CheckForObjectsActionClient> CheckForObjectsActionClientPtr;
 
@@ -65,9 +62,11 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName)
   CheckForObjectsActionClientPtr checkForObjectsActionClient;
 
   // Action clients.
+  std::string checkForObjectsActionName;
+  nh.param("/darknet_ros/camera_action", checkForObjectsActionName, std::string("/darknet/check_for_objects"));
   checkForObjectsActionClient.reset(
       new CheckForObjectsActionClient(
-          nh, param_io::getParam<std::string>(nh, "/darknet_ros/camera_action"),
+          nh, checkForObjectsActionName,
           true));
 
   // Wait till action server launches.

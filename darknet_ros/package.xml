@@ -21,8 +21,7 @@
   <depend>message_generation</depend>
   <depend>darknet_ros_msgs</depend>
   <depend>actionlib</depend>
-  <depend>param_io</depend>
-
+  
   <!-- Test dependencies -->
   <test_depend>rostest</test_depend>
 </package>
