@@ -164,11 +164,11 @@ void *detect_in_thread(void *ptr)
 
 double get_wall_time()
 {
-    struct timeval time;
-    if (gettimeofday(&time,NULL)){
-        return 0;
-    }
-    return (double)time.tv_sec + (double)time.tv_usec * .000001;
+  struct timeval time;
+  if (gettimeofday(&time,NULL)){
+    return 0;
+  }
+  return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
 extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay)
