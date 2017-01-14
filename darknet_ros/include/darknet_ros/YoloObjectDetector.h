@@ -135,6 +135,12 @@ class YoloObjectDetector
    */
   bool isCheckingForObjects() const;
 
+  /*!
+   * Publishes the detection image.
+   * @return true if successful.
+   */
+  bool publishDetectionImage(const cv::Mat& detectionImage);
+
   //! Typedefs.
   typedef actionlib::SimpleActionServer<darknet_ros_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
   typedef std::shared_ptr<CheckForObjectsActionServer> CheckForObjectsActionServerPtr;
@@ -170,6 +176,9 @@ class YoloObjectDetector
   bool viewImage_;
   int waitKeyDelay_;
   bool darknetImageViewer_;
+
+  //! Publisher of the bounding box image.
+  ros::Publisher detectionImagePublisher_;
 };
 
 } /* namespace darknet_ros*/

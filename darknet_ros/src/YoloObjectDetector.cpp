@@ -136,12 +136,16 @@ void YoloObjectDetector::init()
       boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
 
+  // OpenCv image view.
   if(viewImage_ && !darknetImageViewer_)
   {
     cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
     cv::moveWindow(opencvWindow_, 0, 0);
     cv::resizeWindow(opencvWindow_, 1352, 1013);
   }
+
+  // Publisher.
+  detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>("object_detection_image", 1, true);
 }
 
 YoloObjectDetector::~YoloObjectDetector()
@@ -259,6 +263,9 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
     cv::imshow(opencvWindow_, inputFrame);
     cv::waitKey(waitKeyDelay_);
   }
+
+  // Publish elevation change map.
+  if (!publishDetectionImage(inputFrame)) ROS_DEBUG("Detection image has not been broadcasted.");
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -327,6 +334,19 @@ bool YoloObjectDetector::isCheckingForObjects() const
   return (ros::ok() &&
       checkForObjectsActionServer_->isActive() &&
           !checkForObjectsActionServer_->isPreemptRequested());
+}
+
+bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
+{
+  if (detectionImagePublisher_.getNumSubscribers() < 1) return false;
+  cv_bridge::CvImage cvImage;
+  cvImage.header.stamp = ros::Time::now();
+  cvImage.header.frame_id = "detection_image";
+  cvImage.encoding = sensor_msgs::image_encodings::BGR8;
+  cvImage.image    = detectionImage;
+  detectionImagePublisher_.publish(*cvImage.toImageMsg());
+  ROS_DEBUG("Detection image has been published.");
+  return true;
 }
 
 } /* namespace darknet_ros*/
