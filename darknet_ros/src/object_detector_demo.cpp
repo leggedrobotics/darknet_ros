@@ -13,7 +13,6 @@
 #endif
 
 #include "darknet_ros/YoloObjectDetector.h"
-#include <iostream>
 
 extern "C" {
 #include "network.h"
@@ -47,6 +46,7 @@ static image in   ;
 static image in_s ;
 static image det  ;
 static image det_s;
+static image disp = {0};
 static float fps = 0;
 static float demo_thresh = 0;
 static float demo_hier_thresh = .5;
@@ -57,6 +57,8 @@ static image images[FRAMES];
 static float *avg;
 
 static darknet_ros::RosBox_ *ROI_boxes;
+static bool view_image;
+static int wait_key_delay;
 
 void *fetch_in_thread(void *ptr)
 {
@@ -93,6 +95,17 @@ void *detect_in_thread(void *ptr)
   printf("\033[2J");
   printf("\033[1;1H");
   printf("\nFPS:%.1f\n",fps);
+
+  if(view_image)
+  {
+    printf("Objects:\n\n");
+
+    images[demo_index] = det;
+    det = images[(demo_index + FRAMES/2 + 1)%FRAMES];
+    demo_index = (demo_index + 1)%FRAMES;
+
+    draw_detections(det, l.w*l.h*l.n, demo_thresh, boxes, probs, &voc_names, demo_alphabet, demo_classes);
+  }
 
   // extract the bounding boxes and send them to ROS
   int total = l.w*l.h*l.n;
@@ -132,7 +145,6 @@ void *detect_in_thread(void *ptr)
           ROI_boxes[count].prob = probs[i][j];
           count++;
         }
-        //printf("%f %f\n", x_center*320, y_center*240);
       }
     }
   }
@@ -159,11 +171,13 @@ double get_wall_time()
     return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh)
+extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay)
 {
 	image **alphabet = load_alphabet_with_file(datafile);
 	demo_alphabet = alphabet;
 	demo_thresh = thresh;
+	view_image = viewimage;
+	wait_key_delay = waitkeydelay;
 	printf("Demo\n");
 	net = parse_network_cfg(cfgfile);
 	if(weightfile){
@@ -184,6 +198,13 @@ extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, fl
   ROI_boxes = (darknet_ros::RosBox_ *)calloc(l.side*l.side*l.n, sizeof(darknet_ros::RosBox_));
 	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
 	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
+
+	if(view_image)
+	{
+	  cvNamedWindow("YOLO V2", CV_WINDOW_NORMAL);
+	  cvMoveWindow("YOLO V2", 0, 0);
+	  cvResizeWindow("YOLO V2", 1352, 1013);
+	}
 }
 
 extern "C" darknet_ros::RosBox_ *demo_yolo()
@@ -201,12 +222,14 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
 
 	fetch_in_thread(0);
 	detect_in_thread(0);
+	disp = det;
 	det = in;
 	det_s = in_s;
 
 	for(j = 0; j < FRAMES/2; ++j){
 		fetch_in_thread(0);
 		detect_in_thread(0);
+		disp = det;
 		det = in;
 		det_s = in_s;
 	}
@@ -215,14 +238,21 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
   gettimeofday(&tval_before, NULL);
   if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
   if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
-  cvWaitKey(1);
+  if(view_image)
+  {
+    show_image(disp, "YOLO V2");
+    free_image(disp);
+    cvWaitKey(wait_key_delay);
+  }
   pthread_join(fetch_thread, 0);
   pthread_join(detect_thread, 0);
 
+  disp  = det;
   det   = in;
   det_s = in_s;
   free_image(in);
   free_image(in_s);
+  free_image(disp);
 
   gettimeofday(&tval_after, NULL);
   timersub(&tval_after, &tval_before, &tval_result);

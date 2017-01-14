@@ -51,6 +51,7 @@ bool YoloObjectDetector::readParameters()
   // Load common parameters.
   nodeHandle_.param("/darknet_ros/camera_topic", cameraTopicName_, std::string("/camera/image_raw"));
   nodeHandle_.param("/darknet_ros/view_image", viewImage_, true);
+  nodeHandle_.param("/darknet_ros/darknet_image_viewer", darknetImageViewer_, false);
   nodeHandle_.param("/darknet_ros/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
@@ -63,6 +64,7 @@ bool YoloObjectDetector::readParameters()
   {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
     viewImage_ = false;
+    darknetImageViewer_ = false;
   }
 
   return true;
@@ -110,7 +112,7 @@ void YoloObjectDetector::init()
   char *data = new char[dataPath.length() + 1];
   strcpy(data, dataPath.c_str());
 
-  load_network(cfg, weights, data, thresh);
+  load_network(cfg, weights, data, thresh, darknetImageViewer_, waitKeyDelay_);
 
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
@@ -130,7 +132,7 @@ void YoloObjectDetector::init()
       boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
 
-  if(viewImage_)
+  if(viewImage_ && !darknetImageViewer_)
   {
     cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
     cv::moveWindow(opencvWindow_, 0, 0);
@@ -140,7 +142,7 @@ void YoloObjectDetector::init()
 
 YoloObjectDetector::~YoloObjectDetector()
 {
-  if(viewImage_)
+  if(viewImage_ && !darknetImageViewer_)
   {
     cv::destroyWindow(opencvWindow_);
   }
@@ -192,8 +194,11 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
   // if at least one BoundingBox found, draw box
   if (num > 0  && num <= 100)
   {
-    std::cout << "# Objects: " << num << std::endl;
+    if(!darknetImageViewer_)
+    {
+      std::cout << "# Objects: " << num << std::endl;
 
+    }
     // split bounding boxes by class
     for (int i = 0; i < num; i++)
     {
@@ -203,7 +208,10 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
          {
             rosBoxes_[j].push_back(boxes_[i]);
             rosBoxCounter_[j]++;
-            std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_->prob*100 << "%)" << std::endl;
+            if(!darknetImageViewer_)
+            {
+              std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_[i].prob*100 << "%)" << std::endl;
+            }
          }
       }
     }
@@ -242,7 +250,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
      rosBoxCounter_[i] = 0;
   }
 
-  if(viewImage_)
+  if(viewImage_ && !darknetImageViewer_)
   {
     cv::imshow(opencvWindow_, inputFrame);
     cv::waitKey(waitKeyDelay_);
@@ -265,7 +273,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
      return;
   }
 
-  if (cam_image)
+  if(cam_image)
   {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;

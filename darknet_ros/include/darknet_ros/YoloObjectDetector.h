@@ -57,7 +57,7 @@ extern "C" RosBox_ *demo_yolo();
  * @param[in] datafile location of darknet's data file.
  * @param[in] thresh threshold of the object detection (0 < thresh < 1).
  */
-extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh);
+extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay);
 
 /*!
  * This function is called in yolo and allows YOLO to receive the ROS image.
@@ -169,6 +169,7 @@ class YoloObjectDetector
   const std::string opencvWindow_;
   bool viewImage_;
   int waitKeyDelay_;
+  bool darknetImageViewer_;
 };
 
 } /* namespace darknet_ros*/
