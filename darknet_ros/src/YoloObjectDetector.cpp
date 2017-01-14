@@ -64,6 +64,10 @@ bool YoloObjectDetector::readParameters()
   {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
     viewImage_ = false;
+  }
+
+  if(!viewImage_)
+  {
     darknetImageViewer_ = false;
   }
 
