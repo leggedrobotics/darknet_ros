@@ -152,11 +152,11 @@ TEST(ObjectDetection, DetectDog)
   }
 
   ASSERT_TRUE(detectedDog);
-  EXPECT_LT(centerErrorDog, 30.0);
+  EXPECT_LT(centerErrorDog, 40.0);
   ASSERT_TRUE(detectedBicycle);
-  EXPECT_LT(centerErrorBicycle, 30.0);
+  EXPECT_LT(centerErrorBicycle, 40.0);
   ASSERT_TRUE(detectedCar);
-  EXPECT_LT(centerErrorCar, 30.0);
+  EXPECT_LT(centerErrorCar, 40.0);
 }
 
 TEST(ObjectDetection, DetectPerson)
@@ -185,5 +185,5 @@ TEST(ObjectDetection, DetectPerson)
   }
 
   ASSERT_TRUE(detectedPerson);
-  EXPECT_LT(centerErrorPerson, 30.0);
+  EXPECT_LT(centerErrorPerson, 40.0);
 }
