@@ -24,3 +24,12 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 - [Darknet](https://github.com/pjreddie/darknet) (open source neural network framework written in C and CUDA)
 - [OpenCV](http://opencv.org/) (computer vision library),
 - [boost](http://www.boost.org/) (c++ library),
+
+### Building
+
+In order to install the Robot-Centric Elevation Mapping, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
+
+    cd catkin_workspace/src
+    git clone --recursive git@bitbucket.org:leggedrobotics/darknet_ros.git
+    cd ../
+    catkin_make
