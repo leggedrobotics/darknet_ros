@@ -27,7 +27,7 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 
 ### Building
 
-In order to install the Robot-Centric Elevation Mapping, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
+In order to install darknet_ros, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
 
     cd catkin_workspace/src
     git clone --recursive git@bitbucket.org:leggedrobotics/darknet_ros.git
