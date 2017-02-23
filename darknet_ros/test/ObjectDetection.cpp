@@ -70,7 +70,7 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName)
           true));
 
   // Wait till action server launches.
-  if(!checkForObjectsActionClient->waitForServer(ros::Duration(5.0)))
+  if(!checkForObjectsActionClient->waitForServer(ros::Duration(20.0)))
   {
 	  std::cout << "[ObjectDetectionTest] sendImageToYolo(): checkForObjects action server has not been advertised." << std::endl;
 	  return false;
@@ -100,7 +100,7 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName)
       CheckForObjectsActionClient::SimpleActiveCallback(),
       CheckForObjectsActionClient::SimpleFeedbackCallback());
 
-  if(!checkForObjectsActionClient->waitForResult(ros::Duration(20.0)))
+  if(!checkForObjectsActionClient->waitForResult(ros::Duration(100.0)))
   {
     std::cout << "[ObjectDetectionTest] sendImageToYolo(): checkForObjects action server took to long to send back result." << std::endl;
     return false;
