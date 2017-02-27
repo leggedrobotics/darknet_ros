@@ -92,8 +92,8 @@ void *detect_in_thread(void *ptr)
     error("Last layer must produce detections\n");
   }
   if (nms > 0) do_nms(boxes, probs, l.w*l.h*l.n, l.classes, nms);
-  printf("\033[2J");
-  printf("\033[1;1H");
+  //printf("\033[2J");
+  //printf("\033[1;1H");
   printf("\nFPS:%.1f\n",fps);
 
   if(view_image)
