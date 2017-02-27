@@ -116,6 +116,11 @@ void YoloObjectDetector::init()
   char *data = new char[dataPath.length() + 1];
   strcpy(data, dataPath.c_str());
 
+  // Path to default image.
+  std::string pathToTestImage = darknetFilePath_;
+  pathToTestImage += "/data/dog.jpg";
+  camImageCopy_ = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
+
   load_network(cfg, weights, data, thresh, darknetImageViewer_, waitKeyDelay_);
 
   // Initialize publisher and subscriber.

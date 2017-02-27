@@ -60,6 +60,10 @@ static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
 static int wait_key_delay;
 
+pthread_t fetch_thread;
+pthread_t detect_thread;
+struct timeval tval_before, tval_after, tval_result;
+
 void *fetch_in_thread(void *ptr)
 {
   IplImage* ROS_img = darknet_ros::get_ipl_image();
@@ -159,6 +163,7 @@ void *detect_in_thread(void *ptr)
   {
     ROI_boxes[0].num = count;
   }
+
   return 0;
 }
 
@@ -205,43 +210,39 @@ extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, fl
 	  cvMoveWindow("YOLO V2", 0, 0);
 	  cvResizeWindow("YOLO V2", 1352, 1013);
 	}
+
+  fetch_in_thread(0);
+  det = in;
+  det_s = in_s;
+
+  fetch_in_thread(0);
+  detect_in_thread(0);
+  disp = det;
+  det = in;
+  det_s = in_s;
+
+  for(j = 0; j < FRAMES/2; ++j){
+    fetch_in_thread(0);
+    detect_in_thread(0);
+    disp = det;
+    det = in;
+    det_s = in_s;
+  }
+
+  gettimeofday(&tval_before, NULL);
 }
 
 extern "C" darknet_ros::RosBox_ *demo_yolo()
 {
-	int j;
-	char *prefix = 0;
-	int frame_skip = 20;
-	int delay = frame_skip;
-	pthread_t fetch_thread;
-	pthread_t detect_thread;
+  fetch_in_thread(0);
+  det = in;
+  det_s = in_s;
 
-	fetch_in_thread(0);
-	det = in;
-	det_s = in_s;
-
-	fetch_in_thread(0);
-	detect_in_thread(0);
-	disp = det;
-	det = in;
-	det_s = in_s;
-
-	for(j = 0; j < FRAMES/2; ++j){
-		fetch_in_thread(0);
-		detect_in_thread(0);
-		disp = det;
-		det = in;
-		det_s = in_s;
-	}
-
-	struct timeval tval_before, tval_after, tval_result;
-  gettimeofday(&tval_before, NULL);
   if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
   if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
   if(view_image)
   {
     show_image(disp, "YOLO V2");
-    free_image(disp);
     cvWaitKey(wait_key_delay);
   }
   pthread_join(fetch_thread, 0);
@@ -250,9 +251,6 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
   disp  = det;
   det   = in;
   det_s = in_s;
-  free_image(in);
-  free_image(in_s);
-  free_image(disp);
 
   gettimeofday(&tval_after, NULL);
   timersub(&tval_after, &tval_before, &tval_result);

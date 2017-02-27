@@ -15,7 +15,7 @@
   <arg name="view_image_in_opencv"        default="true"/>
 
   <!-- Enable image view in opencv -->
-  <arg name="use_darknet_image_viewer"    default="true"/>
+  <arg name="use_darknet_image_viewer"    default="false"/>
 
   <!-- Delay for cv::waitkey(delay) in millisecons -->
   <arg name="wait_key_delay_in_opencv"    default="1000"/>
