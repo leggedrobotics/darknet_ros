@@ -1,4 +1,4 @@
-# YOLO: Real-Time Object Detection for ROS
+# YOLO ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
@@ -32,4 +32,15 @@ In order to install darknet_ros, clone the latest version from this repository i
     cd catkin_workspace/src
     git clone --recursive git@bitbucket.org:leggedrobotics/darknet_ros.git
     cd ../
-    catkin_make
+    catkin build darknet_ros
+
+### Unit Tests
+
+Run the unit tests with
+
+    catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
+
+You will see the following two figures popping up:
+
+![Darknet Ros example: Detection image 1](darknet_ros/doc/dog.png)
+![Darknet Ros example: Detection image 2](darknet_ros/doc/person.png)
