@@ -34,6 +34,14 @@ In order to install darknet_ros, clone the latest version from this repository i
     cd ../
     catkin build darknet_ros
 
+### Download weights
+
+Go into the weights folder and download the two pre-trained weights
+
+    cd catkin_workspace/src/darknet_ros/darknet_ros/weights/
+    wget http://pjreddie.com/media/files/yolo-voc.weights
+    wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
+
 ### Unit Tests
 
 Run the unit tests with
