@@ -91,7 +91,7 @@ void *detect_in_thread(void *ptr)
   if(l.type == DETECTION){
     get_detection_boxes(l, 1, 1, demo_thresh, probs, boxes, 0);
   } else if (l.type == REGION){
-    get_region_boxes(l, 1, 1, demo_thresh, probs, boxes, 0, 0, demo_hier_thresh);
+    get_region_boxes(l, in.w, in.h, net.w, net.h, demo_thresh, probs, boxes, 0, 0, demo_hier_thresh, 1);
   } else {
     error("Last layer must produce detections\n");
   }
@@ -176,7 +176,7 @@ double get_wall_time()
   return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-extern "C" void load_network(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay)
+extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay)
 {
 	image **alphabet = load_alphabet_with_file(datafile);
 	demo_alphabet = alphabet;

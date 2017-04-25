@@ -121,7 +121,7 @@ void YoloObjectDetector::init()
   pathToTestImage += "/data/dog.jpg";
   camImageCopy_ = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
 
-  load_network(cfg, weights, data, thresh, darknetImageViewer_, waitKeyDelay_);
+  load_network_demo(cfg, weights, data, thresh, darknetImageViewer_, waitKeyDelay_);
 
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);

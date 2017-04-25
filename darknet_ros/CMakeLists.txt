@@ -64,7 +64,7 @@ catkin_package(
     darknet_ros_msgs
     image_transport
   DEPENDS
-    boost
+    Boost
 )
 
 if (CUDA_FOUND)
@@ -85,8 +85,9 @@ if (CUDA_FOUND)
     src/object_detector_demo.cpp
     src/image_interface.c
 
-    ${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/utils.c
     ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/convolutional_layer.c
+		${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/lsd.c
     ${DARKNET_PATH}/src/list.c                    ${DARKNET_PATH}/src/image.c
     ${DARKNET_PATH}/src/activations.c             ${DARKNET_PATH}/src/im2col.c
     ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/blas.c
@@ -112,7 +113,8 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/cifar.c                   ${DARKNET_PATH}/src/go.c
     ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/art.c
     ${DARKNET_PATH}/src/region_layer.c            ${DARKNET_PATH}/src/reorg_layer.c
-    ${DARKNET_PATH}/src/super.c
+    ${DARKNET_PATH}/src/super.c                   ${DARKNET_PATH}/src/detector.c
+		${DARKNET_PATH}/src/regressor.c
 
     ${DARKNET_PATH}/src/convolutional_kernels.cu  ${DARKNET_PATH}/src/network_kernels.cu
     ${DARKNET_PATH}/src/activation_kernels.cu     ${DARKNET_PATH}/src/im2col_kernels.cu
@@ -146,8 +148,9 @@ else()
     src/object_detector_demo.cpp
     src/image_interface.c
 
-    ${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/utils.c
+		${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/utils.c
     ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/convolutional_layer.c
+		${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/lsd.c
     ${DARKNET_PATH}/src/list.c                    ${DARKNET_PATH}/src/image.c
     ${DARKNET_PATH}/src/activations.c             ${DARKNET_PATH}/src/im2col.c
     ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/blas.c
@@ -173,7 +176,8 @@ else()
     ${DARKNET_PATH}/src/cifar.c                   ${DARKNET_PATH}/src/go.c
     ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/art.c
     ${DARKNET_PATH}/src/region_layer.c            ${DARKNET_PATH}/src/reorg_layer.c
-    ${DARKNET_PATH}/src/super.c
+    ${DARKNET_PATH}/src/super.c                   ${DARKNET_PATH}/src/detector.c
+		${DARKNET_PATH}/src/regressor.c
   )
 
   target_link_libraries(${PROJECT_NAME}
