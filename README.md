@@ -36,7 +36,7 @@ In order to install darknet_ros, clone the latest version from this repository i
 
 ### Download weights
 
-Go into the weights folder and download the two pre-trained weights
+The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights
 
     cd catkin_workspace/src/darknet_ros/darknet_ros/weights/
     wget http://pjreddie.com/media/files/yolo-voc.weights
