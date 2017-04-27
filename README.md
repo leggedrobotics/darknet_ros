@@ -30,7 +30,7 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 In order to install darknet_ros, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
 
     cd catkin_workspace/src
-    git clone --recursive git@bitbucket.org:leggedrobotics/darknet_ros.git
+    git clone --recursive git@github.com:leggedrobotics/darknet_ros.git
     cd ../
     catkin build darknet_ros
 
