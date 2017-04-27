@@ -121,6 +121,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/col2im_kernels.cu         ${DARKNET_PATH}/src/blas_kernels.cu
     ${DARKNET_PATH}/src/crop_layer_kernels.cu     ${DARKNET_PATH}/src/dropout_layer_kernels.cu
     ${DARKNET_PATH}/src/maxpool_layer_kernels.cu  ${DARKNET_PATH}/src/avgpool_layer_kernels.cu
+		${DARKNET_PATH}/src/deconvolutional_kernels.cu
   )
 
   target_link_libraries(${PROJECT_NAME}
