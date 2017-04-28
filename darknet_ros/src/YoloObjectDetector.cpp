@@ -121,7 +121,23 @@ void YoloObjectDetector::init()
   pathToTestImage += "/data/dog.jpg";
   camImageCopy_ = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
 
-  load_network_demo(cfg, weights, data, thresh, darknetImageViewer_, waitKeyDelay_);
+  // TODO: Get values from classLabels_ and numClasses_.
+  char *vocNames[numClasses_];
+  for (int i = 0; i < numClasses_; i++)
+  {
+    char *names = new char[classLabels_[i].length() + 1];
+    strcpy(names, classLabels_[i].c_str());
+    vocNames[i] = names;
+  }
+  int numClasses = numClasses_;
+
+  load_network_demo(cfg, weights, data,
+                    thresh,
+                    vocNames, numClasses,
+                    darknetImageViewer_, waitKeyDelay_,
+                    0,
+                    0.5,
+                    0, 0, 0, 0);
 
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
