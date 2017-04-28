@@ -63,6 +63,7 @@ static float *avg;
 static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
 static int wait_key_delay;
+static int full_screen;
 
 static pthread_t fetch_thread;
 static pthread_t detect_thread;
@@ -72,8 +73,6 @@ void *fetch_in_thread(void *ptr)
 {
   IplImage* ROS_img = darknet_ros::get_ipl_image();
   in = ipl_to_image(ROS_img);
-  delete ROS_img;
-  ROS_img = NULL;
   if(!in.data) {
     error("Stream closed.");
   }
@@ -197,7 +196,8 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
 	demo_hier = hier;
 	view_image = viewimage;
 	wait_key_delay = waitkeydelay;
-	printf("Demo\n");
+	full_screen = fullscreen;
+	printf("YOLO_V2\n");
 	net = parse_network_cfg(cfgfile);
 	if(weightfile) {
 		load_weights(&net, weightfile);
@@ -218,64 +218,70 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
 	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
 	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
 
-  fetch_in_thread(0);
-  det = in;
-  det_s = in_s;
-
-  fetch_in_thread(0);
-  detect_in_thread(0);
-  disp = det;
-  det = in;
-  det_s = in_s;
-
-  for(j = 0; j < FRAMES/2; ++j){
-    fetch_in_thread(0);
-    detect_in_thread(0);
-    disp = det;
-    det = in;
-    det_s = in_s;
-  }
-
   count = 0;
-  if(view_image)
-  {
-    cvNamedWindow("YOLO V2", CV_WINDOW_NORMAL);
-    if(fullscreen){
-        cvSetWindowProperty("YOLO V2", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-    } else {
-        cvMoveWindow("YOLO V2", 0, 0);
-        cvResizeWindow("YOLO V2", 1352, 1013);
-    }
-  }
 
   tval_before = get_wall_time();
 }
 
 extern "C" darknet_ros::RosBox_ *demo_yolo()
 {
-  ++count;
-  fetch_in_thread(0);
-  det = in;
-  det_s = in_s;
+  if (count == 0) {
+    ++count;
+    fetch_in_thread(0);
+    det = in;
+    det_s = in_s;
 
-  if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
-  if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
-  if(view_image)
-  {
-    show_image(disp, "YOLO V2");
-    cvWaitKey(wait_key_delay);
+    fetch_in_thread(0);
+    detect_in_thread(0);
+    disp = det;
+    det = in;
+    det_s = in_s;
+
+    int j;
+    for(j = 0; j < FRAMES/2; ++j){
+      fetch_in_thread(0);
+      detect_in_thread(0);
+      disp = det;
+      det = in;
+      det_s = in_s;
+    }
+
+    if(view_image)
+    {
+      cvNamedWindow("YOLO_V2", CV_WINDOW_NORMAL);
+      if(full_screen){
+          cvSetWindowProperty("YOLO_V2", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+      } else {
+          cvMoveWindow("YOLO_V2", 0, 0);
+          cvResizeWindow("YOLO_V2", 1352, 1013);
+      }
+    }
+  } else {
+    ++count;
+    fetch_in_thread(0);
+    det = in;
+    det_s = in_s;
+
+    if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
+    if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");\
+    if(view_image)
+    {
+      show_image(disp, "YOLO_V2");
+      cvWaitKey(wait_key_delay);
+    }
+    pthread_join(fetch_thread, 0);
+    pthread_join(detect_thread, 0);
+
+    free_image(disp);
+    disp  = det;
+    det   = in;
+    det_s = in_s;
+
+    tval_after = get_wall_time();
+    float curr = 1./(tval_after - tval_before);
+    fps = curr;
+    tval_before = tval_after;
   }
-  pthread_join(fetch_thread, 0);
-  pthread_join(detect_thread, 0);
-
-  disp  = det;
-  det   = in;
-  det_s = in_s;
-
-  tval_after = get_wall_time();
-  float curr = 1./(tval_after - tval_before);
-  fps = curr;
-  tval_before = tval_after;
 
   return ROI_boxes;
 }
