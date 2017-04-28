@@ -64,8 +64,8 @@ static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
 static int wait_key_delay;
 
-pthread_t fetch_thread;
-pthread_t detect_thread;
+static pthread_t fetch_thread;
+static pthread_t detect_thread;
 static double tval_before, tval_after;
 
 void *fetch_in_thread(void *ptr)

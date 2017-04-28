@@ -26,7 +26,7 @@
     <arg name="yolo_object_threshold"       value="$(arg yolo_object_threshold)"/>
     <arg name="view_image_in_opencv"        value="$(arg view_image_in_opencv)"/>
     <arg name="use_darknet_image_viewer"    value="$(arg use_darknet_image_viewer)"/>
-  <arg name="wait_key_delay_in_opencv"    value="$(arg wait_key_delay_in_opencv)"/>
+    <arg name="wait_key_delay_in_opencv"    value="$(arg wait_key_delay_in_opencv)"/>
   </include>
 
   <test pkg="darknet_ros" test-name="darknet_ros_object_detection" type="darknet_ros_object_detection-test" time-limit="500.0"/>
