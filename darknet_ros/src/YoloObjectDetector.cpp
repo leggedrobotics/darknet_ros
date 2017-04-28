@@ -26,9 +26,10 @@ char *data_;
 char *vocNames_[numClasses_];
 
 cv::Mat camImageCopy_;
+IplImage* ROS_img;
 IplImage* get_ipl_image()
 {
-   IplImage* ROS_img = new IplImage(camImageCopy_);
+   ROS_img = new IplImage(camImageCopy_);
    return ROS_img;
 }
 
@@ -121,12 +122,7 @@ void YoloObjectDetector::init()
   data_ = new char[dataPath.length() + 1];
   strcpy(data_, dataPath.c_str());
 
-  // Path to default image.
-  std::string pathToTestImage = darknetFilePath_;
-  pathToTestImage += "/data/dog.jpg";
-  camImageCopy_ = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
-
-  // TODO: Get values from classLabels_ and numClasses_.
+  // Get classes.
   for (int i = 0; i < numClasses_; i++)
   {
     char *names = new char[classLabels_[i].length() + 1];
@@ -135,6 +131,7 @@ void YoloObjectDetector::init()
   }
   int numClasses = numClasses_;
 
+  // Load network.
   load_network_demo(cfg_, weights_, data_,
                     thresh,
                     vocNames_, numClasses,
