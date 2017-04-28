@@ -29,15 +29,17 @@ extern "C" {
 #define FRAMES 1
 
 #ifdef OPENCV
+
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+
 extern "C" image ipl_to_image(IplImage* src);
 extern "C" void convert_yolo_detections(float *predictions, int classes, int num, int square, int side, int w, int h, float thresh, float **probs, box *boxes, int only_objectness);
 extern "C" void draw_yolo(image im, int num, float thresh, box *boxes, float **probs);
 
-extern "C" char *voc_names;
+static char **demo_names;
 static image **demo_alphabet;
-int demo_classes = 20;
+static int demo_classes;
 
 static float **probs;
 static box *boxes;
@@ -49,7 +51,7 @@ static image det_s;
 static image disp = {0};
 static float fps = 0;
 static float demo_thresh = 0;
-static float demo_hier_thresh = .5;
+static float demo_hier = .5;
 
 static float *predictions[FRAMES];
 static int demo_index = 0;
@@ -91,7 +93,7 @@ void *detect_in_thread(void *ptr)
   if(l.type == DETECTION){
     get_detection_boxes(l, 1, 1, demo_thresh, probs, boxes, 0);
   } else if (l.type == REGION){
-    get_region_boxes(l, in.w, in.h, net.w, net.h, demo_thresh, probs, boxes, 0, 0, demo_hier_thresh, 1);
+    get_region_boxes(l, in.w, in.h, net.w, net.h, demo_thresh, probs, boxes, 0, 0, demo_hier, 1);
   } else {
     error("Last layer must produce detections\n");
   }
@@ -108,7 +110,7 @@ void *detect_in_thread(void *ptr)
     det = images[(demo_index + FRAMES/2 + 1)%FRAMES];
     demo_index = (demo_index + 1)%FRAMES;
 
-    draw_detections(det, l.w*l.h*l.n, demo_thresh, boxes, probs, &voc_names, demo_alphabet, demo_classes);
+    draw_detections(det, l.w*l.h*l.n, demo_thresh, boxes, probs, demo_names, demo_alphabet, demo_classes);
   }
 
   // extract the bounding boxes and send them to ROS
@@ -176,11 +178,21 @@ double get_wall_time()
   return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile, float thresh, bool viewimage, int waitkeydelay)
+extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
+                       float thresh,
+                       char **names, int classes,
+                       bool viewimage, int waitkeydelay,
+                       int frame_skip,
+                       float hier,
+                       int w, int h, int frames, int fullscreen)
 {
 	image **alphabet = load_alphabet_with_file(datafile);
+	int delay = frame_skip;
+	demo_names = names;
 	demo_alphabet = alphabet;
+	demo_classes = classes;
 	demo_thresh = thresh;
+	demo_hier = hier;
 	view_image = viewimage;
 	wait_key_delay = waitkeydelay;
 	printf("Demo\n");
@@ -259,7 +271,18 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
   return ROI_boxes;
 }
 #else
-extern "C" void demo_yolo(char *cfgfile, char *weightfile, float thresh, int cam_index)
+extern "C"  void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
+                       float thresh,
+                       char **names, int classes,
+                       bool viewimage, int waitkeydelay,
+                       int frame_skip,
+                       float hier,
+                       int w, int h, int frames, int fullscreen)
+{
+  fprintf(stderr, "YOLO demo needs OpenCV for webcam images.\n");
+}
+
+extern "C"  darknet_ros::RosBox_ *demo_yolo()
 {
   fprintf(stderr, "YOLO demo needs OpenCV for webcam images.\n");
 }
