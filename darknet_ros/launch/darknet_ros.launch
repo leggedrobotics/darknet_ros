@@ -14,7 +14,7 @@
   <arg name="camera_action_name"         default="/darknet/check_for_objects"/>
 
   <!-- Threshold of object detection -->
-  <arg name="yolo_object_threshold"      default="0.4"/>
+  <arg name="yolo_object_threshold"      default="0.3"/>
 
   <!-- Enable image view in opencv -->
   <arg name="view_image_in_opencv"       default="true"/>
@@ -23,7 +23,7 @@
   <arg name="use_darknet_image_viewer"   default="false"/>
 
   <!-- Delay for cv::waitkey(delay) in millisecons -->
-  <arg name="wait_key_delay_in_opencv"   default="3"/>
+  <arg name="wait_key_delay_in_opencv"   default="2"/>
 
   <!-- Start darknet and ros wrapper -->
   <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen">

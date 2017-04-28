@@ -226,6 +226,7 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
 extern "C" darknet_ros::RosBox_ *demo_yolo()
 {
   if (count == 0) {
+    ++count;
     fetch_in_thread(0);
     det = in;
     det_s = in_s;
@@ -262,7 +263,7 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
     det_s = in_s;
 
     if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
-    if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
+    if(pthread_create(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");\
     if(view_image)
     {
       show_image(disp, "YOLO_V2");
@@ -271,6 +272,7 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
     pthread_join(fetch_thread, 0);
     pthread_join(detect_thread, 0);
 
+    free_image(disp);
     disp  = det;
     det   = in;
     det_s = in_s;
