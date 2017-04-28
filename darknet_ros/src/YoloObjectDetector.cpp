@@ -20,6 +20,11 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 
 namespace darknet_ros {
 
+char *cfg_;
+char *weights_;
+char *data_;
+char *vocNames_[numClasses_];
+
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
 {
@@ -100,21 +105,21 @@ void YoloObjectDetector::init()
   nodeHandle_.param("/darknet_ros/weights_model", weightsModel, std::string("tiny-yolo-voc.weights"));
   nodeHandle_.param("/darknet_ros/weights_path", weightsPath, std::string("/default"));
   weightsPath += "/" + weightsModel;
-  char *weights = new char[weightsPath.length() + 1];
-  strcpy(weights, weightsPath.c_str());
+  weights_ = new char[weightsPath.length() + 1];
+  strcpy(weights_, weightsPath.c_str());
 
   // Path to config file.
   nodeHandle_.param("/darknet_ros/cfg_model", cfgModel, std::string("tiny-yolo-voc.cfg"));
   configPath = darknetFilePath_;
   configPath += "/cfg/" + cfgModel;
-  char *cfg = new char[configPath.length() + 1];
-  strcpy(cfg, configPath.c_str());
+  cfg_ = new char[configPath.length() + 1];
+  strcpy(cfg_, configPath.c_str());
 
   // Path to data folder.
   dataPath = darknetFilePath_;
   dataPath += "/data";
-  char *data = new char[dataPath.length() + 1];
-  strcpy(data, dataPath.c_str());
+  data_ = new char[dataPath.length() + 1];
+  strcpy(data_, dataPath.c_str());
 
   // Path to default image.
   std::string pathToTestImage = darknetFilePath_;
@@ -122,18 +127,17 @@ void YoloObjectDetector::init()
   camImageCopy_ = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
 
   // TODO: Get values from classLabels_ and numClasses_.
-  char *vocNames[numClasses_];
   for (int i = 0; i < numClasses_; i++)
   {
     char *names = new char[classLabels_[i].length() + 1];
     strcpy(names, classLabels_[i].c_str());
-    vocNames[i] = names;
+    vocNames_[i] = names;
   }
   int numClasses = numClasses_;
 
-  load_network_demo(cfg, weights, data,
+  load_network_demo(cfg_, weights_, data_,
                     thresh,
-                    vocNames, numClasses,
+                    vocNames_, numClasses,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,

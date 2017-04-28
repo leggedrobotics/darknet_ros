@@ -52,6 +52,8 @@ static image disp = {0};
 static float fps = 0;
 static float demo_thresh = 0;
 static float demo_hier = .5;
+static int delay;
+static int count;
 
 static float *predictions[FRAMES];
 static int demo_index = 0;
@@ -62,9 +64,9 @@ static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
 static int wait_key_delay;
 
-pthread_t fetch_thread;
-pthread_t detect_thread;
-struct timeval tval_before, tval_after, tval_result;
+static pthread_t fetch_thread;
+static pthread_t detect_thread;
+static double tval_before, tval_after;
 
 void *fetch_in_thread(void *ptr)
 {
@@ -187,7 +189,7 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
                        int w, int h, int frames, int fullscreen)
 {
 	image **alphabet = load_alphabet_with_file(datafile);
-	int delay = frame_skip;
+	delay = frame_skip;
 	demo_names = names;
 	demo_alphabet = alphabet;
 	demo_classes = classes;
@@ -197,7 +199,7 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
 	wait_key_delay = waitkeydelay;
 	printf("Demo\n");
 	net = parse_network_cfg(cfgfile);
-	if(weightfile){
+	if(weightfile) {
 		load_weights(&net, weightfile);
 	}
 	set_batch_network(&net, 1);
@@ -215,13 +217,6 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
   ROI_boxes = (darknet_ros::RosBox_ *)calloc(l.side*l.side*l.n, sizeof(darknet_ros::RosBox_));
 	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
 	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
-
-	if(view_image)
-	{
-	  cvNamedWindow("YOLO V2", CV_WINDOW_NORMAL);
-	  cvMoveWindow("YOLO V2", 0, 0);
-	  cvResizeWindow("YOLO V2", 1352, 1013);
-	}
 
   fetch_in_thread(0);
   det = in;
@@ -241,11 +236,24 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
     det_s = in_s;
   }
 
-  gettimeofday(&tval_before, NULL);
+  count = 0;
+  if(view_image)
+  {
+    cvNamedWindow("YOLO V2", CV_WINDOW_NORMAL);
+    if(fullscreen){
+        cvSetWindowProperty("YOLO V2", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+    } else {
+        cvMoveWindow("YOLO V2", 0, 0);
+        cvResizeWindow("YOLO V2", 1352, 1013);
+    }
+  }
+
+  tval_before = get_wall_time();
 }
 
 extern "C" darknet_ros::RosBox_ *demo_yolo()
 {
+  ++count;
   fetch_in_thread(0);
   det = in;
   det_s = in_s;
@@ -264,10 +272,11 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
   det   = in;
   det_s = in_s;
 
-  gettimeofday(&tval_after, NULL);
-  timersub(&tval_after, &tval_before, &tval_result);
-  float curr = 1000000.f/((long int)tval_result.tv_usec);
-  fps = .9*fps + .1*curr;
+  tval_after = get_wall_time();
+  float curr = 1./(tval_after - tval_before);
+  fps = curr;
+  tval_before = tval_after;
+
   return ROI_boxes;
 }
 #else
