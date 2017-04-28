@@ -72,8 +72,10 @@ void *fetch_in_thread(void *ptr)
   in = ipl_to_image(ROS_img);
   delete ROS_img;
   ROS_img = NULL;
-  rgbgr_image(in);
-  in_s = resize_image(in, net.w, net.h);
+  if(!in.data) {
+    error("Stream closed.");
+  }
+  in_s = letterbox_image(in, net.w, net.h);
   return 0;
 }
 
@@ -90,14 +92,14 @@ void *detect_in_thread(void *ptr)
   l.output = avg;
 
   free_image(det_s);
-  if(l.type == DETECTION){
+  if(l.type == DETECTION) {
     get_detection_boxes(l, 1, 1, demo_thresh, probs, boxes, 0);
   } else if (l.type == REGION){
     get_region_boxes(l, in.w, in.h, net.w, net.h, demo_thresh, probs, boxes, 0, 0, demo_hier, 1);
   } else {
     error("Last layer must produce detections\n");
   }
-  if (nms > 0) do_nms(boxes, probs, l.w*l.h*l.n, l.classes, nms);
+  if (nms > 0) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
   //printf("\033[2J");
   //printf("\033[1;1H");
   printf("\nFPS:%.1f\n",fps);
@@ -105,11 +107,9 @@ void *detect_in_thread(void *ptr)
   if(view_image)
   {
     printf("Objects:\n\n");
-
     images[demo_index] = det;
     det = images[(demo_index + FRAMES/2 + 1)%FRAMES];
     demo_index = (demo_index + 1)%FRAMES;
-
     draw_detections(det, l.w*l.h*l.n, demo_thresh, boxes, probs, demo_names, demo_alphabet, demo_classes);
   }
 
