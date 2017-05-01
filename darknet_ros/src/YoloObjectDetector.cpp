@@ -26,10 +26,9 @@ char *data_;
 char *vocNames_[numClasses_];
 
 cv::Mat camImageCopy_;
-IplImage* ROS_img;
 IplImage* get_ipl_image()
 {
-   ROS_img = new IplImage(camImageCopy_);
+   IplImage* ROS_img = new IplImage(camImageCopy_);
    return ROS_img;
 }
 

@@ -73,6 +73,8 @@ void *fetch_in_thread(void *ptr)
 {
   IplImage* ROS_img = darknet_ros::get_ipl_image();
   in = ipl_to_image(ROS_img);
+  delete ROS_img;
+  ROS_img = NULL;
   if(!in.data) {
     error("Stream closed.");
   }
