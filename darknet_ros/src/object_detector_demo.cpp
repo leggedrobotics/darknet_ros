@@ -275,10 +275,9 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
     pthread_join(detect_thread, 0);
 
     free_image(disp);
+    disp  = det;
     free_image(in);
     free_image(in_s);
-    free_image(det);
-
 
     tval_after = get_wall_time();
     float curr = 1./(tval_after - tval_before);
