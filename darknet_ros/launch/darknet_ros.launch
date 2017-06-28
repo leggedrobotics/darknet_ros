@@ -6,6 +6,7 @@
   <arg name="yolo_weights_path"          default="$(find darknet_ros)/weights"/>
   <arg name="yolo_cfg_model"             default="$(arg yolo_model).cfg"/>
   <arg name="yolo_weights_model"         default="$(arg yolo_model).weights"/>
+  <arg name="yolo_names_model"           default="voc.names"/>
 
   <!-- Name of camera topic -->
   <arg name="camera_topic_name"          default="/camera/image_raw"/>
@@ -29,6 +30,7 @@
   <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen">
     <param name="cfg_model"             value="$(arg yolo_cfg_model)" />
     <param name="weights_model"         value="$(arg yolo_weights_model)" />
+    <param name="names_model"           value="$(arg yolo_names_model)" />
     <param name="weights_path"          value="$(arg yolo_weights_path)" />
     <param name="camera_topic"          value="$(arg camera_topic_name)" />
     <param name="camera_action"         value="$(arg camera_action_name)" />

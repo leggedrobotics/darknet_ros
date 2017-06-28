@@ -181,9 +181,8 @@ double get_wall_time()
   return (double)time.tv_sec + (double)time.tv_usec * .000001;
 }
 
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
+extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *namefile, char *datafile,
+                       float thresh, int numClasses,
                        bool viewimage, int waitkeydelay,
                        int frame_skip,
                        float hier,
@@ -191,9 +190,9 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
 {
 	image **alphabet = load_alphabet_with_file(datafile);
 	delay = frame_skip;
-	demo_names = names;
+	demo_names = get_labels(namefile);
 	demo_alphabet = alphabet;
-	demo_classes = classes;
+	demo_classes = numClasses;
 	demo_thresh = thresh;
 	demo_hier = hier;
 	view_image = viewimage;
@@ -288,9 +287,8 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
   return ROI_boxes;
 }
 #else
-extern "C"  void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
+extern "C"  void load_network_demo(char *cfgfile, char *weightfile, char *namefile, char *datafile,
+                       float thresh, int numClasses,
                        bool viewimage, int waitkeydelay,
                        int frame_skip,
                        float hier,

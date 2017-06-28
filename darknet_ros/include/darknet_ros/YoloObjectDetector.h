@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <pthread.h>
 
 // ROS
@@ -56,9 +57,8 @@ extern "C" RosBox_ *demo_yolo();
  * @param[in] datafile location of darknet's data file.
  * @param[in] thresh threshold of the object detection (0 < thresh < 1).
  */
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
+extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *namefile, char *datafile,
+                       float thresh, int numClasses,
                        bool viewimage, int waitkeydelay,
                        int frame_skip,
                        float hier,
