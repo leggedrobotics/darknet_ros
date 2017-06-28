@@ -114,29 +114,32 @@ void YoloObjectDetector::init()
   names_ = new char[namesPath.length() + 1];
   strcpy(names_, namesPath.c_str());
 
-  std::ifstream f(namesPath);
-  std::string line;
-  int numClasses;
-  for (numClasses = 0; std::getline(f, line); ++numClasses);
-  printf("NumClasses = %d\n", numClasses);
-
   // Path to data folder.
   dataPath = darknetFilePath_;
   dataPath += "/data";
   data_ = new char[dataPath.length() + 1];
   strcpy(data_, dataPath.c_str());
 
+  // Count number of classes
+  std::ifstream f(namesPath);
+  std::string line;
+  for (numClasses_ = 0; std::getline(f, line); ++numClasses_)
+  {
+    classLabels_.push_back(line);
+  }
+
+  // Resize the detected object vectors
+  rosBoxes_.resize(numClasses_);
+  rosBoxCounter_.resize(numClasses_);
+  rosBoxColors_.resize(numClasses_);
+
   // Load network.
   load_network_demo(cfg_, weights_, names_, data_,
-                    thresh, numClasses,
+                    thresh, numClasses_,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
                     0, 0, 0, 0);
-
-  rosBoxes_.resize(numClasses);
-  rosBoxCounter_.resize(numClasses);
-  rosBoxColors_.resize(numClasses); 
 
   // Initialize color of bounding boxes of different object classes.
   int incr = floor(255/numClasses_);
@@ -232,7 +235,6 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
     if(!darknetImageViewer_)
     {
       std::cout << "# Objects: " << num << std::endl;
-
     }
     // split bounding boxes by class
     for (int i = 0; i < num; i++)

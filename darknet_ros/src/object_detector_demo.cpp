@@ -20,7 +20,7 @@ extern "C" {
 #include "region_layer.h"
 #include "cost_layer.h"
 #include "utils.h"
-#include "parser.h"
+#include "darknet.h"
 #include "box.h"
 #include "darknet_ros/image_interface.h"
 #include <sys/time.h>

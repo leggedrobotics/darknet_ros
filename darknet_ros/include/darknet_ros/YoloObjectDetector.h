@@ -70,12 +70,6 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *namefil
  */
 IplImage* get_ipl_image(void);
 
-//! Class labels.
-const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
-    "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
-    "potted plant", "sheep", "sofa", "train", "tv monitor" };
-const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
-
 class YoloObjectDetector
 {
  public:
@@ -170,6 +164,10 @@ class YoloObjectDetector
   std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
   RosBox_* boxes_;
+
+  // Classes
+  int numClasses_;
+  std::vector<std::string> classLabels_;
 
   //! Camera related parameters.
   std::string cameraTopicName_;
