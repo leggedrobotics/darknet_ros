@@ -20,11 +20,6 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 
 namespace darknet_ros {
 
-char *cfg_;
-char *weights_;
-char *data_;
-char *vocNames_[numClasses_];
-
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
 {
@@ -35,9 +30,11 @@ IplImage* get_ipl_image()
  YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
      imageTransport_(nodeHandle_),
-     rosBoxes_(numClasses_),
-     rosBoxCounter_(numClasses_, 0),
-     rosBoxColors_(numClasses_),
+     numClasses_(0),
+     classLabels_(0),
+     rosBoxes_(0),
+     rosBoxCounter_(0),
+     rosBoxColors_(0),
      opencvWindow_("YOLO V2 object detection")
 {
   ROS_INFO("[YoloObjectDetector] Node started.");
@@ -75,6 +72,14 @@ bool YoloObjectDetector::readParameters()
     darknetImageViewer_ = false;
   }
 
+  // Set vector sizes.
+  nodeHandle_.param("/darknet_ros/yolo_model/detection_classes/names", classLabels_, std::vector<std::string>(0));
+  numClasses_ = classLabels_.size();
+  rosBoxes_ =   std::vector< std::vector<RosBox_> >(numClasses_);
+  rosBoxCounter_ = std::vector<int>(numClasses_);
+  rosBoxColors_ = std::vector<cv::Scalar>(numClasses_);
+
+
   return true;
 }
 
@@ -95,6 +100,10 @@ void YoloObjectDetector::init()
   std::string dataPath;
   std::string configModel;
   std::string weightsModel;
+  char *cfg;
+  char *weights;
+  char *data;
+  char *vocNames[numClasses_];
 
   // Threshold of object detection.
   float thresh;
@@ -104,35 +113,35 @@ void YoloObjectDetector::init()
   nodeHandle_.param("/darknet_ros/yolo_model/weight_file/name", weightsModel, std::string("tiny-yolo-voc.weights"));
   nodeHandle_.param("/darknet_ros/weights_path", weightsPath, std::string("/default"));
   weightsPath += "/" + weightsModel;
-  weights_ = new char[weightsPath.length() + 1];
-  strcpy(weights_, weightsPath.c_str());
+  weights = new char[weightsPath.length() + 1];
+  strcpy(weights, weightsPath.c_str());
 
   // Path to config file.
   nodeHandle_.param("/darknet_ros/yolo_model/config_file/name", configModel, std::string("tiny-yolo-voc.cfg"));
   nodeHandle_.param("/darknet_ros/config_path", configPath, std::string("/default"));
   configPath += "/" + configModel;
-  cfg_ = new char[configPath.length() + 1];
-  strcpy(cfg_, configPath.c_str());
+  cfg = new char[configPath.length() + 1];
+  strcpy(cfg, configPath.c_str());
 
   // Path to data folder.
   dataPath = darknetFilePath_;
   dataPath += "/data";
-  data_ = new char[dataPath.length() + 1];
-  strcpy(data_, dataPath.c_str());
+  data = new char[dataPath.length() + 1];
+  strcpy(data, dataPath.c_str());
 
   // Get classes.
   for (int i = 0; i < numClasses_; i++)
   {
     char *names = new char[classLabels_[i].length() + 1];
     strcpy(names, classLabels_[i].c_str());
-    vocNames_[i] = names;
+    vocNames[i] = names;
   }
   int numClasses = numClasses_;
 
   // Load network.
-  load_network_demo(cfg_, weights_, data_,
+  load_network_demo(cfg, weights, data,
                     thresh,
-                    vocNames_, numClasses,
+                    vocNames, numClasses,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
