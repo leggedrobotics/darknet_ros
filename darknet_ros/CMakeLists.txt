@@ -142,6 +142,7 @@ if (CUDA_FOUND)
 else()
   include_directories(
     ${DARKNET_PATH}/src
+    ${DARKNET_PATH}/include
     include
     ${Boost_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
