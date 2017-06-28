@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <pthread.h>
 
 // ROS
@@ -56,9 +57,8 @@ extern "C" RosBox_ *demo_yolo();
  * @param[in] datafile location of darknet's data file.
  * @param[in] thresh threshold of the object detection (0 < thresh < 1).
  */
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
+extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *namefile, char *datafile,
+                       float thresh, int numClasses,
                        bool viewimage, int waitkeydelay,
                        int frame_skip,
                        float hier,
@@ -69,12 +69,6 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
  * @param[out] current image of the camera.
  */
 IplImage* get_ipl_image(void);
-
-//! Class labels.
-const std::string classLabels_[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
-    "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
-    "potted plant", "sheep", "sofa", "train", "tv monitor" };
-const int numClasses_ = sizeof(classLabels_)/sizeof(classLabels_[0]);
 
 class YoloObjectDetector
 {
@@ -170,6 +164,10 @@ class YoloObjectDetector
   std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
   RosBox_* boxes_;
+
+  // Classes
+  int numClasses_;
+  std::vector<std::string> classLabels_;
 
   //! Camera related parameters.
   std::string cameraTopicName_;

@@ -23,7 +23,7 @@ namespace darknet_ros {
 char *cfg_;
 char *weights_;
 char *data_;
-char *vocNames_[numClasses_];
+char *names_;
 
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
@@ -35,9 +35,6 @@ IplImage* get_ipl_image()
  YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
      imageTransport_(nodeHandle_),
-     rosBoxes_(numClasses_),
-     rosBoxCounter_(numClasses_, 0),
-     rosBoxColors_(numClasses_),
      opencvWindow_("YOLO V2 object detection")
 {
   ROS_INFO("[YoloObjectDetector] Node started.");
@@ -83,19 +80,14 @@ void YoloObjectDetector::init()
 {
   ROS_INFO("[YoloObjectDetector] init().");
 
-  // Initialize color of bounding boxes of different object classes.
-  int incr = floor(255/numClasses_);
-  for (int i = 0; i < numClasses_; i++)
-  {
-    rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
-  }
-
   // Initialize deep network of darknet.
   std::string weightsPath;
   std::string configPath;
   std::string dataPath;
+  std::string namesPath;
   std::string cfgModel;
   std::string weightsModel;
+  std::string namesModel;
 
   // Threshold of object detection.
   float thresh;
@@ -115,29 +107,46 @@ void YoloObjectDetector::init()
   cfg_ = new char[configPath.length() + 1];
   strcpy(cfg_, configPath.c_str());
 
+  // Path to names file.
+  nodeHandle_.param("/darknet_ros/names_model", namesModel, std::string("voc.names"));
+  namesPath = darknetFilePath_;
+  namesPath += "/data/" + namesModel;
+  names_ = new char[namesPath.length() + 1];
+  strcpy(names_, namesPath.c_str());
+
   // Path to data folder.
   dataPath = darknetFilePath_;
   dataPath += "/data";
   data_ = new char[dataPath.length() + 1];
   strcpy(data_, dataPath.c_str());
 
-  // Get classes.
-  for (int i = 0; i < numClasses_; i++)
+  // Count number of classes
+  std::ifstream f(namesPath);
+  std::string line;
+  for (numClasses_ = 0; std::getline(f, line); ++numClasses_)
   {
-    char *names = new char[classLabels_[i].length() + 1];
-    strcpy(names, classLabels_[i].c_str());
-    vocNames_[i] = names;
+    classLabels_.push_back(line);
   }
-  int numClasses = numClasses_;
+
+  // Resize the detected object vectors
+  rosBoxes_.resize(numClasses_);
+  rosBoxCounter_.resize(numClasses_);
+  rosBoxColors_.resize(numClasses_);
 
   // Load network.
-  load_network_demo(cfg_, weights_, data_,
-                    thresh,
-                    vocNames_, numClasses,
+  load_network_demo(cfg_, weights_, names_, data_,
+                    thresh, numClasses_,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
                     0, 0, 0, 0);
+
+  // Initialize color of bounding boxes of different object classes.
+  int incr = floor(255/numClasses_);
+  for (int i = 0; i < numClasses_; i++)
+  {
+    rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
+  }
 
   // Initialize publisher and subscriber.
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName_, 1, &YoloObjectDetector::cameraCallback,this);
@@ -226,7 +235,6 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
     if(!darknetImageViewer_)
     {
       std::cout << "# Objects: " << num << std::endl;
-
     }
     // split bounding boxes by class
     for (int i = 0; i < num; i++)
@@ -291,7 +299,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-  ROS_INFO("[YoloObjectDetector] USB image received.");
+  ROS_INFO("[YoloObjectDetector] Camera image received.");
 
   cv_bridge::CvImagePtr cam_image;
 

@@ -44,11 +44,15 @@ In order to install darknet_ros, clone the latest version from this repository i
 
 ### Download weights
 
-The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights
+The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights.
 
     cd catkin_workspace/src/darknet_ros/darknet_ros/weights/
     wget http://pjreddie.com/media/files/yolo-voc.weights
     wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
+
+If you would like to download additional weights, go into the weights folder and download these pre-trained weights.
+    wget http://pjreddie.com/media/files/yolo.weights
+    wget http://pjreddie.com/media/files/yolo9000.weights
 
 ### Unit Tests
 
@@ -60,3 +64,18 @@ You will see the following two figures popping up :
 
 ![Darknet Ros example: Detection image 1](darknet_ros/doc/dog.png)
 ![Darknet Ros example: Detection image 2](darknet_ros/doc/person.png)
+
+### Switching Between Weights and Networks
+
+You can choose the network and weights that you use in catkin_workspace/src/darknet_ros/launch/darknet_ros.launch.
+
+1. If you decide to use tiny-yolo-voc or yolo-voc, set yolo_names_model to voc.names.
+2. If you decide to use yolo, set yolo_names_model to coco.names.
+3. If you decide to use yolo9000, set yolo_names_model to 9k.names.
+
+#### Yolo9000 Special Case
+If you decide to use yolo9000, you will additionally need to modify yolo9000.cfg in catkin_workspace/src/darknet_ros/darknet/cfg/. You will need to modify tree=data/9k.tree and map = data/coco9k.map to the full path.
+
+For example, 
+tree=/home/${User}/catkin_workspace/src/darknet_ros/darknet/data/9k.tree
+map =/home/${User}/catkin_workspace/src/darknet_ros/darknet/data/coco9k.map
