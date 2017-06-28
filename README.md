@@ -69,9 +69,9 @@ You will see the following two figures popping up :
 
 You can choose the network and weights that you use in catkin_workspace/src/darknet_ros/launch/darknet_ros.launch.
 
-If you decide to use tiny-yolo-voc or yolo-voc, set yolo_names_model to voc.names.
-If you decide to use yolo, set yolo_names_model to coco.names.
-If you decide to use yolo9000, set yolo_names_model to 9k.names.
+1. If you decide to use tiny-yolo-voc or yolo-voc, set yolo_names_model to voc.names.
+2. If you decide to use yolo, set yolo_names_model to coco.names.
+3. If you decide to use yolo9000, set yolo_names_model to 9k.names.
 
 #### Yolo9000 Special Case
 If you decide to use yolo9000, you will additionally need to modify yolo9000.cfg in catkin_workspace/src/darknet_ros/darknet/cfg/. You will need to modify tree=data/9k.tree and map = data/coco9k.map to the full path.
