@@ -172,7 +172,6 @@ class YoloObjectDetector
   RosBox_* boxes_;
 
   //! Camera related parameters.
-  std::string cameraTopicName_;
   int frameWidth_;
   int frameHeight_;
 
