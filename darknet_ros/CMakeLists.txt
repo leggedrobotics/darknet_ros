@@ -99,7 +99,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/convolutional_layer.c     ${DARKNET_PATH}/src/normalization_layer.c
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/option_list.c
     ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/parser.c
-    ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/region_layer.c 
+    ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/region_layer.c
     ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/reorg_layer.c
     ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/rnn_layer.c
     ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/route_layer.c
@@ -114,7 +114,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn_vid.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
-    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/swag.c 
+    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/swag.c
     ${DARKNET_PATH}/examples/dice.c               ${DARKNET_PATH}/examples/tag.c
     ${DARKNET_PATH}/examples/go.c                 ${DARKNET_PATH}/examples/voxel.c
     ${DARKNET_PATH}/examples/lsd.c                ${DARKNET_PATH}/examples/writing.c
@@ -166,7 +166,7 @@ else()
     ${DARKNET_PATH}/src/convolutional_layer.c     ${DARKNET_PATH}/src/normalization_layer.c
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/option_list.c
     ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/parser.c
-    ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/region_layer.c 
+    ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/region_layer.c
     ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/reorg_layer.c
     ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/rnn_layer.c
     ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/route_layer.c
@@ -181,7 +181,7 @@ else()
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn_vid.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
-    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/swag.c 
+    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/swag.c
     ${DARKNET_PATH}/examples/dice.c               ${DARKNET_PATH}/examples/tag.c
     ${DARKNET_PATH}/examples/go.c                 ${DARKNET_PATH}/examples/voxel.c
     ${DARKNET_PATH}/examples/lsd.c                ${DARKNET_PATH}/examples/writing.c
@@ -198,7 +198,7 @@ else()
 endif()
 
 # Download tiny-yolo-voc.weights
-set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/weights")
+set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
 set(FILE "${PATH}/tiny-yolo-voc.weights")
 message(STATUS "Checking and downloading tiny-yolo-voc.weights if needed ...")
 if (NOT EXISTS "${FILE}")
@@ -212,7 +212,7 @@ endif()
 
 if(CATKIN_ENABLE_TESTING)
   # Download yolo-voc.weights
-  set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/weights")
+  set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
   set(FILE "${PATH}/yolo-voc.weights")
   message(STATUS "Checking and downloading yolo-voc.weights if needed ...")
   if (NOT EXISTS "${FILE}")
