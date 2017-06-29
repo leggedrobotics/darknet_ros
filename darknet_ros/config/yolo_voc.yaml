@@ -1,3 +1,9 @@
+image_view:
+
+  enable_opencv: true
+  enable_darknet: false
+  wait_key_delay: 1000
+
 yolo_model:
 
   config_file:
@@ -28,9 +34,3 @@ yolo_model:
       - sofa
       - train
       - tv monitor
-
-image_view:
-
-  enable_opencv: true
-  enable_darknet: false
-  wait_key_delay: 1000

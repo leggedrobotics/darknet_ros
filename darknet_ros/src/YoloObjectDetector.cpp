@@ -103,7 +103,7 @@ void YoloObjectDetector::init()
   char *cfg;
   char *weights;
   char *data;
-  char *vocNames[numClasses_];
+  char *detectionNames[numClasses_];
 
   // Threshold of object detection.
   float thresh;
@@ -134,14 +134,14 @@ void YoloObjectDetector::init()
   {
     char *names = new char[classLabels_[i].length() + 1];
     strcpy(names, classLabels_[i].c_str());
-    vocNames[i] = names;
+    detectionNames[i] = names;
   }
   int numClasses = numClasses_;
 
   // Load network.
   load_network_demo(cfg, weights, data,
                     thresh,
-                    vocNames, numClasses,
+                    detectionNames, numClasses,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
