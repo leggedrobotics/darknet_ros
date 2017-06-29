@@ -1,0 +1,36 @@
+image_view:
+
+  enable_opencv: true
+  enable_darknet: false
+  wait_key_delay: 2
+
+yolo_model:
+
+  config_file:
+    name: tiny-yolo-voc.cfg
+  weight_file:
+    name: tiny-yolo-voc.weights
+  threshold:
+    value: 0.3
+  detection_classes:
+    names:
+      - aeroplane
+      - bicycle
+      - bird
+      - boat
+      - bottle
+      - bus
+      - car
+      - cat
+      - chair
+      - cow
+      - dining table
+      - dog
+      - horse
+      - motorbike
+      - person
+      - potted plant
+      - sheep
+      - sofa
+      - train
+      - tv monitor

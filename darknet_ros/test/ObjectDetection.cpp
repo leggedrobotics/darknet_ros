@@ -63,7 +63,7 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName)
 
   // Action clients.
   std::string checkForObjectsActionName;
-  nh.param("/darknet_ros/camera_action", checkForObjectsActionName, std::string("/darknet/check_for_objects"));
+  nh.param("/darknet_ros/camera_action", checkForObjectsActionName, std::string("/darknet_ros/check_for_objects"));
   checkForObjectsActionClient.reset(
       new CheckForObjectsActionClient(
           nh, checkForObjectsActionName,
