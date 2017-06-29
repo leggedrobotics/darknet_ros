@@ -59,7 +59,18 @@ To use the COCO detection object, you can download the following weights:
 
 ### Use your own detection objects
 
-In order to use your own detection objects you need to provide your weights and your cfg file inside catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/ and catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/cfg/, respectively. In addition, you need to create your config file for ROS where you define the names of the detection objects. You need to include it inside catkin_workspace/src/darknet_ros/darknet_ros/config/. Then in the launch file you have to point to your new config file in the line <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/your_config_file.yaml"/>.
+In order to use your own detection objects you need to provide your weights and your cfg file inside the directories:
+
+    catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
+    catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/cfg/
+
+In addition, you need to create your config file for ROS where you define the names of the detection objects. You need to include it inside:
+
+    catkin_workspace/src/darknet_ros/darknet_ros/config/
+
+Then in the launch file you have to point to your new config file in the line:
+
+    <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/your_config_file.yaml"/>
 
 ### Unit Tests
 
