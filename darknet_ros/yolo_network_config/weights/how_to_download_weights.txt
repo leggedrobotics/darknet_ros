@@ -1,3 +1,12 @@
 cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-wget http://pjreddie.com/media/files/yolo-voc.weights
-wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
+
+VOC data set:
+  wget http://pjreddie.com/media/files/yolo-voc.weights
+  wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
+
+COCO data set:
+  wget http://pjreddie.com/media/files/yolo.weights
+  wget http://pjreddie.com/media/files/tiny-yolo.weights
+
+YOLO9000 data set:
+  wget http://pjreddie.com/media/files/yolo9000.weights
