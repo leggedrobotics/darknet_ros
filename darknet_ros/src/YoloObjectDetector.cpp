@@ -20,6 +20,11 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 
 namespace darknet_ros {
 
+char *cfg;
+char *weights;
+char *data;
+char **detectionNames;
+
 cv::Mat camImageCopy_;
 IplImage* get_ipl_image()
 {
@@ -52,7 +57,7 @@ bool YoloObjectDetector::readParameters()
 {
   // Load common parameters.
   nodeHandle_.param("/darknet_ros/image_view/enable_opencv", viewImage_, true);
-  nodeHandle_.param("/darknet_ros/image_view/enable_darknet", darknetImageViewer_, false);
+  nodeHandle_.param("/darknet_ros/image_view/use_darknet", darknetImageViewer_, false);
   nodeHandle_.param("/darknet_ros/image_view/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
@@ -100,10 +105,6 @@ void YoloObjectDetector::init()
   std::string dataPath;
   std::string configModel;
   std::string weightsModel;
-  char *cfg;
-  char *weights;
-  char *data;
-  char *detectionNames[numClasses_];
 
   // Threshold of object detection.
   float thresh;
@@ -130,18 +131,17 @@ void YoloObjectDetector::init()
   strcpy(data, dataPath.c_str());
 
   // Get classes.
+  detectionNames = (char**)realloc((void*)detectionNames, (numClasses_ + 1) * sizeof(char*));
   for (int i = 0; i < numClasses_; i++)
   {
-    char *names = new char[classLabels_[i].length() + 1];
-    strcpy(names, classLabels_[i].c_str());
-    detectionNames[i] = names;
+    detectionNames[i] = new char[classLabels_[i].length() + 1];
+    strcpy(detectionNames[i], classLabels_[i].c_str());
   }
-  int numClasses = numClasses_;
 
   // Load network.
   load_network_demo(cfg, weights, data,
                     thresh,
-                    detectionNames, numClasses,
+                    detectionNames, numClasses_,
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,

@@ -1,7 +1,7 @@
 image_view:
 
   enable_opencv: true
-  enable_darknet: false
+  use_darknet: false
   wait_key_delay: 1000
 
 yolo_model:
