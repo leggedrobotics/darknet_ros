@@ -97,15 +97,13 @@ You will see the following two figures popping up :
 
 ## Basic Usage
 
-In order to get the Robot-Centric Elevation Mapping to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darkned_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
+In order to get YOLO ROS: Real-Time Object Detection for ROS to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darkned_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
 
 ## Nodes
 
 ### Node: darknet_ros
 
 This is the main YOLO ROS: Real-Time Object Detection for ROS node. It uses the camera measurements to detect pre-learned objects in the frames.
-
-You can change the names and other parameters of the publishers, subscribers and actions inside `darkned_ros/config/ros.yaml`.
 
 ### ROS related parameters
 
