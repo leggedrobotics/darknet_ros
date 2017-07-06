@@ -40,7 +40,14 @@ In order to install darknet_ros, clone the latest version from this repository i
     cd catkin_workspace/src
     git clone --recursive git@github.com:leggedrobotics/darknet_ros.git
     cd ../
-    catkin build darknet_ros
+
+To maximize performance, make sure to build in *Release* mode. You can specify the build type by setting
+
+    catkin_make -DCMAKE_BUILD_TYPE=Release
+
+or using the [Catkin Command Line Tools](http://catkin-tools.readthedocs.io/en/latest/index.html#)
+
+    catkin build darknet_ros -DCMAKE_BUILD_TYPE=Release
 
 ### Download weights
 
@@ -79,7 +86,7 @@ Then in the launch file you have to point to your new config file in the line:
 
 ### Unit Tests
 
-Run the unit tests with
+Run the unit tests using the [Catkin Command Line Tools](http://catkin-tools.readthedocs.io/en/latest/index.html#)
 
     catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
 
@@ -87,3 +94,77 @@ You will see the following two figures popping up :
 
 ![Darknet Ros example: Detection image 1](darknet_ros/doc/dog.png)
 ![Darknet Ros example: Detection image 2](darknet_ros/doc/person.png)
+
+## Basic Usage
+
+In order to get the Robot-Centric Elevation Mapping to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darkned_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
+
+## Nodes
+
+### Node: darknet_ros
+
+This is the main YOLO ROS: Real-Time Object Detection for ROS node. It uses the camera measurements to detect pre-learned objects in the frames.
+
+You can change the names and other parameters of the publishers, subscribers and actions inside `darkned_ros/config/ros.yaml`.
+
+### ROS related parameters
+
+You can change the names and other parameters of the publishers, subscribers and actions inside `darkned_ros/config/ros.yaml`.
+
+#### Subscribed Topics
+
+* **`/camera_reading`** ([sensor_msgs/Image])
+
+    The camera measurements.
+
+#### Published Topics
+
+* **`object_detector`** ([std_msgs::Int8])
+
+    Publishes a 1 if an object was detected and a 0 zero if no object was detected.
+
+* **`bounding_boxes`** ([darknet_ros_msgs::BoundingBoxes])
+
+    Publishes an array of bounding boxes that gives an information of the position and size of the bounding box in pixel coordinates.
+
+* **`detection_image`** ([sensor_msgs::Image])
+
+    Publishes an image of the detection image including the bounding boxes.
+
+#### Actions
+
+* **`camera_reading`** ([sensor_msgs::Image])
+
+    Sends an action with an image and the result is an array of bounding boxes.
+
+#### Detection related parameters
+
+You can change the parameters that are related to the detection by adding a new config file that looks similar to `darkned_ros/config/yolo.yaml`.
+
+* **`image_view/enable_opencv`** (bool)
+
+    Enable or disable the open cv view of the detection image including the bounding boxes.
+
+* **`image_view/use_darknet`** (bool)
+
+    Use the open cv image view from the original darknet algorithm by setting to true or use the on that is implemented darknet_ros by ssetting to false.
+
+* **`image_view/wait_key_delay`** (int)
+
+    Wait ky delaz in ms of the open cv window.
+
+* **`yolo_model/config_file/name`** (string)
+
+    Name of the cfg file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/cfg/`.
+
+* **`yolo_model/weight_file/name`** (string)
+
+    Name of the weights file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/weights/`.
+
+* **`yolo_model/threshold/value`** (float)
+
+    Threshold of the detection algorithm. It is defined between 0 and 1.
+
+* **`yolo_model/detection_classes/names`** (array of strings)
+
+    Detection names of the network used by the cfg and weights file inside `darkned_ros/yolo_network_config/`.
