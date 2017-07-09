@@ -30,7 +30,8 @@ yolo_model:
       - bench
       - bird
       - cat
-      - doghorse
+      - dog
+      - horse
       - sheep
       - cow
       - elephant
