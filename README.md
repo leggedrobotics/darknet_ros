@@ -123,7 +123,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
 * **`bounding_boxes`** ([darknet_ros_msgs::BoundingBoxes])
 
-    Publishes an array of bounding boxes that gives an information of the position and size of the bounding box in pixel coordinates.
+    Publishes an array of bounding boxes that gives information of the position and size of the bounding box in pixel coordinates.
 
 * **`detection_image`** ([sensor_msgs::Image])
 
@@ -145,11 +145,11 @@ You can change the parameters that are related to the detection by adding a new 
 
 * **`image_view/use_darknet`** (bool)
 
-    Use the open cv image view from the original darknet algorithm by setting to true or use the on that is implemented darknet_ros by ssetting to false.
+    Use the open cv image view from the original darknet algorithm by setting to true or use the on that is implemented in darknet_ros by setting to false.
 
 * **`image_view/wait_key_delay`** (int)
 
-    Wait ky delaz in ms of the open cv window.
+    Wait key delay in ms of the open cv window.
 
 * **`yolo_model/config_file/name`** (string)
 
