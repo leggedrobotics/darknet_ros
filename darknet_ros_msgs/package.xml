@@ -5,7 +5,7 @@
   <description>ROS message definitions for YOLO in ROS.</description>
   <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
   <license>MIT</license>
-  <url type="marko.bjelonic@mavt.ethz.ch">https://bitbucket.org/ethz-asl-lr/darknet_ros</url>
+  <url type="marko.bjelonic@mavt.ethz.ch">https://bitbucket.org/leggedrobotics/darknet_ros</url>
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
   <buildtool_depend>catkin</buildtool_depend>
