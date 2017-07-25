@@ -134,7 +134,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
     Sends an action with an image and the result is an array of bounding boxes.
 
-#### Detection related parameters
+### Detection related parameters
 
 You can change the parameters that are related to the detection by adding a new config file that looks similar to `darkned_ros/config/yolo.yaml`.
 
