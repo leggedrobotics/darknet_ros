@@ -63,6 +63,8 @@ add_definitions(-DOPENCV)
 add_definitions(-O4 -g)
 
 catkin_package(
+  INCLUDE_DIRS
+    include
   CATKIN_DEPENDS
     cv_bridge
     roscpp
@@ -88,9 +90,8 @@ if (CUDA_FOUND)
     /usr/local/cuda/lib64
   )
 
-  cuda_add_executable(${PROJECT_NAME}
+  cuda_add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/yolo_object_detector_node.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
 
@@ -135,7 +136,12 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/crop_layer_kernels.cu
   )
 
+  cuda_add_executable(${PROJECT_NAME}
+    src/yolo_object_detector_node.cpp
+  )
+
   target_link_libraries(${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
     m
     pthread
     stdc++
@@ -146,6 +152,13 @@ if (CUDA_FOUND)
     ${Boost_LIBRARIES}
     ${catkin_LIBRARIES}
   )
+
+  install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
+  )
+
 else()
   include_directories(
     ${DARKNET_PATH}/src
