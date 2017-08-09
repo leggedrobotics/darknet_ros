@@ -56,9 +56,9 @@ IplImage* get_ipl_image()
 bool YoloObjectDetector::readParameters()
 {
   // Load common parameters.
-  nodeHandle_.param("/darknet_ros/image_view/enable_opencv", viewImage_, true);
-  nodeHandle_.param("/darknet_ros/image_view/use_darknet", darknetImageViewer_, false);
-  nodeHandle_.param("/darknet_ros/image_view/wait_key_delay", waitKeyDelay_, 3);
+  nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
+  nodeHandle_.param("image_view/use_darknet", darknetImageViewer_, false);
+  nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
   if(XOpenDisplay(NULL))
@@ -78,7 +78,7 @@ bool YoloObjectDetector::readParameters()
   }
 
   // Set vector sizes.
-  nodeHandle_.param("/darknet_ros/yolo_model/detection_classes/names", classLabels_, std::vector<std::string>(0));
+  nodeHandle_.param("yolo_model/detection_classes/names", classLabels_, std::vector<std::string>(0));
   numClasses_ = classLabels_.size();
   rosBoxes_ =   std::vector< std::vector<RosBox_> >(numClasses_);
   rosBoxCounter_ = std::vector<int>(numClasses_);
@@ -108,18 +108,18 @@ void YoloObjectDetector::init()
 
   // Threshold of object detection.
   float thresh;
-  nodeHandle_.param("/darknet_ros/yolo_model/threshold/value", thresh, (float)0.3);
+  nodeHandle_.param("yolo_model/threshold/value", thresh, (float)0.3);
 
   // Path to weights file.
-  nodeHandle_.param("/darknet_ros/yolo_model/weight_file/name", weightsModel, std::string("tiny-yolo-voc.weights"));
-  nodeHandle_.param("/darknet_ros/weights_path", weightsPath, std::string("/default"));
+  nodeHandle_.param("yolo_model/weight_file/name", weightsModel, std::string("tiny-yolo-voc.weights"));
+  nodeHandle_.param("weights_path", weightsPath, std::string("/default"));
   weightsPath += "/" + weightsModel;
   weights = new char[weightsPath.length() + 1];
   strcpy(weights, weightsPath.c_str());
 
   // Path to config file.
-  nodeHandle_.param("/darknet_ros/yolo_model/config_file/name", configModel, std::string("tiny-yolo-voc.cfg"));
-  nodeHandle_.param("/darknet_ros/config_path", configPath, std::string("/default"));
+  nodeHandle_.param("yolo_model/config_file/name", configModel, std::string("tiny-yolo-voc.cfg"));
+  nodeHandle_.param("config_path", configPath, std::string("/default"));
   configPath += "/" + configModel;
   cfg = new char[configPath.length() + 1];
   strcpy(cfg, configPath.c_str());
@@ -160,17 +160,17 @@ void YoloObjectDetector::init()
   int detectionImageQueueSize;
   bool detectionImageLatch;
 
-  nodeHandle_.param("/darknet_ros/subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/image_raw"));
-  nodeHandle_.param("/darknet_ros/subscribers/camera_reading/queue_size", cameraQueueSize, 1);
-  nodeHandle_.param("/darknet_ros/publishers/object_detector/topic", objectDetectorTopicName, std::string("/darknet_ros/found_object"));
-  nodeHandle_.param("/darknet_ros/publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
-  nodeHandle_.param("/darknet_ros/publishers/object_detector/latch", objectDetectorLatch, false);
-  nodeHandle_.param("/darknet_ros/publishers/bounding_boxes/topic", boundingBoxesTopicName, std::string("/darknet_ros/bounding_boxes"));
-  nodeHandle_.param("/darknet_ros/publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
-  nodeHandle_.param("/darknet_ros/publishers/bounding_boxes/latch", boundingBoxesLatch, false);
-  nodeHandle_.param("/darknet_ros/publishers/detection_image/topic", detectionImageTopicName, std::string("/darknet_ros/detection_image"));
-  nodeHandle_.param("/darknet_ros/publishers/detection_image/queue_size", detectionImageQueueSize, 1);
-  nodeHandle_.param("/darknet_ros/publishers/detection_image/latch", detectionImageLatch, true);
+  nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/image_raw"));
+  nodeHandle_.param("subscribers/camera_reading/queue_size", cameraQueueSize, 1);
+  nodeHandle_.param("publishers/object_detector/topic", objectDetectorTopicName, std::string("found_object"));
+  nodeHandle_.param("publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
+  nodeHandle_.param("publishers/object_detector/latch", objectDetectorLatch, false);
+  nodeHandle_.param("publishers/bounding_boxes/topic", boundingBoxesTopicName, std::string("bounding_boxes"));
+  nodeHandle_.param("publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
+  nodeHandle_.param("publishers/bounding_boxes/latch", boundingBoxesLatch, false);
+  nodeHandle_.param("publishers/detection_image/topic", detectionImageTopicName, std::string("detection_image"));
+  nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
+  nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
 
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName, objectDetectorQueueSize, objectDetectorLatch);
@@ -179,7 +179,7 @@ void YoloObjectDetector::init()
 
   // Action servers.
   std::string checkForObjectsActionName;
-  nodeHandle_.param("/darknet_ros/actions/camera_reading/topic", checkForObjectsActionName, std::string("/darknet_ros/check_for_objects"));
+  nodeHandle_.param("actions/camera_reading/topic", checkForObjectsActionName, std::string("check_for_objects"));
   checkForObjectsActionServer_.reset(
       new CheckForObjectsActionServer(
           nodeHandle_, checkForObjectsActionName,
