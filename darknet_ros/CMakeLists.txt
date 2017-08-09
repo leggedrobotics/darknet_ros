@@ -65,6 +65,8 @@ add_definitions(-O4 -g)
 catkin_package(
   INCLUDE_DIRS
     include
+  LIBRARIES
+    ${PROJECT_NAME}_lib
   CATKIN_DEPENDS
     cv_bridge
     roscpp
@@ -136,12 +138,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/crop_layer_kernels.cu
   )
 
-  cuda_add_executable(${PROJECT_NAME}
-    src/yolo_object_detector_node.cpp
-  )
-
-  target_link_libraries(${PROJECT_NAME}
-    ${PROJECT_NAME}_lib
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
@@ -151,6 +148,19 @@ if (CUDA_FOUND)
     curand
     ${Boost_LIBRARIES}
     ${catkin_LIBRARIES}
+  )
+
+  cuda_add_executable(${PROJECT_NAME}
+    src/yolo_object_detector_node.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
+  )
+
+  install(
+    TARGETS ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   )
 
   install(
