@@ -207,6 +207,17 @@ YoloObjectDetector::~YoloObjectDetector()
   }
 }
 
+void YoloObjectDetector::testImage(cv::Mat &inputImage, cv::Mat &outputImage, DetectionsVector &detections, int id) {
+  ROS_INFO("[YoloObjectDetector] Test inputImage received.");
+
+  camImageCopy_ = inputImage.clone();
+  frameWidth_ = inputImage.size().width;
+  frameHeight_ = inputImage.size().height;
+  runYolo(inputImage, outputImage, id);\
+  detections = rosBoxes_;
+  return;
+}
+
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
    cv::Scalar &rosBoxColor, const std::string &objectLabel)
 {
@@ -238,14 +249,19 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
+void YoloObjectDetector::runYolo(cv::Mat &inputFrame, cv::Mat &outputFrame, int id)
 {
   ROS_INFO("[YoloObjectDetector] runYolo().");
 
-  cv::Mat inputFrame = fullFrame.clone();
-
   // run yolo and get bounding boxes for objects
   boxes_ = demo_yolo();
+
+  // Clearing results from the last frame
+  for (int i = 0; i < numClasses_; i++)
+  {
+    rosBoxes_[i].clear();
+    rosBoxCounter_[i] = 0;
+  }
 
   // get the number of bounding boxes found
   int num = boxes_[0].num;
@@ -253,12 +269,13 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
   // if at least one BoundingBox found, draw box
   if (num > 0  && num <= 100)
   {
+    // Command line output if no viewer
     if(!darknetImageViewer_)
     {
       std::cout << "# Objects: " << num << std::endl;
 
     }
-    // split bounding boxes by class
+    // Split bounding boxes by class
     for (int i = 0; i < num; i++)
     {
       for (int j = 0; j < numClasses_; j++)
@@ -275,19 +292,22 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
       }
     }
 
-    // send message that an object has been detected
+/*    // send message that an object has been detected
     std_msgs::Int8 msg;
     msg.data = 1;
-    objectPublisher_.publish(msg);
+    objectPublisher_.publish(msg);*/
 
+    // Drawing the output image
+    outputFrame = inputFrame.clone();
     for (int i = 0; i < numClasses_; i++)
     {
-      if (rosBoxCounter_[i] > 0) drawBoxes(inputFrame, rosBoxes_[i],
-                                             rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
+      if (rosBoxCounter_[i] > 0) drawBoxes(outputFrame, rosBoxes_[i],
+                                           rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
     }
-    boundingBoxesPublisher_.publish(boundingBoxesResults_);
+
+    //boundingBoxesPublisher_.publish(boundingBoxesResults_);
   }
-  else
+/*  else
   {
     std_msgs::Int8 msg;
     msg.data = 0;
@@ -300,23 +320,19 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
     objectsActionResult.id = id;
     objectsActionResult.boundingBoxes = boundingBoxesResults_;
     checkForObjectsActionServer_->setSucceeded(objectsActionResult,"Send bounding boxes.");
-  }
+  }*/
+
+  // Clearing the bounding box results
   boundingBoxesResults_.boundingBoxes.clear();
 
-  for (int i = 0; i < numClasses_; i++)
+/*  if(viewImage_ && !darknetImageViewer_)
   {
-     rosBoxes_[i].clear();
-     rosBoxCounter_[i] = 0;
-  }
-
-  if(viewImage_ && !darknetImageViewer_)
-  {
-    cv::imshow(opencvWindow_, inputFrame);
+    cv::imshow(opencvWindow_, outputFrame);
     cv::waitKey(waitKeyDelay_);
-  }
+  }*/
 
-  // Publish elevation change map.
-  if (!publishDetectionImage(inputFrame)) ROS_DEBUG("Detection image has not been broadcasted.");
+  // Publish marked up image.
+  //if (!publishDetectionImage(outputFrame)) ROS_DEBUG("Detection image has not been broadcasted.");
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -340,7 +356,8 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image);
+    cv::Mat outputImage;
+    runYolo(cam_image->image, outputImage);
   }
   return;
 }
@@ -369,7 +386,8 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image, imageActionPtr->id);
+    cv::Mat outputImage;
+    runYolo(cam_image->image, outputImage, imageActionPtr->id);
   }
   return;
 }

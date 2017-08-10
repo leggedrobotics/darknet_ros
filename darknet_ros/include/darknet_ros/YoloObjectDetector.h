@@ -43,6 +43,9 @@ typedef struct {
   int num, Class;
 } RosBox_;
 
+// A typedef for the detection structure
+typedef std::vector<std::vector<RosBox_> > DetectionsVector;
+
 /*!
  * Run YOLO and detect obstacles.
  * @param[out] bounding box.
@@ -83,6 +86,18 @@ class YoloObjectDetector
    */
   ~YoloObjectDetector();
 
+  /*!
+   * Run YOLO and detect obstacles.
+   * @param[in] fullFrame image of current camera frame.
+   */
+  void testImage(cv::Mat &image, cv::Mat &outputImage, DetectionsVector &detections, int id = 0);
+
+  /*!
+   * Returns the class labels for clients.
+   * @param[out] classLabels place to store the labels.
+   */
+  void getClassLabels(std::vector<std::string>& classLabels) {classLabels = classLabels_; }
+
  private:
   /*!
    * Reads and verifies the ROS parameters.
@@ -110,7 +125,7 @@ class YoloObjectDetector
    * Run YOLO and detect obstacles.
    * @param[in] fullFrame image of current camera frame.
    */
-  void runYolo(cv::Mat &fullFrame, int id = 0);
+  void runYolo(cv::Mat &inputFrame, cv::Mat &outputFrame, int id = 0);
 
   /*!
    * Callback of camera.
@@ -163,7 +178,7 @@ class YoloObjectDetector
   ros::Publisher boundingBoxesPublisher_;
 
   //! Detected objects.
-  std::vector< std::vector<RosBox_> > rosBoxes_;
+  DetectionsVector rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
