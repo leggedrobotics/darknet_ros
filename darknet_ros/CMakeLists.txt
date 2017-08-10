@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+make_minimum_required(VERSION 2.8.12)
 project(darknet_ros)
 
 # Set c++11 cmake flags
@@ -6,8 +6,8 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
-	NAMES "README.md"
-	HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
+  NAMES "README.md"
+  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
@@ -38,10 +38,10 @@ endif()
 MESSAGE ( STATUS "Searching for X11..." )
 FIND_PACKAGE ( X11 REQUIRED )
 IF ( X11_FOUND )
-      INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
-      LINK_LIBRARIES ( ${X11_LIBRARIES} )
-      MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
-      MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
+  INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
+  LINK_LIBRARIES ( ${X11_LIBRARIES} )
+  MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
+  MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
 ENDIF ( X11_FOUND )
 
 # Find rquired packeges
@@ -225,7 +225,7 @@ else()
     ${catkin_LIBRARIES}
   )
 
-	add_executable(${PROJECT_NAME}
+  add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
   )
 
@@ -233,7 +233,7 @@ else()
     ${PROJECT_NAME}_lib
   )
 
-	install(
+  install(
     TARGETS ${PROJECT_NAME}_lib
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   )
@@ -250,8 +250,8 @@ set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
 set(FILE "${PATH}/tiny-yolo-voc.weights")
 message(STATUS "Checking and downloading tiny-yolo-voc.weights if needed ...")
 if (NOT EXISTS "${FILE}")
-	message(STATUS "... file does not exist. Downloading now ...")
-	execute_process(COMMAND wget http://pjreddie.com/media/files/tiny-yolo-voc.weights -P ${PATH})
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget http://pjreddie.com/media/files/tiny-yolo-voc.weights -P ${PATH})
 endif()
 
 #############
@@ -264,8 +264,8 @@ if(CATKIN_ENABLE_TESTING)
   set(FILE "${PATH}/yolo-voc.weights")
   message(STATUS "Checking and downloading yolo-voc.weights if needed ...")
   if (NOT EXISTS "${FILE}")
-	  message(STATUS "... file does not exist. Downloading now ...")
-		execute_process(COMMAND wget http://pjreddie.com/media/files/yolo-voc.weights -P ${PATH})
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget http://pjreddie.com/media/files/yolo-voc.weights -P ${PATH})
   endif()
 
   find_package(rostest REQUIRED)

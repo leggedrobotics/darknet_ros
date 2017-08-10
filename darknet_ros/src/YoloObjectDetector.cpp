@@ -26,13 +26,12 @@ char *data;
 char **detectionNames;
 
 cv::Mat camImageCopy_;
-IplImage* get_ipl_image()
-{
-   IplImage* ROS_img = new IplImage(camImageCopy_);
-   return ROS_img;
+IplImage* get_ipl_image() {
+  IplImage* ROS_img = new IplImage(camImageCopy_);
+  return ROS_img;
 }
 
- YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
+YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
      imageTransport_(nodeHandle_),
      numClasses_(0),
@@ -45,35 +44,30 @@ IplImage* get_ipl_image()
   ROS_INFO("[YoloObjectDetector] Node started.");
 
   // Read parameters from config file.
-  if (!readParameters())
-  {
+  if (!readParameters()) {
     ros::requestShutdown();
   }
 
   init();
 }
 
-bool YoloObjectDetector::readParameters()
-{
+bool YoloObjectDetector::readParameters() {
   // Load common parameters.
   nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
   nodeHandle_.param("image_view/use_darknet", darknetImageViewer_, false);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
-  if(XOpenDisplay(NULL))
-  {
+  if(XOpenDisplay(NULL)) {
     // Do nothing!
     ROS_INFO("[YoloObjectDetector] Xserver is running.");
   }
-  else
-  {
+  else {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
     viewImage_ = false;
   }
 
-  if(!viewImage_)
-  {
+  if(!viewImage_) {
     darknetImageViewer_ = false;
   }
 
@@ -84,18 +78,15 @@ bool YoloObjectDetector::readParameters()
   rosBoxCounter_ = std::vector<int>(numClasses_);
   rosBoxColors_ = std::vector<cv::Scalar>(numClasses_);
 
-
   return true;
 }
 
-void YoloObjectDetector::init()
-{
+void YoloObjectDetector::init() {
   ROS_INFO("[YoloObjectDetector] init().");
 
   // Initialize color of bounding boxes of different object classes.
   int incr = floor(255/numClasses_);
-  for (int i = 0; i < numClasses_; i++)
-  {
+  for (int i = 0; i < numClasses_; i++) {
     rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
   }
 
@@ -132,8 +123,7 @@ void YoloObjectDetector::init()
 
   // Get classes.
   detectionNames = (char**)realloc((void*)detectionNames, (numClasses_ + 1) * sizeof(char*));
-  for (int i = 0; i < numClasses_; i++)
-  {
+  for (int i = 0; i < numClasses_; i++) {
     detectionNames[i] = new char[classLabels_[i].length() + 1];
     strcpy(detectionNames[i], classLabels_[i].c_str());
   }
@@ -191,55 +181,49 @@ void YoloObjectDetector::init()
   checkForObjectsActionServer_->start();
 
   // OpenCv image view.
-  if(viewImage_ && !darknetImageViewer_)
-  {
+  if(viewImage_ && !darknetImageViewer_) {
     cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
     cv::moveWindow(opencvWindow_, 0, 0);
     cv::resizeWindow(opencvWindow_, 1352, 1013);
   }
 }
 
-YoloObjectDetector::~YoloObjectDetector()
-{
-  if(viewImage_ && !darknetImageViewer_)
-  {
+YoloObjectDetector::~YoloObjectDetector() {
+  if(viewImage_ && !darknetImageViewer_) {
     cv::destroyWindow(opencvWindow_);
   }
 }
 
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
-   cv::Scalar &rosBoxColor, const std::string &objectLabel)
-{
+   cv::Scalar &rosBoxColor, const std::string &objectLabel) {
   darknet_ros_msgs::BoundingBox boundingBox;
 
-  for (int i = 0; i < numberOfObjects; i++)
-  {
-     int xmin = (rosBoxes[i].x - rosBoxes[i].w/2)*frameWidth_;
-     int ymin = (rosBoxes[i].y - rosBoxes[i].h/2)*frameHeight_;
-     int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
-     int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
+  for (int i = 0; i < numberOfObjects; i++) {
+    int xmin = (rosBoxes[i].x - rosBoxes[i].w/2)*frameWidth_;
+    int ymin = (rosBoxes[i].y - rosBoxes[i].h/2)*frameHeight_;
+    int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
+    int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
 
-     boundingBox.Class = objectLabel;
-     boundingBox.probability = rosBoxes[i].prob;
-     boundingBox.xmin = xmin;
-     boundingBox.ymin = ymin;
-     boundingBox.xmax = xmax;
-     boundingBox.ymax = ymax;
-     boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
+    boundingBox.Class = objectLabel;
+    boundingBox.probability = rosBoxes[i].prob;
+    boundingBox.xmin = xmin;
+    boundingBox.ymin = ymin;
+    boundingBox.xmax = xmax;
+    boundingBox.ymax = ymax;
+    boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
 
-     // draw bounding box of first object found
-     cv::Point topLeftCorner = cv::Point(xmin, ymin);
-     cv::Point botRightCorner = cv::Point(xmax, ymax);
-     cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
-     std::ostringstream probability;
-     probability << rosBoxes[i].prob*100;
-     cv::putText(inputFrame, objectLabel + " (" + probability.str() + "%)", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
-                 1.0, rosBoxColor, 2.0);
+    // draw bounding box of first object found
+    cv::Point topLeftCorner = cv::Point(xmin, ymin);
+    cv::Point botRightCorner = cv::Point(xmax, ymax);
+    cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
+    std::ostringstream probability;
+    probability << rosBoxes[i].prob*100;
+    cv::putText(inputFrame, objectLabel + " (" + probability.str() + "%)", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
+                1.0, rosBoxColor, 2.0);
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
-{
+void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
   ROS_INFO("[YoloObjectDetector] runYolo().");
 
   cv::Mat inputFrame = fullFrame.clone();
@@ -251,24 +235,17 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
   int num = boxes_[0].num;
 
   // if at least one BoundingBox found, draw box
-  if (num > 0  && num <= 100)
-  {
-    if(!darknetImageViewer_)
-    {
+  if (num > 0  && num <= 100) {
+    if(!darknetImageViewer_) {
       std::cout << "# Objects: " << num << std::endl;
-
     }
     // split bounding boxes by class
-    for (int i = 0; i < num; i++)
-    {
-      for (int j = 0; j < numClasses_; j++)
-      {
-         if (boxes_[i].Class == j)
-         {
+    for (int i = 0; i < num; i++) {
+      for (int j = 0; j < numClasses_; j++) {
+         if (boxes_[i].Class == j) {
             rosBoxes_[j].push_back(boxes_[i]);
             rosBoxCounter_[j]++;
-            if(!darknetImageViewer_)
-            {
+            if(!darknetImageViewer_) {
               std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_[i].prob*100 << "%)" << std::endl;
             }
          }
@@ -280,21 +257,18 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
     msg.data = 1;
     objectPublisher_.publish(msg);
 
-    for (int i = 0; i < numClasses_; i++)
-    {
+    for (int i = 0; i < numClasses_; i++) {
       if (rosBoxCounter_[i] > 0) drawBoxes(inputFrame, rosBoxes_[i],
                                              rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
     }
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   }
-  else
-  {
+  else {
     std_msgs::Int8 msg;
     msg.data = 0;
     objectPublisher_.publish(msg);
   }
-  if (isCheckingForObjects())
-  {
+  if (isCheckingForObjects()) {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
     darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
     objectsActionResult.id = id;
@@ -303,14 +277,12 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
   }
   boundingBoxesResults_.boundingBoxes.clear();
 
-  for (int i = 0; i < numClasses_; i++)
-  {
+  for (int i = 0; i < numClasses_; i++) {
      rosBoxes_[i].clear();
      rosBoxCounter_[i] = 0;
   }
 
-  if(viewImage_ && !darknetImageViewer_)
-  {
+  if(viewImage_ && !darknetImageViewer_) {
     cv::imshow(opencvWindow_, inputFrame);
     cv::waitKey(waitKeyDelay_);
   }
@@ -319,24 +291,20 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id)
   if (!publishDetectionImage(inputFrame)) ROS_DEBUG("Detection image has not been broadcasted.");
 }
 
-void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
-{
+void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
   ROS_INFO("[YoloObjectDetector] USB image received.");
 
   cv_bridge::CvImagePtr cam_image;
 
-  try
-  {
+  try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   }
-  catch (cv_bridge::Exception& e)
-  {
-     ROS_ERROR("cv_bridge exception: %s", e.what());
-     return;
+  catch (cv_bridge::Exception& e) {
+    ROS_ERROR("cv_bridge exception: %s", e.what());
+    return;
   }
 
-  if(cam_image)
-  {
+  if(cam_image) {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
@@ -345,8 +313,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   return;
 }
 
-void YoloObjectDetector::checkForObjectsActionGoalCB()
-{
+void YoloObjectDetector::checkForObjectsActionGoalCB() {
   ROS_INFO("[YoloObjectDetector] Start check for objects action.");
 
   boost::shared_ptr<const darknet_ros_msgs::CheckForObjectsGoal> imageActionPtr = checkForObjectsActionServer_->acceptNewGoal();
@@ -354,18 +321,15 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
 
   cv_bridge::CvImagePtr cam_image;
 
-  try
-  {
+  try {
     cam_image = cv_bridge::toCvCopy(imageAction, sensor_msgs::image_encodings::BGR8);
   }
-  catch (cv_bridge::Exception& e)
-  {
+  catch (cv_bridge::Exception& e) {
      ROS_ERROR("cv_bridge exception: %s", e.what());
      return;
   }
 
-  if (cam_image)
-  {
+  if (cam_image) {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
@@ -374,21 +338,18 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
   return;
 }
 
-void YoloObjectDetector::checkForObjectsActionPreemptCB()
-{
+void YoloObjectDetector::checkForObjectsActionPreemptCB() {
   ROS_INFO("[YoloObjectDetector] Preempt check for objects action.");
   checkForObjectsActionServer_->setPreempted();
 }
 
-bool YoloObjectDetector::isCheckingForObjects() const
-{
+bool YoloObjectDetector::isCheckingForObjects() const {
   return (ros::ok() &&
       checkForObjectsActionServer_->isActive() &&
           !checkForObjectsActionServer_->isPreemptRequested());
 }
 
-bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
-{
+bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage) {
   if (detectionImagePublisher_.getNumSubscribers() < 1) return false;
   cv_bridge::CvImage cvImage;
   cvImage.header.stamp = ros::Time::now();
