@@ -178,9 +178,8 @@ else()
     ${catkin_INCLUDE_DIRS}
   )
 
-  add_executable(${PROJECT_NAME}
+  add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/yolo_object_detector_node.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
 
@@ -218,12 +217,31 @@ else()
     ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/yolo.c
   )
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
     ${Boost_LIBRARIES}
     ${catkin_LIBRARIES}
+  )
+
+	add_executable(${PROJECT_NAME}
+    src/yolo_object_detector_node.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
+  )
+
+	install(
+    TARGETS ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+
+  install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
   )
 endif()
 
