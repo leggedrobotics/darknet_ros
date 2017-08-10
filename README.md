@@ -1,4 +1,4 @@
-# YOLOv2 for ROS: Real-Time Object Detection for ROS
+# YOLO (v2) for ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
