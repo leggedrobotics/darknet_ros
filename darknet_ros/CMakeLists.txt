@@ -6,8 +6,8 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
-	NAMES "README.md"
-	HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
+  NAMES "README.md"
+  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
@@ -38,10 +38,10 @@ endif()
 MESSAGE ( STATUS "Searching for X11..." )
 FIND_PACKAGE ( X11 REQUIRED )
 IF ( X11_FOUND )
-      INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
-      LINK_LIBRARIES ( ${X11_LIBRARIES} )
-      MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
-      MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
+  INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
+  LINK_LIBRARIES ( ${X11_LIBRARIES} )
+  MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
+  MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
 ENDIF ( X11_FOUND )
 
 # Find rquired packeges
@@ -63,6 +63,10 @@ add_definitions(-DOPENCV)
 add_definitions(-O4 -g)
 
 catkin_package(
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}_lib
   CATKIN_DEPENDS
     cv_bridge
     roscpp
@@ -88,9 +92,8 @@ if (CUDA_FOUND)
     /usr/local/cuda/lib64
   )
 
-  cuda_add_executable(${PROJECT_NAME}
+  cuda_add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/yolo_object_detector_node.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
 
@@ -135,7 +138,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/crop_layer_kernels.cu
   )
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
@@ -146,6 +149,26 @@ if (CUDA_FOUND)
     ${Boost_LIBRARIES}
     ${catkin_LIBRARIES}
   )
+
+  cuda_add_executable(${PROJECT_NAME}
+    src/yolo_object_detector_node.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
+  )
+
+  install(
+    TARGETS ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+
+  install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
+  )
+
 else()
   include_directories(
     ${DARKNET_PATH}/src
@@ -155,9 +178,8 @@ else()
     ${catkin_INCLUDE_DIRS}
   )
 
-  add_executable(${PROJECT_NAME}
+  add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/yolo_object_detector_node.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
 
@@ -195,12 +217,31 @@ else()
     ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/yolo.c
   )
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
     ${Boost_LIBRARIES}
     ${catkin_LIBRARIES}
+  )
+
+  add_executable(${PROJECT_NAME}
+    src/yolo_object_detector_node.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
+  )
+
+  install(
+    TARGETS ${PROJECT_NAME}_lib
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+
+  install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
   )
 endif()
 
@@ -209,8 +250,8 @@ set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
 set(FILE "${PATH}/tiny-yolo-voc.weights")
 message(STATUS "Checking and downloading tiny-yolo-voc.weights if needed ...")
 if (NOT EXISTS "${FILE}")
-	message(STATUS "... file does not exist. Downloading now ...")
-	execute_process(COMMAND wget http://pjreddie.com/media/files/tiny-yolo-voc.weights -P ${PATH})
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget http://pjreddie.com/media/files/tiny-yolo-voc.weights -P ${PATH})
 endif()
 
 #############
@@ -223,8 +264,8 @@ if(CATKIN_ENABLE_TESTING)
   set(FILE "${PATH}/yolo-voc.weights")
   message(STATUS "Checking and downloading yolo-voc.weights if needed ...")
   if (NOT EXISTS "${FILE}")
-	  message(STATUS "... file does not exist. Downloading now ...")
-		execute_process(COMMAND wget http://pjreddie.com/media/files/yolo-voc.weights -P ${PATH})
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget http://pjreddie.com/media/files/yolo-voc.weights -P ${PATH})
   endif()
 
   find_package(rostest REQUIRED)

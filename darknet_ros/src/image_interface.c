@@ -8,8 +8,7 @@
 
 #include "darknet_ros/image_interface.h"
 
-image **load_alphabet_with_file(char *datafile)
-{
+image **load_alphabet_with_file(char *datafile) {
   int i, j;
   const int nsize = 8;
   image **alphabets = calloc(nsize, sizeof(image));

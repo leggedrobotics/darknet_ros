@@ -69,8 +69,7 @@ static pthread_t fetch_thread;
 static pthread_t detect_thread;
 static double tval_before, tval_after;
 
-void *fetch_in_thread(void *ptr)
-{
+void *fetch_in_thread(void *ptr) {
   IplImage* ROS_img = darknet_ros::get_ipl_image();
   in = ipl_to_image(ROS_img);
   delete ROS_img;
@@ -82,8 +81,7 @@ void *fetch_in_thread(void *ptr)
   return 0;
 }
 
-void *detect_in_thread(void *ptr)
-{
+void *detect_in_thread(void *ptr) {
   float nms = .4;
 
   layer l = net.layers[net.n-1];
@@ -172,8 +170,7 @@ void *detect_in_thread(void *ptr)
   return 0;
 }
 
-double get_wall_time()
-{
+double get_wall_time() {
   struct timeval time;
   if (gettimeofday(&time,NULL)){
     return 0;
@@ -182,51 +179,49 @@ double get_wall_time()
 }
 
 extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
-                       bool viewimage, int waitkeydelay,
-                       int frame_skip,
-                       float hier,
-                       int w, int h, int frames, int fullscreen)
-{
-	image **alphabet = load_alphabet_with_file(datafile);
-	delay = frame_skip;
-	demo_names = names;
-	demo_alphabet = alphabet;
-	demo_classes = classes;
-	demo_thresh = thresh;
-	demo_hier = hier;
-	view_image = viewimage;
-	wait_key_delay = waitkeydelay;
-	full_screen = fullscreen;
-	printf("YOLO_V2\n");
-	net = parse_network_cfg(cfgfile);
-	if(weightfile) {
-		load_weights(&net, weightfile);
-	}
-	set_batch_network(&net, 1);
+                                  float thresh,
+                                  char **names, int classes,
+                                  bool viewimage, int waitkeydelay,
+                                  int frame_skip,
+                                  float hier,
+                                  int w, int h, int frames, int fullscreen) {
+  image **alphabet = load_alphabet_with_file(datafile);
+  delay = frame_skip;
+  demo_names = names;
+  demo_alphabet = alphabet;
+  demo_classes = classes;
+  demo_thresh = thresh;
+  demo_hier = hier;
+  view_image = viewimage;
+  wait_key_delay = waitkeydelay;
+  full_screen = fullscreen;
+  printf("YOLO_V2\n");
+  net = parse_network_cfg(cfgfile);
+  if(weightfile) {
+    load_weights(&net, weightfile);
+  }
+  set_batch_network(&net, 1);
 
-	srand(2222222);
+  srand(2222222);
 
-	layer l = net.layers[net.n-1];
-	int j;
+  layer l = net.layers[net.n-1];
+  int j;
 
-	avg = (float *) calloc(l.outputs, sizeof(float));
-	for(j = 0; j < FRAMES; ++j) predictions[j] = (float *) calloc(l.outputs, sizeof(float));
-	for(j = 0; j < FRAMES; ++j) images[j] = make_image(1,1,3);
+  avg = (float *) calloc(l.outputs, sizeof(float));
+  for(j = 0; j < FRAMES; ++j) predictions[j] = (float *) calloc(l.outputs, sizeof(float));
+  for(j = 0; j < FRAMES; ++j) images[j] = make_image(1,1,3);
 
-	boxes = (box *)calloc(l.w*l.h*l.n, sizeof(box));
+  boxes = (box *)calloc(l.w*l.h*l.n, sizeof(box));
   ROI_boxes = (darknet_ros::RosBox_ *)calloc(l.side*l.side*l.n, sizeof(darknet_ros::RosBox_));
-	probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
-	for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
+  probs = (float **)calloc(l.w*l.h*l.n, sizeof(float *));
+  for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float *)calloc(l.classes, sizeof(float *));
 
   count = 0;
 
   tval_before = get_wall_time();
 }
 
-extern "C" darknet_ros::RosBox_ *demo_yolo()
-{
+extern "C" darknet_ros::RosBox_ *demo_yolo() {
   if (count == 0) {
     ++count;
     fetch_in_thread(0);
@@ -252,10 +247,10 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
     {
       cvNamedWindow("YOLO_V2", CV_WINDOW_NORMAL);
       if(full_screen){
-          cvSetWindowProperty("YOLO_V2", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+        cvSetWindowProperty("YOLO_V2", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
       } else {
-          cvMoveWindow("YOLO_V2", 0, 0);
-          cvResizeWindow("YOLO_V2", 1352, 1013);
+        cvMoveWindow("YOLO_V2", 0, 0);
+        cvResizeWindow("YOLO_V2", 1352, 1013);
       }
     }
   } else {
@@ -289,12 +284,12 @@ extern "C" darknet_ros::RosBox_ *demo_yolo()
 }
 #else
 extern "C"  void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                       float thresh,
-                       char **names, int classes,
-                       bool viewimage, int waitkeydelay,
-                       int frame_skip,
-                       float hier,
-                       int w, int h, int frames, int fullscreen)
+                                   float thresh,
+                                   char **names, int classes,
+                                   bool viewimage, int waitkeydelay,
+                                   int frame_skip,
+                                   float hier,
+                                   int w, int h, int frames, int fullscreen)
 {
   fprintf(stderr, "YOLO demo needs OpenCV for webcam images.\n");
 }
