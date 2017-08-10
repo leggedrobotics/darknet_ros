@@ -26,13 +26,12 @@ char *data;
 char **detectionNames;
 
 cv::Mat camImageCopy_;
-IplImage* get_ipl_image()
-{
-   IplImage* ROS_img = new IplImage(camImageCopy_);
-   return ROS_img;
+IplImage* get_ipl_image() {
+  IplImage* ROS_img = new IplImage(camImageCopy_);
+  return ROS_img;
 }
 
- YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
+YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
      nodeHandle_(nh),
      imageTransport_(nodeHandle_),
      numClasses_(0),
@@ -45,35 +44,30 @@ IplImage* get_ipl_image()
   ROS_INFO("[YoloObjectDetector] Node started.");
 
   // Read parameters from config file.
-  if (!readParameters())
-  {
+  if (!readParameters()) {
     ros::requestShutdown();
   }
 
   init();
 }
 
-bool YoloObjectDetector::readParameters()
-{
+bool YoloObjectDetector::readParameters() {
   // Load common parameters.
   nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
   nodeHandle_.param("image_view/use_darknet", darknetImageViewer_, false);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
 
   // Check if Xserver is running on Linux.
-  if(XOpenDisplay(NULL))
-  {
+  if(XOpenDisplay(NULL)) {
     // Do nothing!
     ROS_INFO("[YoloObjectDetector] Xserver is running.");
   }
-  else
-  {
+  else {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
     viewImage_ = false;
   }
 
-  if(!viewImage_)
-  {
+  if(!viewImage_) {
     darknetImageViewer_ = false;
   }
 
@@ -88,14 +82,12 @@ bool YoloObjectDetector::readParameters()
   return true;
 }
 
-void YoloObjectDetector::init()
-{
+void YoloObjectDetector::init() {
   ROS_INFO("[YoloObjectDetector] init().");
 
   // Initialize color of bounding boxes of different object classes.
   int incr = floor(255/numClasses_);
-  for (int i = 0; i < numClasses_; i++)
-  {
+  for (int i = 0; i < numClasses_; i++) {
     rosBoxColors_[i] = cv::Scalar(255 - incr*i, 0 + incr*i, 255 - incr*i);
   }
 
@@ -132,8 +124,7 @@ void YoloObjectDetector::init()
 
   // Get classes.
   detectionNames = (char**)realloc((void*)detectionNames, (numClasses_ + 1) * sizeof(char*));
-  for (int i = 0; i < numClasses_; i++)
-  {
+  for (int i = 0; i < numClasses_; i++) {
     detectionNames[i] = new char[classLabels_[i].length() + 1];
     strcpy(detectionNames[i], classLabels_[i].c_str());
   }
@@ -191,18 +182,15 @@ void YoloObjectDetector::init()
   checkForObjectsActionServer_->start();
 
   // OpenCv image view.
-  if(viewImage_ && !darknetImageViewer_)
-  {
+  if(viewImage_ && !darknetImageViewer_) {
     cv::namedWindow(opencvWindow_, cv::WINDOW_NORMAL);
     cv::moveWindow(opencvWindow_, 0, 0);
     cv::resizeWindow(opencvWindow_, 1352, 1013);
   }
 }
 
-YoloObjectDetector::~YoloObjectDetector()
-{
-  if(viewImage_ && !darknetImageViewer_)
-  {
+YoloObjectDetector::~YoloObjectDetector() {
+  if(viewImage_ && !darknetImageViewer_) {
     cv::destroyWindow(opencvWindow_);
   }
 }
@@ -219,33 +207,31 @@ void YoloObjectDetector::testImage(cv::Mat &inputImage, cv::Mat &outputImage, De
 }
 
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
-   cv::Scalar &rosBoxColor, const std::string &objectLabel)
-{
+   cv::Scalar &rosBoxColor, const std::string &objectLabel) {
   darknet_ros_msgs::BoundingBox boundingBox;
 
-  for (int i = 0; i < numberOfObjects; i++)
-  {
-     int xmin = (rosBoxes[i].x - rosBoxes[i].w/2)*frameWidth_;
-     int ymin = (rosBoxes[i].y - rosBoxes[i].h/2)*frameHeight_;
-     int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
-     int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
+  for (int i = 0; i < numberOfObjects; i++) {
+    int xmin = (rosBoxes[i].x - rosBoxes[i].w/2)*frameWidth_;
+    int ymin = (rosBoxes[i].y - rosBoxes[i].h/2)*frameHeight_;
+    int xmax = (rosBoxes[i].x + rosBoxes[i].w/2)*frameWidth_;
+    int ymax = (rosBoxes[i].y + rosBoxes[i].h/2)*frameHeight_;
 
-     boundingBox.Class = objectLabel;
-     boundingBox.probability = rosBoxes[i].prob;
-     boundingBox.xmin = xmin;
-     boundingBox.ymin = ymin;
-     boundingBox.xmax = xmax;
-     boundingBox.ymax = ymax;
-     boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
+    boundingBox.Class = objectLabel;
+    boundingBox.probability = rosBoxes[i].prob;
+    boundingBox.xmin = xmin;
+    boundingBox.ymin = ymin;
+    boundingBox.xmax = xmax;
+    boundingBox.ymax = ymax;
+    boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
 
-     // draw bounding box of first object found
-     cv::Point topLeftCorner = cv::Point(xmin, ymin);
-     cv::Point botRightCorner = cv::Point(xmax, ymax);
-     cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
-     std::ostringstream probability;
-     probability << rosBoxes[i].prob*100;
-     cv::putText(inputFrame, objectLabel + " (" + probability.str() + "%)", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
-                 1.0, rosBoxColor, 2.0);
+    // draw bounding box of first object found
+    cv::Point topLeftCorner = cv::Point(xmin, ymin);
+    cv::Point botRightCorner = cv::Point(xmax, ymax);
+    cv::rectangle(inputFrame, topLeftCorner, botRightCorner, rosBoxColor, 2);
+    std::ostringstream probability;
+    probability << rosBoxes[i].prob*100;
+    cv::putText(inputFrame, objectLabel + " (" + probability.str() + "%)", cv::Point(xmin, ymax+15), cv::FONT_HERSHEY_PLAIN,
+                1.0, rosBoxColor, 2.0);
   }
 }
 
