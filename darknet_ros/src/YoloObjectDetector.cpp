@@ -196,8 +196,6 @@ YoloObjectDetector::~YoloObjectDetector() {
 }
 
 void YoloObjectDetector::testImage(cv::Mat &inputImage, cv::Mat &outputImage, DetectionsVector &detections, int id) {
-  ROS_INFO("[YoloObjectDetector] Test inputImage received.");
-
   camImageCopy_ = inputImage.clone();
   frameWidth_ = inputImage.size().width;
   frameHeight_ = inputImage.size().height;
@@ -237,8 +235,6 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
 
 void YoloObjectDetector::runYolo(cv::Mat &inputFrame, cv::Mat &outputFrame, int id)
 {
-  ROS_INFO("[YoloObjectDetector] runYolo().");
-
   // run yolo and get bounding boxes for objects
   boxes_ = demo_yolo();
 
