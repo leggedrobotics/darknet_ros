@@ -226,7 +226,9 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
 }
 
 void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
-  ROS_INFO("[YoloObjectDetector] runYolo().");
+  if(enableConsoleOutput_) {
+    ROS_INFO("[YoloObjectDetector] runYolo().");
+  }
 
   cv::Mat inputFrame = fullFrame.clone();
 
@@ -294,7 +296,9 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
-  ROS_INFO("[YoloObjectDetector] USB image received.");
+  if(enableConsoleOutput_) {
+    ROS_INFO("[YoloObjectDetector] USB image received.");
+  }
 
   cv_bridge::CvImagePtr cam_image;
 
@@ -316,7 +320,9 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void YoloObjectDetector::checkForObjectsActionGoalCB() {
-  ROS_INFO("[YoloObjectDetector] Start check for objects action.");
+  if(enableConsoleOutput_) {
+    ROS_INFO("[YoloObjectDetector] Start check for objects action.");
+  }
 
   boost::shared_ptr<const darknet_ros_msgs::CheckForObjectsGoal> imageActionPtr = checkForObjectsActionServer_->acceptNewGoal();
   sensor_msgs::Image imageAction = imageActionPtr->image;
