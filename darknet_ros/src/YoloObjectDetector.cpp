@@ -56,6 +56,7 @@ bool YoloObjectDetector::readParameters() {
   nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
   nodeHandle_.param("image_view/use_darknet", darknetImageViewer_, false);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
+  nodeHandle_.param("image_view/enable_console_output", enableConsoleOutput_, false);
 
   // Check if Xserver is running on Linux.
   if(XOpenDisplay(NULL)) {
@@ -135,7 +136,8 @@ void YoloObjectDetector::init() {
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
-                    0, 0, 0, 0);
+                    0, 0, 0, 0,
+                    enableConsoleOutput_);
 
   // Initialize publisher and subscriber.
   std::string cameraTopicName;
@@ -236,7 +238,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
 
   // if at least one BoundingBox found, draw box
   if (num > 0  && num <= 100) {
-    if(!darknetImageViewer_) {
+    if(!darknetImageViewer_ && enableConsoleOutput_) {
       std::cout << "# Objects: " << num << std::endl;
     }
     // split bounding boxes by class
@@ -245,7 +247,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
          if (boxes_[i].Class == j) {
             rosBoxes_[j].push_back(boxes_[i]);
             rosBoxCounter_[j]++;
-            if(!darknetImageViewer_) {
+            if(!darknetImageViewer_ && enableConsoleOutput_) {
               std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_[i].prob*100 << "%)" << std::endl;
             }
          }

@@ -62,6 +62,7 @@ static float *avg;
 
 static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
+static bool enable_console_output
 static int wait_key_delay;
 static int full_screen;
 
@@ -103,11 +104,15 @@ void *detect_in_thread(void *ptr) {
   if (nms > 0) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
   //printf("\033[2J");
   //printf("\033[1;1H");
-  printf("\nFPS:%.1f\n",fps);
+  if (enable_console_output) {
+    printf("\nFPS:%.1f\n",fps);
+  }
 
   if(view_image)
   {
-    printf("Objects:\n\n");
+    if (enable_console_output) {
+      printf("Objects:\n\n");
+    }
     images[demo_index] = det;
     det = images[(demo_index + FRAMES/2 + 1)%FRAMES];
     demo_index = (demo_index + 1)%FRAMES;
@@ -184,7 +189,8 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
                                   bool viewimage, int waitkeydelay,
                                   int frame_skip,
                                   float hier,
-                                  int w, int h, int frames, int fullscreen) {
+                                  int w, int h, int frames, int fullscreen,
+                                  bool enableConsoleOutput) {
   image **alphabet = load_alphabet_with_file(datafile);
   delay = frame_skip;
   demo_names = names;
@@ -195,6 +201,7 @@ extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafil
   view_image = viewimage;
   wait_key_delay = waitkeydelay;
   full_screen = fullscreen;
+  enable_console_output = enableConsoleOutput;
   printf("YOLO_V2\n");
   net = parse_network_cfg(cfgfile);
   if(weightfile) {
@@ -289,7 +296,8 @@ extern "C"  void load_network_demo(char *cfgfile, char *weightfile, char *datafi
                                    bool viewimage, int waitkeydelay,
                                    int frame_skip,
                                    float hier,
-                                   int w, int h, int frames, int fullscreen)
+                                   int w, int h, int frames, int fullscreen,
+                                   bool enableConsoleOutput)
 {
   fprintf(stderr, "YOLO demo needs OpenCV for webcam images.\n");
 }
