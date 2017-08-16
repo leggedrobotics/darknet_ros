@@ -62,7 +62,7 @@ static float *avg;
 
 static darknet_ros::RosBox_ *ROI_boxes;
 static bool view_image;
-static bool enable_console_output
+static bool enable_console_output;
 static int wait_key_delay;
 static int full_screen;
 
