@@ -25,3 +25,10 @@ publishers:
     topic: /darknet_ros/detection_image
     queue_size: 1
     latch: true
+
+image_view:
+
+  enable_opencv: true
+  use_darknet: false
+  wait_key_delay: 2
+  enable_console_output: false
