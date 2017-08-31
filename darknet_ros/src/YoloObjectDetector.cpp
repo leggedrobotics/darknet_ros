@@ -56,6 +56,7 @@ bool YoloObjectDetector::readParameters() {
   nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
   nodeHandle_.param("image_view/use_darknet", darknetImageViewer_, false);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
+  nodeHandle_.param("image_view/enable_console_output", enableConsoleOutput_, false);
 
   // Check if Xserver is running on Linux.
   if(XOpenDisplay(NULL)) {
@@ -77,7 +78,6 @@ bool YoloObjectDetector::readParameters() {
   rosBoxes_ =   std::vector< std::vector<RosBox_> >(numClasses_);
   rosBoxCounter_ = std::vector<int>(numClasses_);
   rosBoxColors_ = std::vector<cv::Scalar>(numClasses_);
-
 
   return true;
 }
@@ -136,7 +136,8 @@ void YoloObjectDetector::init() {
                     darknetImageViewer_, waitKeyDelay_,
                     0,
                     0.5,
-                    0, 0, 0, 0);
+                    0, 0, 0, 0,
+                    enableConsoleOutput_);
 
   // Initialize publisher and subscriber.
   std::string cameraTopicName;
@@ -233,8 +234,13 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &inputFrame, cv::Mat &outputFrame, int id)
-{
+void YoloObjectDetector::runYolo(cv::Mat &fullFrame, cv::Mat &outputFrame, int id) {
+  if(enableConsoleOutput_) {
+    ROS_INFO("[YoloObjectDetector] runYolo().");
+  }
+
+  cv::Mat inputFrame = fullFrame.clone();
+
   // run yolo and get bounding boxes for objects
   boxes_ = demo_yolo();
 
@@ -249,25 +255,17 @@ void YoloObjectDetector::runYolo(cv::Mat &inputFrame, cv::Mat &outputFrame, int 
   int num = boxes_[0].num;
 
   // if at least one BoundingBox found, draw box
-  if (num > 0  && num <= 100)
-  {
-    // Command line output if no viewer
-    if(!darknetImageViewer_)
-    {
+  if (num > 0  && num <= 100) {
+    if(!darknetImageViewer_ && enableConsoleOutput_) {
       std::cout << "# Objects: " << num << std::endl;
-
     }
-    // Split bounding boxes by class
-    for (int i = 0; i < num; i++)
-    {
-      for (int j = 0; j < numClasses_; j++)
-      {
-         if (boxes_[i].Class == j)
-         {
+    // split bounding boxes by class
+    for (int i = 0; i < num; i++) {
+      for (int j = 0; j < numClasses_; j++) {
+         if (boxes_[i].Class == j) {
             rosBoxes_[j].push_back(boxes_[i]);
             rosBoxCounter_[j]++;
-            if(!darknetImageViewer_)
-            {
+            if(!darknetImageViewer_ && enableConsoleOutput_) {
               std::cout << classLabels_[boxes_[i].Class] << " (" << boxes_[i].prob*100 << "%)" << std::endl;
             }
          }
@@ -344,9 +342,10 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   return;
 }
 
-void YoloObjectDetector::checkForObjectsActionGoalCB()
-{
-  ROS_INFO("[YoloObjectDetector] Start check for objects action.");
+void YoloObjectDetector::checkForObjectsActionGoalCB() {
+  if(enableConsoleOutput_) {
+    ROS_INFO("[YoloObjectDetector] Start check for objects action.");
+  }
 
   boost::shared_ptr<const darknet_ros_msgs::CheckForObjectsGoal> imageActionPtr = checkForObjectsActionServer_->acceptNewGoal();
   sensor_msgs::Image imageAction = imageActionPtr->image;

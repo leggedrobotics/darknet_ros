@@ -1,4 +1,4 @@
-# YOLO for ROS: Real-Time Object Detection for ROS
+# YOLO v2 for ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
@@ -30,9 +30,9 @@ Darknet on the CPU is fast (approximately 1.5 seconds on an Intel Core i7-6700HQ
 
     nvcc fatal : Unsupported gpu architecture 'compute_61'.
 
-This means that you need to check the compute capability (version) of your GPU. You can find a list of supported GPUs in CUDA here: [CUDA - WIKIPEDIA](https://en.wikipedia.org/wiki/CUDA#Supported_GPUs). Simply find the compute capability of your GPU and replace in darknet_ros/CMakeLists.txt the version number 61 with your version number:
+This means that you need to check the compute capability (version) of your GPU. You can find a list of supported GPUs in CUDA here: [CUDA - WIKIPEDIA](https://en.wikipedia.org/wiki/CUDA#Supported_GPUs). Simply find the compute capability of your GPU and add it into darknet_ros/CMakeLists.txt. Simply add a similar line like
 
-    -O3 -gencode arch=compute_61,code=sm_61
+    -O3 -gencode arch=compute_62,code=sm_62
 
 In order to install darknet_ros, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
 
