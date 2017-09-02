@@ -66,7 +66,7 @@ catkin_package(
   INCLUDE_DIRS
     include
   LIBRARIES
-    ${PROJECT_NAME}
+    ${PROJECT_NAME}_lib
   CATKIN_DEPENDS
     cv_bridge
     roscpp
@@ -93,7 +93,7 @@ if (CUDA_FOUND)
     /usr/local/cuda/lib64
   )
 
-  cuda_add_library(${PROJECT_NAME}
+  cuda_add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
@@ -139,7 +139,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/crop_layer_kernels.cu
   )
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
@@ -157,7 +157,7 @@ if (CUDA_FOUND)
 
 else()
 
-  add_library(${PROJECT_NAME}
+  add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
@@ -196,7 +196,7 @@ else()
     ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/yolo.c
   )
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(${PROJECT_NAME}_lib
     m
     pthread
     stdc++
@@ -210,9 +210,17 @@ else()
 
 endif()
 
-install(TARGETS ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_lib
+)
+
+install(TARGETS ${PROJECT_NAME}_lib
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
