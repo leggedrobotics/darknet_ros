@@ -66,7 +66,7 @@ catkin_package(
   INCLUDE_DIRS
     include
   LIBRARIES
-    ${PROJECT_NAME}_lib
+    ${PROJECT_NAME}
   CATKIN_DEPENDS
     cv_bridge
     roscpp
@@ -79,20 +79,21 @@ catkin_package(
     Boost
 )
 
+include_directories(
+  ${DARKNET_PATH}/src
+  ${DARKNET_PATH}/include
+  include
+  ${Boost_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+)
+
 if (CUDA_FOUND)
-  include_directories(
-    ${DARKNET_PATH}/src
-    ${DARKNET_PATH}/include
-    include
-    ${Boost_INCLUDE_DIRS}
-    ${catkin_INCLUDE_DIRS}
-  )
 
   link_directories(
     /usr/local/cuda/lib64
   )
 
-  cuda_add_library(${PROJECT_NAME}_lib
+  cuda_add_library(${PROJECT_NAME}
     src/YoloObjectDetector.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
@@ -138,7 +139,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/crop_layer_kernels.cu
   )
 
-  target_link_libraries(${PROJECT_NAME}_lib
+  target_link_libraries(${PROJECT_NAME}
     m
     pthread
     stdc++
@@ -154,36 +155,9 @@ if (CUDA_FOUND)
     src/yolo_object_detector_node.cpp
   )
 
-  target_link_libraries(${PROJECT_NAME}
-    ${PROJECT_NAME}_lib
-  )
-
-  install(
-    TARGETS ${PROJECT_NAME}_lib
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  )
-
-  install(
-    TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-
-  install(
-    DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    FILES_MATCHING PATTERN "*.h"
-  )
-
 else()
-  include_directories(
-    ${DARKNET_PATH}/src
-    ${DARKNET_PATH}/include
-    include
-    ${Boost_INCLUDE_DIRS}
-    ${catkin_INCLUDE_DIRS}
-  )
 
-  add_library(${PROJECT_NAME}_lib
+  add_library(${PROJECT_NAME}
     src/YoloObjectDetector.cpp
     src/object_detector_demo.cpp
     src/image_interface.c
@@ -222,7 +196,7 @@ else()
     ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/yolo.c
   )
 
-  target_link_libraries(${PROJECT_NAME}_lib
+  target_link_libraries(${PROJECT_NAME}
     m
     pthread
     stdc++
@@ -234,26 +208,23 @@ else()
     src/yolo_object_detector_node.cpp
   )
 
-  target_link_libraries(${PROJECT_NAME}
-    ${PROJECT_NAME}_lib
-  )
-
-  install(
-    TARGETS ${PROJECT_NAME}_lib
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  )
-
-  install(
-    TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-
-  install(
-    DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    FILES_MATCHING PATTERN "*.h"
-  )
 endif()
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+  DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+)
 
 # Download tiny-yolo-voc.weights
 set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
