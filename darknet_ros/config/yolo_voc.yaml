@@ -5,7 +5,7 @@ yolo_model:
   weight_file:
     name: yolo-voc.weights
   threshold:
-    value: 0.5
+    value: 0.2
   detection_classes:
     names:
       - aeroplane
