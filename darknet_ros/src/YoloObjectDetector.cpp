@@ -258,7 +258,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
 
     // send message that an object has been detected
     std_msgs::Int8 msg;
-    msg.data = 1;
+    msg.data = num;
     objectPublisher_.publish(msg);
 
     for (int i = 0; i < numClasses_; i++) {
