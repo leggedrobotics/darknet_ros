@@ -118,7 +118,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
 * **`object_detector`** ([std_msgs::Int8])
 
-    Publishes a 1 if an object was detected and a 0 zero if no object was detected.
+    Publishes the number of detected objects.
 
 * **`bounding_boxes`** ([darknet_ros_msgs::BoundingBoxes])
 
