@@ -148,6 +148,9 @@ void YoloObjectDetector::init() {
   std::string boundingBoxesTopicName;
   int boundingBoxesQueueSize;
   bool boundingBoxesLatch;
+  std::string boundingBoxesStampedTopicName;
+  int boundingBoxesStampedQueueSize;
+  bool boundingBoxesStampedLatch;
   std::string detectionImageTopicName;
   int detectionImageQueueSize;
   bool detectionImageLatch;
@@ -160,6 +163,9 @@ void YoloObjectDetector::init() {
   nodeHandle_.param("publishers/bounding_boxes/topic", boundingBoxesTopicName, std::string("bounding_boxes"));
   nodeHandle_.param("publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
   nodeHandle_.param("publishers/bounding_boxes/latch", boundingBoxesLatch, false);
+  nodeHandle_.param("publishers/bounding_boxes_stamped/topic", boundingBoxesStampedTopicName, std::string("bounding_boxes_stamped"));
+  nodeHandle_.param("publishers/bounding_boxes_stamped/queue_size", boundingBoxesStampedQueueSize, 1);
+  nodeHandle_.param("publishers/bounding_boxes_stamped/latch", boundingBoxesStampedLatch, false);
   nodeHandle_.param("publishers/detection_image/topic", detectionImageTopicName, std::string("detection_image"));
   nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
   nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
@@ -167,6 +173,7 @@ void YoloObjectDetector::init() {
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback,this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName, objectDetectorQueueSize, objectDetectorLatch);
   boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>(boundingBoxesTopicName, boundingBoxesQueueSize, boundingBoxesLatch);
+  boundingBoxesStampedPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxesStamped>(boundingBoxesStampedTopicName, boundingBoxesStampedQueueSize, boundingBoxesStampedLatch);
   detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName, detectionImageQueueSize, detectionImageLatch);
 
   // Action servers.
@@ -212,7 +219,7 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
     boundingBox.ymin = ymin;
     boundingBox.xmax = xmax;
     boundingBox.ymax = ymax;
-    boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
+    boundingBoxesResults_.boundingBoxes.boundingBoxes.push_back(boundingBox);
 
     // draw bounding box of first object found
     cv::Point topLeftCorner = cv::Point(xmin, ymin);
@@ -225,7 +232,7 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
+void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id) {
   if(enableConsoleOutput_) {
     ROS_INFO("[YoloObjectDetector] runYolo().");
   }
@@ -265,7 +272,9 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
       if (rosBoxCounter_[i] > 0) drawBoxes(inputFrame, rosBoxes_[i],
                                              rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
     }
-    boundingBoxesPublisher_.publish(boundingBoxesResults_);
+    boundingBoxesPublisher_.publish(boundingBoxesResults_.boundingBoxes);
+    boundingBoxesResults_.header = header;
+    boundingBoxesStampedPublisher_.publish(boundingBoxesResults_);
   }
   else {
     std_msgs::Int8 msg;
@@ -276,10 +285,10 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
     darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
     objectsActionResult.id = id;
-    objectsActionResult.boundingBoxes = boundingBoxesResults_;
+    objectsActionResult.boundingBoxes = boundingBoxesResults_.boundingBoxes;
     checkForObjectsActionServer_->setSucceeded(objectsActionResult,"Send bounding boxes.");
   }
-  boundingBoxesResults_.boundingBoxes.clear();
+  boundingBoxesResults_.boundingBoxes.boundingBoxes.clear();
 
   for (int i = 0; i < numClasses_; i++) {
      rosBoxes_[i].clear();
@@ -314,7 +323,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image);
+    runYolo(cam_image->image, msg->header);
   }
   return;
 }
@@ -341,7 +350,7 @@ void YoloObjectDetector::checkForObjectsActionGoalCB() {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image, imageActionPtr->id);
+    runYolo(cam_image->image, imageAction.header, imageActionPtr->id);
   }
   return;
 }

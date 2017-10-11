@@ -31,6 +31,7 @@
 #include <cv_bridge/cv_bridge.h>
 
 // darknet_ros_msgs
+#include <darknet_ros_msgs/BoundingBoxesStamped.h>
 #include <darknet_ros_msgs/BoundingBoxes.h>
 #include <darknet_ros_msgs/BoundingBox.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
@@ -111,7 +112,7 @@ class YoloObjectDetector
    * Run YOLO and detect obstacles.
    * @param[in] fullFrame image of current camera frame.
    */
-  void runYolo(cv::Mat &fullFrame, int id = 0);
+  void runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id = 0);
 
   /*!
    * Callback of camera.
@@ -162,12 +163,13 @@ class YoloObjectDetector
   image_transport::Subscriber imageSubscriber_;
   ros::Publisher objectPublisher_;
   ros::Publisher boundingBoxesPublisher_;
+  ros::Publisher boundingBoxesStampedPublisher_;
 
   //! Detected objects.
   std::vector< std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
-  darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
+  darknet_ros_msgs::BoundingBoxesStamped boundingBoxesResults_;
   RosBox_* boxes_;
 
   //! Camera related parameters.
