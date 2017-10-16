@@ -169,7 +169,7 @@ class YoloObjectDetector
   std::vector< std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
-  darknet_ros_msgs::BoundingBoxesStamped boundingBoxesResults_;
+  darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
   RosBox_* boxes_;
 
   //! Camera related parameters.
