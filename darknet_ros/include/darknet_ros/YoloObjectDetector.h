@@ -162,7 +162,6 @@ class YoloObjectDetector
   image_transport::Subscriber imageSubscriber_;
   ros::Publisher objectPublisher_;
   ros::Publisher boundingBoxesPublisher_;
-  ros::Publisher boundingBoxesStampedPublisher_;
 
   //! Detected objects.
   std::vector< std::vector<RosBox_> > rosBoxes_;
