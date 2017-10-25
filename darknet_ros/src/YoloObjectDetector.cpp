@@ -225,7 +225,7 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
   }
 }
 
-void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
+void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id) {
   if(enableConsoleOutput_) {
     ROS_INFO("[YoloObjectDetector] runYolo().");
   }
@@ -265,6 +265,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, int id) {
       if (rosBoxCounter_[i] > 0) drawBoxes(inputFrame, rosBoxes_[i],
                                              rosBoxCounter_[i], rosBoxColors_[i], classLabels_[i]);
     }
+    boundingBoxesResults_.header = header;
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   }
   else {
@@ -314,7 +315,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image);
+    runYolo(cam_image->image, msg->header);
   }
   return;
 }
@@ -341,7 +342,7 @@ void YoloObjectDetector::checkForObjectsActionGoalCB() {
     camImageCopy_ = cam_image->image.clone();
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image, imageActionPtr->id);
+    runYolo(cam_image->image, imageAction.header, imageActionPtr->id);
   }
   return;
 }
