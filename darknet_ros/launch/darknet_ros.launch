@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <launch>
+  <!-- Console launch prefix -->
+  <arg name="launch_prefix" default=""/>
+
   <!-- Config and weights folder. -->
   <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
   <arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
@@ -10,7 +13,7 @@
   <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/yolo_voc.yaml"/>
 
   <!-- Start darknet and ros wrapper -->
-  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen">
+  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
     <param name="weights_path"          value="$(arg yolo_weights_path)" />
     <param name="config_path"           value="$(arg yolo_config_path)" />
   </node>
