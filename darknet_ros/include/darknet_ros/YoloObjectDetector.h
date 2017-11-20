@@ -40,14 +40,14 @@
 namespace darknet_ros {
 
 //! Bounding box of the detected object.
-typedef struct {
+typedef struct
+{
   float x, y, w, h, prob;
   int num, Class;
 } RosBox_;
 
 /*!
  * Run YOLO and detect obstacles.
- * @param[out] bounding box.
  */
 extern "C" void yolo();
 
@@ -58,14 +58,10 @@ extern "C" void yolo();
  * @param[in] datafile location of darknet's data file.
  * @param[in] thresh threshold of the object detection (0 < thresh < 1).
  */
-extern "C" void setup_network(char *cfgfile, char *weightfile, char *datafile,
-                              float thresh,
-                              char **names, int classes,
-                              bool viewimage, int waitkeydelay,
-                              int delay, char *prefix, int avg_frames,
-                              float hier,
-                              int w, int h, int frames, int fullscreen,
-                              bool enableConsoleOutput);
+extern "C" void setup_network(char *cfgfile, char *weightfile, char *datafile, float thresh,
+                              char **names, int classes, bool viewimage, int waitkeydelay,
+                              int delay, char *prefix, int avg_frames, float hier, int w, int h,
+                              int frames, int fullscreen, bool enableConsoleOutput);
 
 /*!
  * This function is called in yolo and allows YOLO to receive the ROS image.
@@ -74,10 +70,16 @@ extern "C" void setup_network(char *cfgfile, char *weightfile, char *datafile,
 IplImage* get_ipl_image(void);
 
 /*!
- * This function is called in yolo and allows YOLO to receive the ROS image.
- * @param[out] current image of the camera.
+ * This function is called in yolo and allows YOLO to receive if the node received an image
+ * @param[out] current status if the node received an image.
  */
 bool get_image_status(void);
+
+/*!
+ * This function is called in yolo and allows YOLO to receive the status of the node.
+ * @param[out] current status of the node.
+ */
+bool is_node_running(void);
 
 class YoloObjectDetector
 {
@@ -113,7 +115,7 @@ class YoloObjectDetector
    * @param[in] objectLabel name of detected class.
    */
   void drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
-      cv::Scalar &rosBoxColor, const std::string &objectLabel);
+                 cv::Scalar &rosBoxColor, const std::string &objectLabel);
 
   /*!
    * Run YOLO and detect obstacles.
@@ -172,7 +174,7 @@ class YoloObjectDetector
   ros::Publisher boundingBoxesPublisher_;
 
   //! Detected objects.
-  std::vector< std::vector<RosBox_> > rosBoxes_;
+  std::vector<std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
