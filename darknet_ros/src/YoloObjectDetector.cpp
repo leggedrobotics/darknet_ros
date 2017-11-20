@@ -288,7 +288,9 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& hea
   }
 
   if(viewImage_ && !darknetImageViewer_) {
-    cv::imshow(opencvWindow_, inputFrame);
+    cv::Mat showImage;
+    cv::cvtColor(inputFrame, showImage, cv::COLOR_RGB2BGR);
+    cv::imshow(opencvWindow_, showImage);
     cv::waitKey(waitKeyDelay_);
   }
 
