@@ -14,6 +14,8 @@
 #include <vector>
 #include <iostream>
 #include <pthread.h>
+#include <thread>
+#include <chrono>
 
 // ROS
 #include <ros/ros.h>
@@ -47,7 +49,7 @@ typedef struct {
  * Run YOLO and detect obstacles.
  * @param[out] bounding box.
  */
-extern "C" RosBox_ *demo_yolo();
+extern "C" void yolo();
 
 /*!
  * Initialize darknet network of yolo.
@@ -56,20 +58,26 @@ extern "C" RosBox_ *demo_yolo();
  * @param[in] datafile location of darknet's data file.
  * @param[in] thresh threshold of the object detection (0 < thresh < 1).
  */
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                                  float thresh,
-                                  char **names, int classes,
-                                  bool viewimage, int waitkeydelay,
-                                  int frame_skip,
-                                  float hier,
-                                  int w, int h, int frames, int fullscreen,
-                                  bool enableConsoleOutput);
+extern "C" void setup_network(char *cfgfile, char *weightfile, char *datafile,
+                              float thresh,
+                              char **names, int classes,
+                              bool viewimage, int waitkeydelay,
+                              int delay, char *prefix, int avg_frames,
+                              float hier,
+                              int w, int h, int frames, int fullscreen,
+                              bool enableConsoleOutput);
 
 /*!
  * This function is called in yolo and allows YOLO to receive the ROS image.
  * @param[out] current image of the camera.
  */
 IplImage* get_ipl_image(void);
+
+/*!
+ * This function is called in yolo and allows YOLO to receive the ROS image.
+ * @param[out] current image of the camera.
+ */
+bool get_image_status(void);
 
 class YoloObjectDetector
 {
@@ -183,6 +191,9 @@ class YoloObjectDetector
 
   //! Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
+
+  // Yolo running on thread.
+  std::thread yoloThread_;
 };
 
 } /* namespace darknet_ros*/

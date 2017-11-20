@@ -26,9 +26,18 @@ char *data;
 char **detectionNames;
 
 cv::Mat camImageCopy_;
+boost::shared_mutex mutexImageCallback_;
 IplImage* get_ipl_image() {
+  boost::shared_lock<boost::shared_mutex> lock(mutexImageCallback_);
   IplImage* ROS_img = new IplImage(camImageCopy_);
   return ROS_img;
+}
+
+bool imageStatus_ = false;
+boost::shared_mutex mutexImageStatus_;
+bool get_image_status(void) {
+  boost::shared_lock<boost::shared_mutex> lock(mutexImageStatus_);
+  return imageStatus_;
 }
 
 YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh):
@@ -130,14 +139,15 @@ void YoloObjectDetector::init() {
   }
 
   // Load network.
-  load_network_demo(cfg, weights, data,
-                    thresh,
-                    detectionNames, numClasses_,
-                    darknetImageViewer_, waitKeyDelay_,
-                    0,
-                    0.5,
-                    0, 0, 0, 0,
-                    enableConsoleOutput_);
+  setup_network(cfg, weights, data,
+                thresh,
+                detectionNames, numClasses_,
+                darknetImageViewer_, waitKeyDelay_,
+                0, 0, 1,
+                0.5,
+                0, 0, 0, 0,
+                enableConsoleOutput_);
+  yoloThread_ =  std::thread(yolo);
 
   // Initialize publisher and subscriber.
   std::string cameraTopicName;
@@ -194,6 +204,7 @@ YoloObjectDetector::~YoloObjectDetector() {
   if(viewImage_ && !darknetImageViewer_) {
     cv::destroyWindow(opencvWindow_);
   }
+  yoloThread_.join();
 }
 
 void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
@@ -226,14 +237,12 @@ void YoloObjectDetector::drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &ro
 }
 
 void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id) {
-  if(enableConsoleOutput_) {
-    ROS_INFO("[YoloObjectDetector] runYolo().");
-  }
+  ROS_DEBUG("[YoloObjectDetector] runYolo().");
 
   cv::Mat inputFrame = fullFrame.clone();
 
   // run yolo and get bounding boxes for objects
-  boxes_ = demo_yolo();
+//  boxes_ = demo_yolo();
 
   // get the number of bounding boxes found
   int num = boxes_[0].num;
@@ -299,9 +308,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& hea
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
-  if(enableConsoleOutput_) {
-    ROS_INFO("[YoloObjectDetector] USB image received.");
-  }
+  ROS_DEBUG("[YoloObjectDetector] USB image received.");
 
   cv_bridge::CvImagePtr cam_image;
 
@@ -314,7 +321,14 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
   }
 
   if(cam_image) {
-    camImageCopy_ = cam_image->image.clone();
+    {
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+      camImageCopy_ = cam_image->image.clone();
+    }
+    {
+      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+      imageStatus_ = true;
+    }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
     runYolo(cam_image->image, msg->header);
@@ -323,9 +337,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void YoloObjectDetector::checkForObjectsActionGoalCB() {
-  if(enableConsoleOutput_) {
-    ROS_INFO("[YoloObjectDetector] Start check for objects action.");
-  }
+  ROS_DEBUG("[YoloObjectDetector] Start check for objects action.");
 
   boost::shared_ptr<const darknet_ros_msgs::CheckForObjectsGoal> imageActionPtr = checkForObjectsActionServer_->acceptNewGoal();
   sensor_msgs::Image imageAction = imageActionPtr->image;
@@ -350,7 +362,7 @@ void YoloObjectDetector::checkForObjectsActionGoalCB() {
 }
 
 void YoloObjectDetector::checkForObjectsActionPreemptCB() {
-  ROS_INFO("[YoloObjectDetector] Preempt check for objects action.");
+  ROS_DEBUG("[YoloObjectDetector] Preempt check for objects action.");
   checkForObjectsActionServer_->setPreempted();
 }
 
