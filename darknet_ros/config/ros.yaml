@@ -28,7 +28,7 @@ publishers:
 
 image_view:
 
-  enable_opencv: false
+  enable_opencv: true
   use_darknet: true
   wait_key_delay: 2
   enable_console_output: false

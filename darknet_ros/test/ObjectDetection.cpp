@@ -82,7 +82,7 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName) {
   // Get test image
   cv_bridge::CvImagePtr cv_ptr(new cv_bridge::CvImage);
   cv_ptr->image = cv::imread(pathToTestImage, CV_LOAD_IMAGE_COLOR);
-  cv_ptr->encoding = sensor_msgs::image_encodings::BGR8;
+  cv_ptr->encoding = sensor_msgs::image_encodings::RGB8;
   sensor_msgs::ImagePtr image = cv_ptr->toImageMsg();
 
   // Generate goal.

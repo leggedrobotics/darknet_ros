@@ -4,7 +4,7 @@
   <version>0.1.0</version>
   <description>ROS package to use YOLO in ROS.</description>
   <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
-  <license>MIT</license>
+  <license>BSD</license>
   <url type="website">https://bitbucket.org/leggedrobotics/darknet_ros</url>
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
