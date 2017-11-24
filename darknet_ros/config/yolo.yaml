@@ -5,11 +5,11 @@ yolo_model:
   weight_file:
     name: yolo.weights
   threshold:
-    value: 0.3
+    value: 0.5
   detection_classes:
     names:
       - person
-      - bicycle
+      - my gripper
       - car
       - motorcycle
       - airplane
@@ -66,7 +66,7 @@ yolo_model:
       - cake
       - chair
       - couch
-      - potted plant
+      - flower
       - bed
       - dining table
       - toilet
@@ -83,7 +83,7 @@ yolo_model:
       - refrigerator
       - book
       - clock
-      - vase
+      - flower
       - scissors
       - teddy bear
       - hair drier

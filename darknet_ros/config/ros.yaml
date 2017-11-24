@@ -1,7 +1,7 @@
 subscribers:
 
   camera_reading:
-    topic: /camera/rgb/image_raw
+    topic: /head_xtion/rgb/image_raw
     queue_size: 1
 
 actions:
@@ -28,7 +28,7 @@ publishers:
 
 image_view:
 
-  enable_opencv: true
-  use_darknet: false
+  enable_opencv: false
+  use_darknet: true
   wait_key_delay: 2
   enable_console_output: false
