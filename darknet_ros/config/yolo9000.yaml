@@ -5,7 +5,7 @@ yolo_model:
   weight_file:
     name: yolo9000.weights
   threshold:
-    value: 0.3
+    value: 0.9
   detection_classes:
     names:
       - thing
