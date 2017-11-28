@@ -354,7 +354,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image, msg->header);
+    //runYolo(cam_image->image, msg->header);
   }
   return;
 }
