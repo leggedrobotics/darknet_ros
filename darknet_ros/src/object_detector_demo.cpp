@@ -6,6 +6,12 @@
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
+#ifdef GPU
+#include "cuda_runtime.h"
+#include "curand.h"
+#include "cublas_v2.h"
+#endif
+
 #include "darknet_ros/YoloObjectDetector.h"
 
 extern "C" {
