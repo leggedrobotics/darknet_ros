@@ -148,6 +148,7 @@ if (CUDA_FOUND)
     cublas
     curand
     ${Boost_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
   )
 
@@ -201,6 +202,7 @@ else()
     pthread
     stdc++
     ${Boost_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
   )
 
