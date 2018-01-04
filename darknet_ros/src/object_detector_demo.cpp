@@ -120,15 +120,13 @@ void *detect_in_thread(void *ptr)
   if (nms > 0)
     do_nms_obj(boxes, probs, l.w * l.h * l.n, l.classes, nms);
 
-  if (view_image) {
-    if (enable_console_output) {
-      printf("\nFPS:%.1f\n", fps);
-      printf("Objects:\n\n");
-    }
-    image display = buff[(buff_index + 2) % 3];
-    draw_detections(display, demo_detections, demo_thresh, boxes, probs, demo_names, demo_alphabet,
-                    demo_classes);
+  if (enable_console_output) {
+    printf("\nFPS:%.1f\n", fps);
+    printf("Objects:\n\n");
   }
+  image display = buff[(buff_index + 2) % 3];
+  draw_detections(display, demo_detections, demo_thresh, boxes, probs, demo_names, demo_alphabet,
+                  demo_classes);
 
   // extract the bounding boxes and send them to ROS
   int total = l.w * l.h * l.n;
@@ -303,7 +301,7 @@ extern "C" void yolo()
 
   int count = 0;
 
-  if (!demo_prefix) {
+  if (!demo_prefix && view_image) {
     cvNamedWindow("Demo", CV_WINDOW_NORMAL);
     if (full_screen) {
       cvSetWindowProperty("Demo", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
@@ -330,7 +328,9 @@ extern "C" void yolo()
         last_avg2 = swap;
         memcpy(last_avg, avg, l.outputs * sizeof(float));
       }
-      display_in_thread(0);
+      if (view_image) {
+        display_in_thread(0);
+      }
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demo_prefix, count);
