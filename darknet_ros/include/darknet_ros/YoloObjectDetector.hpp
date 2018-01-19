@@ -37,6 +37,33 @@
 #include <darknet_ros_msgs/BoundingBox.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 
+// Darknet.
+#ifdef GPU
+#include "cuda_runtime.h"
+#include "curand.h"
+#include "cublas_v2.h"
+#endif
+
+extern "C" {
+#include "network.h"
+#include "detection_layer.h"
+#include "region_layer.h"
+#include "cost_layer.h"
+#include "utils.h"
+#include "parser.h"
+#include "box.h"
+#include "darknet_ros/image_interface.h"
+#include <sys/time.h>
+}
+
+extern "C" void ipl_into_image(IplImage* src, image im);
+extern "C" image ipl_to_image(IplImage* src);
+extern "C" void convert_yolo_detections(float *predictions, int classes, int num, int square,
+                                        int side, int w, int h, float thresh, float **probs,
+                                        box *boxes, int only_objectness);
+extern "C" void draw_yolo(image im, int num, float thresh, box *boxes, float **probs);
+extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
+
 namespace darknet_ros {
 
 //! Bounding box of the detected object.
@@ -45,41 +72,6 @@ typedef struct
   float x, y, w, h, prob;
   int num, Class;
 } RosBox_;
-
-/*!
- * Run YOLO and detect obstacles.
- */
-extern "C" void yolo();
-
-/*!
- * Initialize darknet network of yolo.
- * @param[in] cfgfile location of darknet's cfg file describing the layers of the network.
- * @param[in] weightfile location of darknet's weights file setting the weights of the network.
- * @param[in] datafile location of darknet's data file.
- * @param[in] thresh threshold of the object detection (0 < thresh < 1).
- */
-extern "C" void setup_network(char *cfgfile, char *weightfile, char *datafile, float thresh,
-                              char **names, int classes, bool viewimage, int waitkeydelay,
-                              int delay, char *prefix, int avg_frames, float hier, int w, int h,
-                              int frames, int fullscreen, bool enableConsoleOutput);
-
-/*!
- * This function is called in yolo and allows YOLO to receive the ROS image.
- * @param[out] current image of the camera.
- */
-IplImage* get_ipl_image(void);
-
-/*!
- * This function is called in yolo and allows YOLO to receive if the node received an image
- * @param[out] current status if the node received an image.
- */
-bool get_image_status(void);
-
-/*!
- * This function is called in yolo and allows YOLO to receive the status of the node.
- * @param[out] current status of the node.
- */
-bool is_node_running(void);
 
 class YoloObjectDetector
 {
@@ -196,6 +188,76 @@ class YoloObjectDetector
 
   // Yolo running on thread.
   std::thread yoloThread_;
+
+  // Darknet.
+  char **demo_names;
+  image **demo_alphabet;
+  int demo_classes;
+
+  float **probs;
+  box *boxes;
+  network net;
+  image buff[3];
+  image buff_letter[3];
+  int buff_index = 0;
+  IplImage * ipl;
+  float fps = 0;
+  float demo_thresh = 0;
+  float demo_hier = .5;
+  int running = 0;
+
+  int demo_delay = 0;
+  int demo_frame = 3;
+  int demo_detections = 0;
+  float **predictions;
+  int demo_index = 0;
+  int demo_done = 0;
+  float *last_avg2;
+  float *last_avg;
+  float *avg;
+  double demo_time;
+
+  darknet_ros::RosBox_ *ROI_boxes;
+  bool view_image;
+  bool enable_console_output;
+  int wait_key_delay;
+  int full_screen;
+  char *demo_prefix;
+
+  cv::Mat camImageCopy_;
+  boost::shared_mutex mutexImageCallback_;
+
+  bool imageStatus_ = false;
+  boost::shared_mutex mutexImageStatus_;
+
+  bool isNodeRunning_ = true;
+  boost::shared_mutex mutexNodeStatus_;
+
+
+  double get_wall_time();
+
+  void *fetch_in_thread();
+
+  void *detect_in_thread();
+
+  void *display_in_thread(void *ptr);
+
+  void *display_loop(void *ptr);
+
+  void *detect_loop(void *ptr);
+
+  void setup_network(char *cfgfile, char *weightfile, char *datafile, float thresh,
+                     char **names, int classes, bool viewimage, int waitkeydelay,
+                     int delay, char *prefix, int avg_frames, float hier, int w, int h,
+                     int frames, int fullscreen, bool enableConsoleOutput);
+
+  void yolo();
+
+  IplImage* get_ipl_image();
+
+  bool get_image_status(void);
+
+  bool is_node_running(void);
 };
 
 } /* namespace darknet_ros*/
