@@ -217,7 +217,7 @@ class YoloObjectDetector
   float *avg;
   double demo_time;
 
-  darknet_ros::RosBox_ *ROI_boxes;
+  RosBox_ *ROI_boxes;
   bool view_image;
   bool enable_console_output;
   int wait_key_delay;
@@ -258,6 +258,8 @@ class YoloObjectDetector
   bool get_image_status(void);
 
   bool is_node_running(void);
+
+  void *publish_in_thread();
 };
 
 } /* namespace darknet_ros*/

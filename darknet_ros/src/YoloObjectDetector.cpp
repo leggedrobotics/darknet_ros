@@ -300,7 +300,7 @@ void YoloObjectDetector::runYolo(cv::Mat &fullFrame, const std_msgs::Header& hea
     cv::waitKey(waitKeyDelay_);
   }
 
-  // Publish elevation change map.
+  // Publish detection image.
   if (!publishDetectionImage(inputFrame))
     ROS_DEBUG("Detection image has not been broadcasted.");
 }
@@ -329,7 +329,6 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    //runYolo(cam_image->image, msg->header);
   }
   return;
 }
@@ -640,6 +639,7 @@ void YoloObjectDetector::yolo()
       if (view_image) {
         display_in_thread(0);
       }
+      publish_in_thread();
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demo_prefix, count);
@@ -673,5 +673,67 @@ bool YoloObjectDetector::is_node_running(void)
   boost::shared_lock<boost::shared_mutex> lock(mutexNodeStatus_);
   return isNodeRunning_;
 }
+
+void *YoloObjectDetector::publish_in_thread()
+{
+  // Publish image.
+  cv::Mat cvImage = cv::cvarrToMat(ipl);
+  if (!publishDetectionImage(cv::Mat(cvImage))) {
+    ROS_DEBUG("Detection image has not been broadcasted.");
+  }
+
+  // Publish bounding boxes and detection result.
+  int num = ROI_boxes[0].num;
+  if (num > 0 && num <= 100) {
+    for (int i = 0; i < num; i++) {
+      for (int j = 0; j < numClasses_; j++) {
+        if (ROI_boxes[i].Class == j) {
+          rosBoxes_[j].push_back(ROI_boxes[i]);
+          rosBoxCounter_[j]++;
+        }
+      }
+    }
+
+    std_msgs::Int8 msg;
+    msg.data = num;
+    objectPublisher_.publish(msg);
+
+    for (int i = 0; i < numClasses_; i++) {
+      if (rosBoxCounter_[i] > 0) {
+        darknet_ros_msgs::BoundingBox boundingBox;
+
+        for (int j = 0; j < rosBoxCounter_[i]; j++) {
+          int xmin = (rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2) * frameWidth_;
+          int ymin = (rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2) * frameHeight_;
+          int xmax = (rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2) * frameWidth_;
+          int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
+
+          boundingBox.Class = classLabels_[i];
+          boundingBox.probability = rosBoxes_[i][j].prob;
+          boundingBox.xmin = xmin;
+          boundingBox.ymin = ymin;
+          boundingBox.xmax = xmax;
+          boundingBox.ymax = ymax;
+          boundingBoxesResults_.boundingBoxes.push_back(boundingBox);
+        }
+      }
+    }
+    boundingBoxesResults_.header.stamp = ros::Time::now();
+    boundingBoxesResults_.header.frame_id = "detection";
+    boundingBoxesPublisher_.publish(boundingBoxesResults_);
+  } else {
+    std_msgs::Int8 msg;
+    msg.data = 0;
+    objectPublisher_.publish(msg);
+  }
+  boundingBoxesResults_.boundingBoxes.clear();
+  for (int i = 0; i < numClasses_; i++) {
+    rosBoxes_[i].clear();
+    rosBoxCounter_[i] = 0;
+  }
+
+  return 0;
+}
+
 
 } /* namespace darknet_ros*/
