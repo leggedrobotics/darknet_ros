@@ -148,6 +148,7 @@ if (CUDA_FOUND)
     cublas
     curand
     ${Boost_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
   )
@@ -201,6 +202,7 @@ else()
     pthread
     stdc++
     ${Boost_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
   )
@@ -213,6 +215,10 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
+)
+
+add_dependencies(${PROJECT_NAME}_lib
+  darknet_ros_msgs_generate_messages_cpp
 )
 
 install(TARGETS ${PROJECT_NAME}_lib
