@@ -351,10 +351,16 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
   }
 
   if (cam_image) {
-    camImageCopy_ = cam_image->image.clone();
+    {
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+      camImageCopy_ = cam_image->image.clone();
+    }
+    {
+      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+      imageStatus_ = true;
+    }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
-    runYolo(cam_image->image, imageAction.header, imageActionPtr->id);
   }
   return;
 }
@@ -725,6 +731,13 @@ void *YoloObjectDetector::publish_in_thread()
     std_msgs::Int8 msg;
     msg.data = 0;
     objectPublisher_.publish(msg);
+  }
+  if (isCheckingForObjects()) {
+    ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
+    darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
+    objectsActionResult.id = 0; // TODO: Fix id.
+    objectsActionResult.boundingBoxes = boundingBoxesResults_;
+    checkForObjectsActionServer_->setSucceeded(objectsActionResult, "Send bounding boxes.");
   }
   boundingBoxesResults_.boundingBoxes.clear();
   for (int i = 0; i < numClasses_; i++) {
