@@ -47,6 +47,7 @@ ENDIF ( X11_FOUND )
 # Find rquired packeges
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(catkin REQUIRED
   COMPONENTS
     cv_bridge
@@ -95,7 +96,6 @@ if (CUDA_FOUND)
 
   cuda_add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/object_detector_demo.cpp
     src/image_interface.c
 
     ${DARKNET_PATH}/src/activation_layer.c        ${DARKNET_PATH}/src/im2col.c
@@ -150,6 +150,7 @@ if (CUDA_FOUND)
     ${Boost_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
   )
 
   cuda_add_executable(${PROJECT_NAME}
@@ -160,7 +161,6 @@ else()
 
   add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
-    src/object_detector_demo.cpp
     src/image_interface.c
 
     ${DARKNET_PATH}/src/activation_layer.c        ${DARKNET_PATH}/src/im2col.c
@@ -204,6 +204,7 @@ else()
     ${Boost_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
   )
 
   add_executable(${PROJECT_NAME}

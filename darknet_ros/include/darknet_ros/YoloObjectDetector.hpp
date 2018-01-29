@@ -14,6 +14,8 @@
 #include <vector>
 #include <iostream>
 #include <pthread.h>
+#include <thread>
+#include <chrono>
 
 // ROS
 #include <ros/ros.h>
@@ -35,41 +37,37 @@
 #include <darknet_ros_msgs/BoundingBox.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 
+// Darknet.
+#ifdef GPU
+#include "cuda_runtime.h"
+#include "curand.h"
+#include "cublas_v2.h"
+#endif
+
+extern "C" {
+#include "network.h"
+#include "detection_layer.h"
+#include "region_layer.h"
+#include "cost_layer.h"
+#include "utils.h"
+#include "parser.h"
+#include "box.h"
+#include "darknet_ros/image_interface.h"
+#include <sys/time.h>
+}
+
+extern "C" void ipl_into_image(IplImage* src, image im);
+extern "C" image ipl_to_image(IplImage* src);
+extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
+
 namespace darknet_ros {
 
 //! Bounding box of the detected object.
-typedef struct {
+typedef struct
+{
   float x, y, w, h, prob;
   int num, Class;
 } RosBox_;
-
-/*!
- * Run YOLO and detect obstacles.
- * @param[out] bounding box.
- */
-extern "C" RosBox_ *demo_yolo();
-
-/*!
- * Initialize darknet network of yolo.
- * @param[in] cfgfile location of darknet's cfg file describing the layers of the network.
- * @param[in] weightfile location of darknet's weights file setting the weights of the network.
- * @param[in] datafile location of darknet's data file.
- * @param[in] thresh threshold of the object detection (0 < thresh < 1).
- */
-extern "C" void load_network_demo(char *cfgfile, char *weightfile, char *datafile,
-                                  float thresh,
-                                  char **names, int classes,
-                                  bool viewimage, int waitkeydelay,
-                                  int frame_skip,
-                                  float hier,
-                                  int w, int h, int frames, int fullscreen,
-                                  bool enableConsoleOutput);
-
-/*!
- * This function is called in yolo and allows YOLO to receive the ROS image.
- * @param[out] current image of the camera.
- */
-IplImage* get_ipl_image(void);
 
 class YoloObjectDetector
 {
@@ -95,23 +93,6 @@ class YoloObjectDetector
    * Initialize the ROS connections.
    */
   void init();
-
-  /*!
-   * Draws the bounding boxes of the detected objects.
-   * @param[in] inputFrame image of current camera frame.
-   * @param[in] rosBoxes vector of detected bounding boxes of specific class.
-   * @param[in] numberOfObjects number of objects of specific class.
-   * @param[in] rosBoxColor color of specific class.
-   * @param[in] objectLabel name of detected class.
-   */
-  void drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
-      cv::Scalar &rosBoxColor, const std::string &objectLabel);
-
-  /*!
-   * Run YOLO and detect obstacles.
-   * @param[in] fullFrame image of current camera frame.
-   */
-  void runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id = 0);
 
   /*!
    * Callback of camera.
@@ -164,25 +145,94 @@ class YoloObjectDetector
   ros::Publisher boundingBoxesPublisher_;
 
   //! Detected objects.
-  std::vector< std::vector<RosBox_> > rosBoxes_;
+  std::vector<std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
-  std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
-  RosBox_* boxes_;
 
   //! Camera related parameters.
   int frameWidth_;
   int frameHeight_;
 
-  //! Image view in opencv.
-  const std::string opencvWindow_;
-  bool viewImage_;
-  int waitKeyDelay_;
-  bool darknetImageViewer_;
-  bool enableConsoleOutput_;
-
   //! Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
+
+  // Yolo running on thread.
+  std::thread yoloThread_;
+
+  // Darknet.
+  char **demoNames_;
+  image **demoAlphabet_;
+  int demoClasses_;
+
+  float **probs_;
+  box *boxes_;
+  network net_;
+  image buff_[3];
+  image buffLetter_[3];
+  int buffId_[3];
+  int buffIndex_ = 0;
+  IplImage * ipl_;
+  float fps_ = 0;
+  float demoThresh_ = 0;
+  float demoHier_ = .5;
+  int running_ = 0;
+
+  int demoDelay_ = 0;
+  int demoFrame_ = 3;
+  int demoDetections_ = 0;
+  float **predictions_;
+  int demoIndex_ = 0;
+  int demoDone_ = 0;
+  float *lastAvg2_;
+  float *lastAvg_;
+  float *avg_;
+  double demoTime_;
+
+  RosBox_ *roiBoxes_;
+  bool viewImage_;
+  bool enableConsoleOutput_;
+  int waitKeyDelay_;
+  int fullScreen_;
+  char *demoPrefix_;
+
+  cv::Mat camImageCopy_;
+  boost::shared_mutex mutexImageCallback_;
+
+  bool imageStatus_ = false;
+  boost::shared_mutex mutexImageStatus_;
+
+  bool isNodeRunning_ = true;
+  boost::shared_mutex mutexNodeStatus_;
+
+  int actionId_;
+  boost::shared_mutex mutexActionStatus_;
+
+  double getWallTime();
+
+  void *fetchInThread();
+
+  void *detectInThread();
+
+  void *displayInThread(void *ptr);
+
+  void *displayLoop(void *ptr);
+
+  void *detectLoop(void *ptr);
+
+  void setupNetwork(char *cfgfile, char *weightfile, char *datafile, float thresh,
+                    char **names, int classes,
+                    int delay, char *prefix, int avg_frames, float hier, int w, int h,
+                    int frames, int fullscreen);
+
+  void yolo();
+
+  IplImage* getIplImage();
+
+  bool getImageStatus(void);
+
+  bool isNodeRunning(void);
+
+  void *publishInThread();
 };
 
 } /* namespace darknet_ros*/

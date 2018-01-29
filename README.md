@@ -144,10 +144,6 @@ You can change the parameters that are related to the detection by adding a new 
 
     Enable or disable the open cv view of the detection image including the bounding boxes.
 
-* **`image_view/use_darknet`** (bool)
-
-    Use the open cv image view from the original darknet algorithm by setting to true or use the on that is implemented in darknet_ros by setting to false.
-
 * **`image_view/wait_key_delay`** (int)
 
     Wait key delay in ms of the open cv window.

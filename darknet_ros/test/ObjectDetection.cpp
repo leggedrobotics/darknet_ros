@@ -113,6 +113,7 @@ TEST(ObjectDetection, DetectDog)
 
   // Send dog image to yolo.
   ASSERT_TRUE(sendImageToYolo(nodeHandle, "dog"));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, "dog"));
 
   // Evaluate if yolo was able to detect the three objects: dog, bicycle and car.
   bool detectedDog = false;
@@ -153,10 +154,11 @@ TEST(ObjectDetection, DetectDog)
   EXPECT_LT(centerErrorCar, 40.0);
 }
 
-TEST(ObjectDetection, DetectPerson) {
+TEST(ObjectDetection, DISABLED_DetectPerson) {
   srand((unsigned int) time(0));
   ros::NodeHandle nodeHandle("~");
 
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, "person"));
   ASSERT_TRUE(sendImageToYolo(nodeHandle, "person"));
 
   // Evaluate if yolo was able to detect the person.

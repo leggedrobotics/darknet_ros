@@ -2,7 +2,7 @@
 <package>
   <name>darknet_ros_msgs</name>
   <version>1.1.2</version>
-  <description>ROS message definitions for YOLO in ROS.</description>
+  <description>Darknet is an open source neural network framework that runs on CPU and GPU. You only look once (YOLO) is a state-of-the-art, real-time object detection system.</description>
   <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
   <license>BSD</license>
   <url type="website">https://github.com/leggedrobotics/darknet_ros</url>
