@@ -58,10 +58,6 @@ extern "C" {
 
 extern "C" void ipl_into_image(IplImage* src, image im);
 extern "C" image ipl_to_image(IplImage* src);
-extern "C" void convert_yolo_detections(float *predictions, int classes, int num, int square,
-                                        int side, int w, int h, float thresh, float **probs,
-                                        box *boxes, int only_objectness);
-extern "C" void draw_yolo(image im, int num, float thresh, box *boxes, float **probs);
 extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
 
 namespace darknet_ros {
@@ -97,23 +93,6 @@ class YoloObjectDetector
    * Initialize the ROS connections.
    */
   void init();
-
-  /*!
-   * Draws the bounding boxes of the detected objects.
-   * @param[in] inputFrame image of current camera frame.
-   * @param[in] rosBoxes vector of detected bounding boxes of specific class.
-   * @param[in] numberOfObjects number of objects of specific class.
-   * @param[in] rosBoxColor color of specific class.
-   * @param[in] objectLabel name of detected class.
-   */
-  void drawBoxes(cv::Mat &inputFrame, std::vector<RosBox_> &rosBoxes, int &numberOfObjects,
-                 cv::Scalar &rosBoxColor, const std::string &objectLabel);
-
-  /*!
-   * Run YOLO and detect obstacles.
-   * @param[in] fullFrame image of current camera frame.
-   */
-  void runYolo(cv::Mat &fullFrame, const std_msgs::Header& header, int id = 0);
 
   /*!
    * Callback of camera.
@@ -168,20 +147,11 @@ class YoloObjectDetector
   //! Detected objects.
   std::vector<std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
-  std::vector<cv::Scalar> rosBoxColors_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
-  RosBox_* boxes_;
 
   //! Camera related parameters.
   int frameWidth_;
   int frameHeight_;
-
-  //! Image view in opencv.
-  const std::string opencvWindow_;
-  bool viewImage_;
-  int waitKeyDelay_;
-  bool darknetImageViewer_;
-  bool enableConsoleOutput_;
 
   //! Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
@@ -190,39 +160,40 @@ class YoloObjectDetector
   std::thread yoloThread_;
 
   // Darknet.
-  char **demo_names;
-  image **demo_alphabet;
-  int demo_classes;
+  char **demoNames_;
+  image **demoAlphabet_;
+  int demoClasses_;
 
-  float **probs;
-  box *boxes;
-  network net;
-  image buff[3];
-  image buff_letter[3];
-  int buff_index = 0;
-  IplImage * ipl;
-  float fps = 0;
-  float demo_thresh = 0;
-  float demo_hier = .5;
-  int running = 0;
+  float **probs_;
+  box *boxes_;
+  network net_;
+  image buff_[3];
+  image buffLetter_[3];
+  int buffId_[3];
+  int buffIndex_ = 0;
+  IplImage * ipl_;
+  float fps_ = 0;
+  float demoThresh_ = 0;
+  float demoHier_ = .5;
+  int running_ = 0;
 
-  int demo_delay = 0;
-  int demo_frame = 3;
-  int demo_detections = 0;
-  float **predictions;
-  int demo_index = 0;
-  int demo_done = 0;
-  float *last_avg2;
-  float *last_avg;
-  float *avg;
-  double demo_time;
+  int demoDelay_ = 0;
+  int demoFrame_ = 3;
+  int demoDetections_ = 0;
+  float **predictions_;
+  int demoIndex_ = 0;
+  int demoDone_ = 0;
+  float *lastAvg2_;
+  float *lastAvg_;
+  float *avg_;
+  double demoTime_;
 
-  RosBox_ *ROI_boxes;
-  bool view_image;
-  bool enable_console_output;
-  int wait_key_delay;
-  int full_screen;
-  char *demo_prefix;
+  RosBox_ *roiBoxes_;
+  bool viewImage_;
+  bool enableConsoleOutput_;
+  int waitKeyDelay_;
+  int fullScreen_;
+  char *demoPrefix_;
 
   cv::Mat camImageCopy_;
   boost::shared_mutex mutexImageCallback_;
@@ -233,33 +204,35 @@ class YoloObjectDetector
   bool isNodeRunning_ = true;
   boost::shared_mutex mutexNodeStatus_;
 
+  int actionId_;
+  boost::shared_mutex mutexActionStatus_;
 
-  double get_wall_time();
+  double getWallTime();
 
-  void *fetch_in_thread();
+  void *fetchInThread();
 
-  void *detect_in_thread();
+  void *detectInThread();
 
-  void *display_in_thread(void *ptr);
+  void *displayInThread(void *ptr);
 
-  void *display_loop(void *ptr);
+  void *displayLoop(void *ptr);
 
-  void *detect_loop(void *ptr);
+  void *detectLoop(void *ptr);
 
-  void setup_network(char *cfgfile, char *weightfile, char *datafile, float thresh,
-                     char **names, int classes, bool viewimage, int waitkeydelay,
-                     int delay, char *prefix, int avg_frames, float hier, int w, int h,
-                     int frames, int fullscreen, bool enableConsoleOutput);
+  void setupNetwork(char *cfgfile, char *weightfile, char *datafile, float thresh,
+                    char **names, int classes,
+                    int delay, char *prefix, int avg_frames, float hier, int w, int h,
+                    int frames, int fullscreen);
 
   void yolo();
 
-  IplImage* get_ipl_image();
+  IplImage* getIplImage();
 
-  bool get_image_status(void);
+  bool getImageStatus(void);
 
-  bool is_node_running(void);
+  bool isNodeRunning(void);
 
-  void *publish_in_thread();
+  void *publishInThread();
 };
 
 } /* namespace darknet_ros*/
