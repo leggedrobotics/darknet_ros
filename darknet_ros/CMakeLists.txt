@@ -28,6 +28,7 @@ if (CUDA_FOUND)
     -gencode arch=compute_52,code=[sm_52,compute_52]
     -gencode arch=compute_61,code=sm_61
     -gencode arch=compute_62,code=sm_62
+    --std=c++11
   )
   add_definitions(-DGPU)
 else()
