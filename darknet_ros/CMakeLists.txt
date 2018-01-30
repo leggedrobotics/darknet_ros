@@ -8,6 +8,12 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 find_path(DARKNET_PATH
   NAMES "README.md"
   HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
+  find_library(LUA_LIB lua)
+if(NOT DARKNET_PATH)
+  message(STATUS "Initializing and cloning submodule...")
+  execute_process(COMMAND git submodule update --init --recursive
+                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../)
+endif()
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
