@@ -12,6 +12,9 @@ if(NOT DARKNET_PATH)
   message(STATUS "Initializing and cloning submodule...")
   execute_process(COMMAND git submodule update --init --recursive
                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../)
+  find_path(DARKNET_PATH
+    NAMES "README.md"
+    HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
 endif()
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
