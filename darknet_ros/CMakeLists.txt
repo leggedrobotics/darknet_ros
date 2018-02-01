@@ -15,6 +15,18 @@ if(NOT DARKNET_PATH)
   find_path(DARKNET_PATH
     NAMES "README.md"
     HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
+
+  # Hack for ros build server (TODO: Find a better way).
+  if(NOT DARKNET_PATH)
+    message(STATUS "Update submodule did not work. Cloning and checkout of darknet ...")
+    execute_process(COMMAND git clone git@github.com:pjreddie/darknet.git
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../)
+    execute_process(COMMAND git checkout 59ed1719d4aa77a462eb41dd4db2dd3a2f8e4a1b
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../darknet/)
+    find_path(DARKNET_PATH
+      NAMES "README.md"
+      HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
+  endif()
 endif()
 message("Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
