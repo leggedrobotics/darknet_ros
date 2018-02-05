@@ -166,7 +166,7 @@ class YoloObjectDetector
 
   float **probs_;
   box *boxes_;
-  network net_;
+  network *net_;
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
