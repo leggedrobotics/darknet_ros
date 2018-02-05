@@ -187,6 +187,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
   try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    rgb_image_header_ = msg->header;
   } catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
@@ -603,6 +604,7 @@ void *YoloObjectDetector::publishInThread()
     }
     boundingBoxesResults_.header.stamp = ros::Time::now();
     boundingBoxesResults_.header.frame_id = "detection";
+    boundingBoxesResults_.rgb_image_header = rgb_image_header_;
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
     std_msgs::Int8 msg;
