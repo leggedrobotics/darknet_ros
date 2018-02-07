@@ -500,7 +500,7 @@ void YoloObjectDetector::yolo()
       cvSetWindowProperty("Demo", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
     } else {
       cvMoveWindow("Demo", 0, 0);
-      cvResizeWindow("Demo", 1352, 1013);
+      cvResizeWindow("Demo", 640, 480);
     }
   }
 
