@@ -3,6 +3,7 @@
 <launch>
   <!-- Console launch prefix -->
   <arg name="launch_prefix" default=""/>
+  <arg name="image_rate" default="1.0"/>
 
   <!-- Config and weights folder. -->
   <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
@@ -11,6 +12,16 @@
   <!-- Load parameters -->
   <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/ros.yaml"/>
   <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/yolo.yaml"/>
+
+
+  <!--Start throttle-->
+  <node pkg="topic_tools" type="throttle" name="throttle_yolo" output="screen"
+    args="messages /head_xtion/rgb/image_raw $(arg image_rate) /darknet_ros/yolo_throttled/image"
+  />
+  <node pkg="topic_tools" type="throttle" name="throttle_yolo_depth" output="screen"
+    args="messages /head_xtion/depth/image_raw $(arg image_rate) /head_xtion/depth/image_raw_throttle"
+  />
+
 
   <!-- Start darknet and ros wrapper -->
   <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
