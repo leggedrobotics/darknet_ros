@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>darknet_ros</name>
-  <version>0.1.0</version>
-  <description>ROS package to use YOLO in ROS.</description>
+  <version>1.1.2</version>
+  <description>Darknet is an open source neural network framework that runs on CPU and GPU. You only look once (YOLO) is a state-of-the-art, real-time object detection system.</description>
   <maintainer email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</maintainer>
   <license>BSD</license>
-  <url type="website">https://bitbucket.org/leggedrobotics/darknet_ros</url>
+  <url type="website">https://github.com/leggedrobotics/darknet_ros</url>
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -14,7 +14,6 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>std_msgs</depend>
-  <depend>opencv2</depend>
   <depend>image_transport</depend>
   <depend>cv_bridge</depend>
   <depend>sensor_msgs</depend>
