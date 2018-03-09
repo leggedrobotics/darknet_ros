@@ -1,0 +1,11 @@
+yolo_model:
+
+  config_file:
+    name: beer.cfg
+  weight_file:
+    name: beer.weights
+  threshold:
+    value: 0.5
+  detection_classes:
+    names:
+      - beer

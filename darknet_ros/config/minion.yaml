@@ -1,0 +1,14 @@
+yolo_model:
+
+  config_file:
+    name: multi.cfg
+  weight_file:
+    name: multi.weights
+  threshold:
+    value: 0.5
+  detection_classes:
+    names:
+      - nfpa
+      - minion
+      - cup
+
