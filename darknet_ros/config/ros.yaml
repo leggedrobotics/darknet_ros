@@ -1,7 +1,7 @@
 subscribers:
 
   camera_reading:
-    topic: /head_xtion/rgb/image_raw
+    topic: /darknet_ros/yolo_throttled/image
     queue_size: 1
 
 actions:
