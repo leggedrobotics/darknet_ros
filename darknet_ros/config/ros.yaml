@@ -4,7 +4,7 @@ frame_rate: 2
 subscribers:
 
   camera_reading:
-    topic: /darknet_ros/yolo_throttled/image
+    topic: /head_xtion/rgb/image_raw
     queue_size: 1
 
 actions:
