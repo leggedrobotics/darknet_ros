@@ -138,9 +138,9 @@ void YoloObjectDetector::init()
   std::string detectionImageTopicName;
   int detectionImageQueueSize;
   bool detectionImageLatch;
-  int sleep_time;
-  nodeHandle_.param("sleep_time", sleep_time, 500);
-  slow_mode = std::chrono::milliseconds(sleep_time);
+  int rate;
+  nodeHandle_.param("frame_rate", rate, 2);
+  run_period = std::chrono::duration<double>(1.0/rate);
 
   nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName,
                     std::string("/camera/image_raw"));
@@ -508,10 +508,14 @@ void YoloObjectDetector::yolo()
   }
 
   demoTime_ = getWallTime();
+
   while (!demoDone_) {
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+
+
     if (!demoPrefix_) {
       if (count % (demoDelay_ + 1) == 0) {
         fps_ = 1. / (getWallTime() - demoTime_);
@@ -536,7 +540,13 @@ void YoloObjectDetector::yolo()
     if (!isNodeRunning()) {
       demoDone_ = true;
     }
-    std::this_thread::sleep_for(slow_mode);  // Slow down things to let others live.
+
+
+    std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_time = end-start;
+
+
+    std::this_thread::sleep_for(run_period - elapsed_time);  // Sleep a bit so you don't kill my GPU!
   }
 
 }
