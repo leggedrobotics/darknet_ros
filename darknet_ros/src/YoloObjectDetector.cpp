@@ -138,6 +138,9 @@ void YoloObjectDetector::init()
   std::string detectionImageTopicName;
   int detectionImageQueueSize;
   bool detectionImageLatch;
+  int sleep_time;
+  nodeHandle_.param("sleep_time", sleep_time, 500);
+  slow_mode = std::chrono::milliseconds(sleep_time);
 
   nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName,
                     std::string("/camera/image_raw"));
@@ -454,7 +457,6 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
 void YoloObjectDetector::yolo()
 {
   const auto wait_duration = std::chrono::milliseconds(2000);
-  const auto slow_mode = std::chrono::milliseconds(250);
   while (!getImageStatus()) {
     printf("Waiting for image.\n");
     if (!isNodeRunning()) {
@@ -523,7 +525,6 @@ void YoloObjectDetector::yolo()
         displayInThread(0);
       }
       publishInThread();
-      std::this_thread::sleep_for(slow_mode);  // Slow down things to let others live.
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demoPrefix_, count);
@@ -535,6 +536,7 @@ void YoloObjectDetector::yolo()
     if (!isNodeRunning()) {
       demoDone_ = true;
     }
+    std::this_thread::sleep_for(slow_mode);  // Slow down things to let others live.
   }
 
 }

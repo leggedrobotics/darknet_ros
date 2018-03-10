@@ -1,3 +1,6 @@
+
+sleep_time: 500
+
 subscribers:
 
   camera_reading:

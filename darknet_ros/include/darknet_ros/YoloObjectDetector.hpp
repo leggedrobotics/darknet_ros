@@ -187,7 +187,7 @@ class YoloObjectDetector
   float *lastAvg_;
   float *avg_;
   double demoTime_;
-
+  std::chrono::duration<int64_t, std::milli> slow_mode;
   RosBox_ *roiBoxes_;
   bool viewImage_;
   bool enableConsoleOutput_;
