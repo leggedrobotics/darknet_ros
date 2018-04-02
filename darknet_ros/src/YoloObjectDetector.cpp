@@ -55,20 +55,20 @@ YoloObjectDetector::~YoloObjectDetector()
 bool YoloObjectDetector::readParameters()
 {
   // Load common parameters.
-  nodeHandle_.param("image_view/enable_opencv", viewImage_, false);
+  nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
   nodeHandle_.param("image_view/enable_console_output", enableConsoleOutput_, false);
 
-  viewImage_ = false;
   // Check if Xserver is running on Linux.
   if (XOpenDisplay(NULL)) {
     // Do nothing!
     ROS_INFO("[YoloObjectDetector] Xserver is running.");
   } else {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
-    viewImage_= false;
+    viewImage_ = false;
   }
 
+  viewImage_ = false;
   // Set vector sizes.
   nodeHandle_.param("yolo_model/detection_classes/names", classLabels_,
                     std::vector<std::string>(0));
@@ -462,13 +462,6 @@ void YoloObjectDetector::yolo()
     }
     std::this_thread::sleep_for(wait_duration);
   }
-
-  if (viewImage_) {
-      printf("ho viewImage....\n");
-  } else {
-      printf("ho not veiwImage....\n");
-  }
-
 
   std::thread detect_thread;
   std::thread fetch_thread;
