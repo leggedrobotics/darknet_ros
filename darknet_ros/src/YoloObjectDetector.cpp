@@ -55,17 +55,18 @@ YoloObjectDetector::~YoloObjectDetector()
 bool YoloObjectDetector::readParameters()
 {
   // Load common parameters.
-  nodeHandle_.param("image_view/enable_opencv", viewImage_, true);
+  nodeHandle_.param("image_view/enable_opencv", viewImage_, false);
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
   nodeHandle_.param("image_view/enable_console_output", enableConsoleOutput_, false);
 
+  viewImage_ = false;
   // Check if Xserver is running on Linux.
   if (XOpenDisplay(NULL)) {
     // Do nothing!
     ROS_INFO("[YoloObjectDetector] Xserver is running.");
   } else {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
-    viewImage_ = false;
+    viewImage_= false;
   }
 
   // Set vector sizes.
@@ -381,7 +382,7 @@ void *YoloObjectDetector::detectInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
-  show_image_cv(buff_[(buffIndex_ + 1) % 3], "Demo", ipl_);
+  show_image_cv(buff_[(buffIndex_ + 1) % 3], "Demo", ipl_, viewImage_);
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1)
     c = c % 256;
@@ -462,6 +463,13 @@ void YoloObjectDetector::yolo()
     std::this_thread::sleep_for(wait_duration);
   }
 
+  if (viewImage_) {
+      printf("ho viewImage....\n");
+  } else {
+      printf("ho not veiwImage....\n");
+  }
+
+
   std::thread detect_thread;
   std::thread fetch_thread;
 
@@ -519,7 +527,7 @@ void YoloObjectDetector::yolo()
         lastAvg2_ = swap;
         memcpy(lastAvg_, avg_, l.outputs * sizeof(float));
       }
-      if (viewImage_) {
+      if (true) {
         displayInThread(0);
       }
       publishInThread();
