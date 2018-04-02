@@ -463,12 +463,6 @@ void YoloObjectDetector::yolo()
     std::this_thread::sleep_for(wait_duration);
   }
 
-  if (viewImage_) {
-      printf("ho viewImage....\n");
-  } else {
-      printf("ho not veiwImage....\n");
-  }
-
 
   std::thread detect_thread;
   std::thread fetch_thread;
