@@ -68,6 +68,7 @@ bool YoloObjectDetector::readParameters()
     viewImage_ = false;
   }
 
+  viewImage_ = false;
   // Set vector sizes.
   nodeHandle_.param("yolo_model/detection_classes/names", classLabels_,
                     std::vector<std::string>(0));
@@ -381,7 +382,7 @@ void *YoloObjectDetector::detectInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
-  show_image_cv(buff_[(buffIndex_ + 1) % 3], "Demo", ipl_);
+  show_image_cv(buff_[(buffIndex_ + 1) % 3], "Demo", ipl_, viewImage_);
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1)
     c = c % 256;
@@ -519,7 +520,7 @@ void YoloObjectDetector::yolo()
         lastAvg2_ = swap;
         memcpy(lastAvg_, avg_, l.outputs * sizeof(float));
       }
-      if (viewImage_) {
+      if (true) {
         displayInThread(0);
       }
       publishInThread();
