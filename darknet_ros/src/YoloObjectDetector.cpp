@@ -187,6 +187,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
   try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    rgb_image_header_ = msg->header;
   } catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
@@ -287,7 +288,7 @@ void *YoloObjectDetector::fetchInThread()
     buffId_[buffIndex_] = actionId_;
   }
   rgbgr_image(buff_[buffIndex_]);
-  letterbox_image_into(buff_[buffIndex_], net_.w, net_.h, buffLetter_[buffIndex_]);
+  letterbox_image_into(buff_[buffIndex_], net_->w, net_->h, buffLetter_[buffIndex_]);
   return 0;
 }
 
@@ -296,7 +297,7 @@ void *YoloObjectDetector::detectInThread()
   running_ = 1;
   float nms = .4;
 
-  layer l = net_.layers[net_.n - 1];
+  layer l = net_->layers[net_->n - 1];
   float *X = buffLetter_[(buffIndex_ + 2) % 3].data;
   float *prediction = network_predict(net_, X);
 
@@ -308,7 +309,7 @@ void *YoloObjectDetector::detectInThread()
   if (l.type == DETECTION) {
     get_detection_boxes(l, 1, 1, demoThresh_, probs_, boxes_, 0);
   } else if (l.type == REGION) {
-    get_region_boxes(l, buff_[0].w, buff_[0].h, net_.w, net_.h, demoThresh_, probs_, boxes_, 0, 0,
+    get_region_boxes(l, buff_[0].w, buff_[0].h, net_->w, net_->h, demoThresh_, probs_, boxes_, 0, 0, 0,
                      demoHier_, 1);
   } else {
     error("Last layer must produce detections\n");
@@ -321,7 +322,7 @@ void *YoloObjectDetector::detectInThread()
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_ + 2) % 3];
-  draw_detections(display, demoDetections_, demoThresh_, boxes_, probs_, demoNames_, demoAlphabet_,
+  draw_detections(display, demoDetections_, demoThresh_, boxes_, probs_, 0, demoNames_, demoAlphabet_,
                   demoClasses_);
 
   // extract the bounding boxes and send them to ROS
@@ -446,9 +447,9 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
   printf("YOLO_V2\n");
   net_ = parse_network_cfg(cfgfile);
   if (weightfile) {
-    load_weights(&net_, weightfile);
+    load_weights(net_, weightfile);
   }
-  set_batch_network(&net_, 1);
+  set_batch_network(net_, 1);
 }
 
 void YoloObjectDetector::yolo()
@@ -467,7 +468,7 @@ void YoloObjectDetector::yolo()
 
   srand(2222222);
 
-  layer l = net_.layers[net_.n - 1];
+  layer l = net_->layers[net_->n - 1];
   demoDetections_ = l.n * l.w * l.h;
   int j;
 
@@ -487,9 +488,9 @@ void YoloObjectDetector::yolo()
   buff_[0] = ipl_to_image(ROS_img);
   buff_[1] = copy_image(buff_[0]);
   buff_[2] = copy_image(buff_[0]);
-  buffLetter_[0] = letterbox_image(buff_[0], net_.w, net_.h);
-  buffLetter_[1] = letterbox_image(buff_[0], net_.w, net_.h);
-  buffLetter_[2] = letterbox_image(buff_[0], net_.w, net_.h);
+  buffLetter_[0] = letterbox_image(buff_[0], net_->w, net_->h);
+  buffLetter_[1] = letterbox_image(buff_[0], net_->w, net_->h);
+  buffLetter_[2] = letterbox_image(buff_[0], net_->w, net_->h);
   ipl_ = cvCreateImage(cvSize(buff_[0].w, buff_[0].h), IPL_DEPTH_8U, buff_[0].c);
 
   int count = 0;
@@ -603,6 +604,7 @@ void *YoloObjectDetector::publishInThread()
     }
     boundingBoxesResults_.header.stamp = ros::Time::now();
     boundingBoxesResults_.header.frame_id = "detection";
+    boundingBoxesResults_.rgb_image_header = rgb_image_header_;
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
     std_msgs::Int8 msg;

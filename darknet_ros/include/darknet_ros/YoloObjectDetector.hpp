@@ -19,6 +19,7 @@
 
 // ROS
 #include <ros/ros.h>
+#include <std_msgs/Header.h>
 #include <std_msgs/Int8.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sensor_msgs/image_encodings.h>
@@ -166,7 +167,7 @@ class YoloObjectDetector
 
   float **probs_;
   box *boxes_;
-  network net_;
+  network *net_;
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
@@ -195,6 +196,7 @@ class YoloObjectDetector
   int fullScreen_;
   char *demoPrefix_;
 
+  std_msgs::Header rgb_image_header_;
   cv::Mat camImageCopy_;
   boost::shared_mutex mutexImageCallback_;
 
