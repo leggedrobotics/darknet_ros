@@ -1,3 +1,3 @@
 Header header
-Header rgb_image_header
-BoundingBox[] boundingBoxes
+Header image_header
+BoundingBox[] bounding_boxes
