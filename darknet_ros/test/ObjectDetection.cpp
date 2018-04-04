@@ -52,7 +52,7 @@ void checkForObjectsResultCB(
     const darknet_ros_msgs::CheckForObjectsResultConstPtr& result) {
   std::cout <<  "[ObjectDetectionTest] Received bounding boxes." << std::endl;
 
-  boundingBoxesResults_ = result->boundingBoxes;
+  boundingBoxesResults_ = result->bounding_boxes;
 }
 
 bool sendImageToYolo(ros::NodeHandle nh, std::string imageName) {
@@ -123,23 +123,23 @@ TEST(ObjectDetection, DetectDog)
   bool detectedCar = false;
   double centerErrorCar;
 
-  for(unsigned int i = 0; i < boundingBoxesResults_.boundingBoxes.size(); ++i) {
-    double xPosCenter = boundingBoxesResults_.boundingBoxes.at(i).xmin +
-        (boundingBoxesResults_.boundingBoxes.at(i).xmax - boundingBoxesResults_.boundingBoxes.at(i).xmin)*0.5;
-    double yPosCenter = boundingBoxesResults_.boundingBoxes.at(i).ymin +
-        (boundingBoxesResults_.boundingBoxes.at(i).ymax - boundingBoxesResults_.boundingBoxes.at(i).ymin)*0.5;
+  for(unsigned int i = 0; i < boundingBoxesResults_.bounding_boxes.size(); ++i) {
+    double xPosCenter = boundingBoxesResults_.bounding_boxes.at(i).xmin +
+        (boundingBoxesResults_.bounding_boxes.at(i).xmax - boundingBoxesResults_.bounding_boxes.at(i).xmin)*0.5;
+    double yPosCenter = boundingBoxesResults_.bounding_boxes.at(i).ymin +
+        (boundingBoxesResults_.bounding_boxes.at(i).ymax - boundingBoxesResults_.bounding_boxes.at(i).ymin)*0.5;
 
-    if(boundingBoxesResults_.boundingBoxes.at(i).Class == "dog") {
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "dog") {
       detectedDog = true;
       //std::cout << "centerErrorDog  " << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorDog = std::sqrt(std::pow(xPosCenter - 222.5, 2) + std::pow(yPosCenter - 361.5, 2));
     }
-    if(boundingBoxesResults_.boundingBoxes.at(i).Class == "bicycle") {
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "bicycle") {
       detectedBicycle = true;
       //std::cout << "centerErrorBicycle "  << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorBicycle = std::sqrt(std::pow(xPosCenter - 338.0, 2) + std::pow(yPosCenter - 289.0, 2));
     }
-    if(boundingBoxesResults_.boundingBoxes.at(i).Class == "car") {
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "car") {
       detectedCar = true;
       //std::cout << "centerErrorCar  " << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorCar = std::sqrt(std::pow(xPosCenter - 561.0, 2) + std::pow(yPosCenter - 126.5, 2));
@@ -165,13 +165,13 @@ TEST(ObjectDetection, DISABLED_DetectPerson) {
   bool detectedPerson = false;
   double centerErrorPerson;
 
-  for(unsigned int i = 0; i < boundingBoxesResults_.boundingBoxes.size(); ++i) {
-    double xPosCenter = boundingBoxesResults_.boundingBoxes.at(i).xmin +
-        (boundingBoxesResults_.boundingBoxes.at(i).xmax - boundingBoxesResults_.boundingBoxes.at(i).xmin)*0.5;
-    double yPosCenter = boundingBoxesResults_.boundingBoxes.at(i).ymin +
-        (boundingBoxesResults_.boundingBoxes.at(i).ymax - boundingBoxesResults_.boundingBoxes.at(i).ymin)*0.5;
+  for(unsigned int i = 0; i < boundingBoxesResults_.bounding_boxes.size(); ++i) {
+    double xPosCenter = boundingBoxesResults_.bounding_boxes.at(i).xmin +
+        (boundingBoxesResults_.bounding_boxes.at(i).xmax - boundingBoxesResults_.bounding_boxes.at(i).xmin)*0.5;
+    double yPosCenter = boundingBoxesResults_.bounding_boxes.at(i).ymin +
+        (boundingBoxesResults_.bounding_boxes.at(i).ymax - boundingBoxesResults_.bounding_boxes.at(i).ymin)*0.5;
 
-    if(boundingBoxesResults_.boundingBoxes.at(i).Class == "person") {
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "person") {
       detectedPerson = true;
       //std::cout << "centerErrorPerson  " << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorPerson = std::sqrt(std::pow(xPosCenter - 228.0, 2) + std::pow(yPosCenter - 238.0, 2));
