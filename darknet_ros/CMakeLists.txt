@@ -231,13 +231,13 @@ install(
   FILES_MATCHING PATTERN "*.h"
 )
 
-# Download tiny-yolo-voc.weights
+# Download yolov2-tiny.weights
 set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
-set(FILE "${PATH}/tiny-yolo-voc.weights")
-message(STATUS "Checking and downloading tiny-yolo-voc.weights if needed ...")
+set(FILE "${PATH}/yolov2-tiny.weights")
+message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
 if (NOT EXISTS "${FILE}")
   message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget http://pjreddie.com/media/files/tiny-yolo-voc.weights -P ${PATH})
+  execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
 endif()
 
 #############
@@ -245,13 +245,13 @@ endif()
 #############
 
 if(CATKIN_ENABLE_TESTING)
-  # Download yolo-voc.weights
+  # Download yolov2.weights
   set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
-  set(FILE "${PATH}/yolo-voc.weights")
-  message(STATUS "Checking and downloading yolo-voc.weights if needed ...")
+  set(FILE "${PATH}/yolov2.weights")
+  message(STATUS "Checking and downloading yolov2.weights if needed ...")
   if (NOT EXISTS "${FILE}")
     message(STATUS "... file does not exist. Downloading now ...")
-    execute_process(COMMAND wget http://pjreddie.com/media/files/yolo-voc.weights -P ${PATH})
+    execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2.weights -P ${PATH})
   endif()
 
   find_package(rostest REQUIRED)

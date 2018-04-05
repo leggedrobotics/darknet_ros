@@ -52,23 +52,11 @@ This means that you need to check the compute capability (version) of your GPU. 
 
 ### Download weights
 
-The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights from the VOC data set:
+The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights from the COCO data set:
 
     cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo-voc.weights
-    wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
-
-
-To use the COCO detection objects, you can download the following weights:
-
-    cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo.weights
-    wget http://pjreddie.com/media/files/tiny-yolo.weights
-
-To use the YOLO9000 detection objects, you can download the following weights:
-
-    cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo9000.weights
+    wget http://pjreddie.com/media/files/yolov2.weights
+    wget http://pjreddie.com/media/files/yolov2-tiny.weights
 
 ### Use your own detection objects
 

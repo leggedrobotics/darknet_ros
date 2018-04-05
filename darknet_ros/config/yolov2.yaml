@@ -1,9 +1,9 @@
 yolo_model:
 
   config_file:
-    name: yolo.cfg
+    name: yolov2.cfg
   weight_file:
-    name: yolo.weights
+    name: yolov2.weights
   threshold:
     value: 0.3
   detection_classes:
@@ -11,8 +11,8 @@ yolo_model:
       - person
       - bicycle
       - car
-      - motorcycle
-      - airplane
+      - motorbike
+      - aeroplane
       - bus
       - train
       - truck
@@ -65,12 +65,12 @@ yolo_model:
       - donut
       - cake
       - chair
-      - couch
-      - potted plant
+      - sofa
+      - pottedplant
       - bed
-      - dining table
+      - diningtable
       - toilet
-      - tv
+      - tvmonitor
       - laptop
       - mouse
       - remote
