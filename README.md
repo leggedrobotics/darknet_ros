@@ -10,6 +10,7 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 
 **Affiliation: Robotic Systems Lab, ETH Zurich**
 
+![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
 
 ## Citing
 
@@ -52,23 +53,11 @@ This means that you need to check the compute capability (version) of your GPU. 
 
 ### Download weights
 
-The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights from the VOC data set:
+The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights from the COCO data set:
 
     cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo-voc.weights
-    wget http://pjreddie.com/media/files/tiny-yolo-voc.weights
-
-
-To use the COCO detection objects, you can download the following weights:
-
-    cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo.weights
-    wget http://pjreddie.com/media/files/tiny-yolo.weights
-
-To use the YOLO9000 detection objects, you can download the following weights:
-
-    cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    wget http://pjreddie.com/media/files/yolo9000.weights
+    wget http://pjreddie.com/media/files/yolov2.weights
+    wget http://pjreddie.com/media/files/yolov2-tiny.weights
 
 ### Use your own detection objects
 
@@ -91,10 +80,7 @@ Run the unit tests using the [Catkin Command Line Tools](http://catkin-tools.rea
 
     catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
 
-You will see the following two figures popping up :
-
-![Darknet Ros example: Detection image 1](darknet_ros/doc/dog.png)
-![Darknet Ros example: Detection image 2](darknet_ros/doc/person.png)
+You will see the image above popping up.
 
 ## Basic Usage
 

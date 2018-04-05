@@ -139,7 +139,7 @@ TEST(ObjectDetection, DetectDog)
       //std::cout << "centerErrorBicycle "  << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorBicycle = std::sqrt(std::pow(xPosCenter - 338.0, 2) + std::pow(yPosCenter - 289.0, 2));
     }
-    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "car") {
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "truck") {
       detectedCar = true;
       //std::cout << "centerErrorCar  " << xPosCenter << ", " <<  yPosCenter << std::endl;
       centerErrorCar = std::sqrt(std::pow(xPosCenter - 561.0, 2) + std::pow(yPosCenter - 126.5, 2));
