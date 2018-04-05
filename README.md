@@ -80,7 +80,7 @@ Run the unit tests using the [Catkin Command Line Tools](http://catkin-tools.rea
 
     catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
 
-You will see the image above popping.
+You will see the image above popping up.
 
 ## Basic Usage
 
