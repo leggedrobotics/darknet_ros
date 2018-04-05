@@ -79,10 +79,9 @@ Run the unit tests using the [Catkin Command Line Tools](http://catkin-tools.rea
 
     catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
 
-You will see the following two figures popping up :
+You will see the following figure popping up :
 
-![Darknet Ros example: Detection image 1](darknet_ros/doc/dog.png)
-![Darknet Ros example: Detection image 2](darknet_ros/doc/person.png)
+![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
 
 ## Basic Usage
 
