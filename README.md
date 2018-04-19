@@ -29,7 +29,9 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 
 [![Build Status](https://ci.leggedrobotics.com/buildStatus/icon?job=github_leggedrobotics/darknet_ros/master)](https://ci.leggedrobotics.com/job/github_leggedrobotics/job/darknet_ros/job/master/)
 
-In order to install darknet_ros, clone the latest version from this repository into your catkin workspace and compile the package using ROS.
+In order to install darknet_ros, clone the latest version using SSH (see [how to set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)) from this repository into your catkin workspace and compile the package using ROS.
+
+
 
     cd catkin_workspace/src
     git clone --recursive git@github.com:leggedrobotics/darknet_ros.git
