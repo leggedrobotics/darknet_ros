@@ -103,7 +103,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/list.c
     ${DARKNET_PATH}/src/blas.c                    ${DARKNET_PATH}/src/local_layer.c
     ${DARKNET_PATH}/src/box.c                     ${DARKNET_PATH}/src/lstm_layer.c
-    ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/matrix.c           
+    ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/matrix.c
     ${DARKNET_PATH}/src/connected_layer.c         ${DARKNET_PATH}/src/maxpool_layer.c
     ${DARKNET_PATH}/src/convolutional_layer.c     ${DARKNET_PATH}/src/network.c
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/normalization_layer.c
@@ -124,10 +124,10 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
-    ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c   
-    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c               
-    ${DARKNET_PATH}/examples/go.c                 
-                    
+    ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c
+    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c
+    ${DARKNET_PATH}/examples/go.c
+
     ${DARKNET_PATH}/src/activation_kernels.cu     ${DARKNET_PATH}/src/crop_layer_kernels.cu
     ${DARKNET_PATH}/src/avgpool_layer_kernels.cu  ${DARKNET_PATH}/src/deconvolutional_kernels.cu
     ${DARKNET_PATH}/src/blas_kernels.cu           ${DARKNET_PATH}/src/dropout_layer_kernels.cu
@@ -165,7 +165,7 @@ else()
     ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/list.c
     ${DARKNET_PATH}/src/blas.c                    ${DARKNET_PATH}/src/local_layer.c
     ${DARKNET_PATH}/src/box.c                     ${DARKNET_PATH}/src/lstm_layer.c
-    ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/matrix.c           
+    ${DARKNET_PATH}/src/col2im.c                  ${DARKNET_PATH}/src/matrix.c
     ${DARKNET_PATH}/src/connected_layer.c         ${DARKNET_PATH}/src/maxpool_layer.c
     ${DARKNET_PATH}/src/convolutional_layer.c     ${DARKNET_PATH}/src/network.c
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/normalization_layer.c
@@ -186,9 +186,9 @@ else()
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
-    ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c   
-    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c               
-    ${DARKNET_PATH}/examples/go.c                 
+    ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c
+    ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c
+    ${DARKNET_PATH}/examples/go.c
   )
 
   target_link_libraries(${PROJECT_NAME}_lib
@@ -238,6 +238,14 @@ message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
 if (NOT EXISTS "${FILE}")
   message(STATUS "... file does not exist. Downloading now ...")
   execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
+endif()
+
+# Download yolov3.weights
+set(FILE "${PATH}/yolov3.weights")
+message(STATUS "Checking and downloading yolov3.weights if needed ...")
+if (NOT EXISTS "${FILE}")
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget http://pjreddie.com/media/files/yolov3.weights -P ${PATH})
 endif()
 
 #############
