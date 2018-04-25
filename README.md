@@ -1,4 +1,4 @@
-# YOLO v2 for ROS: Real-Time Object Detection for ROS
+# YOLO v3 for ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
@@ -60,6 +60,16 @@ The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in t
     cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
     wget http://pjreddie.com/media/files/yolov2.weights
     wget http://pjreddie.com/media/files/yolov2-tiny.weights
+
+And weights from the VOC data set can be found here:
+
+    wget http://pjreddie.com/media/files/yolov2-voc.weights
+    wget http://pjreddie.com/media/files/yolov2-tiny-voc.weights
+
+And the pre-trained weight from YOLO v3 can be found here:
+
+    wget http://pjreddie.com/media/files/yolov3-voc.weights
+    wget http://pjreddie.com/media/files/yolov3.weights
 
 ### Use your own detection objects
 
