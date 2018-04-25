@@ -165,8 +165,6 @@ class YoloObjectDetector
   image **demoAlphabet_;
   int demoClasses_;
 
-  float **probs_;
-  box *boxes_;
   network *net_;
   image buff_[3];
   image buffLetter_[3];
@@ -180,13 +178,13 @@ class YoloObjectDetector
 
   int demoDelay_ = 0;
   int demoFrame_ = 3;
-  int demoDetections_ = 0;
   float **predictions_;
   int demoIndex_ = 0;
   int demoDone_ = 0;
   float *lastAvg2_;
   float *lastAvg_;
   float *avg_;
+  int demoTotal_ = 0;
   double demoTime_;
 
   RosBox_ *roiBoxes_;
@@ -209,11 +207,17 @@ class YoloObjectDetector
   int actionId_;
   boost::shared_mutex mutexActionStatus_;
 
-  double getWallTime();
+  // double getWallTime();
 
-  void *fetchInThread();
+  int sizeNetwork(network *net);
+
+  void rememberNetwork(network *net);
+
+  detection *avgPredictions(network *net, int *nboxes);
 
   void *detectInThread();
+
+  void *fetchInThread();
 
   void *displayInThread(void *ptr);
 
