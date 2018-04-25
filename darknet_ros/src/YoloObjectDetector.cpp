@@ -354,10 +354,10 @@ void *YoloObjectDetector::detectInThread()
   int i, j;
   int count = 0;
   for (i = 0; i < total; ++i) {
-    float xmin = boxes_[i].x - boxes_[i].w / 2.;
-    float xmax = boxes_[i].x + boxes_[i].w / 2.;
-    float ymin = boxes_[i].y - boxes_[i].h / 2.;
-    float ymax = boxes_[i].y + boxes_[i].h / 2.;
+    float xmin = dets[i].bbox.x - dets[i].bbox.w / 2.;
+    float xmax = dets[i].bbox.x + dets[i].bbox.w / 2.;
+    float ymin = dets[i].bbox.y - dets[i].bbox.h / 2.;
+    float ymax = dets[i].bbox.y + dets[i].bbox.h / 2.;
 
     if (xmin < 0)
       xmin = 0;
@@ -370,7 +370,7 @@ void *YoloObjectDetector::detectInThread()
 
     // iterate through possible boxes and collect the bounding boxes
     for (j = 0; j < l.classes; ++j) {
-      if (probs_[i][j]) {
+      if (dets[i].prob[j]) {
         float x_center = (xmin + xmax) / 2;
         float y_center = (ymin + ymax) / 2;
         float BoundingBox_width = xmax - xmin;
@@ -384,7 +384,7 @@ void *YoloObjectDetector::detectInThread()
           roiBoxes_[count].w = BoundingBox_width;
           roiBoxes_[count].h = BoundingBox_height;
           roiBoxes_[count].Class = j;
-          roiBoxes_[count].prob = probs_[i][j];
+          roiBoxes_[count].prob = dets[i].prob[j];
           count++;
         }
       }
@@ -502,11 +502,7 @@ void YoloObjectDetector::yolo()
   avg_ = (float *) calloc(demoTotal_, sizeof(float));
 
   layer l = net_->layers[net_->n - 1];
-  boxes_ = (box *) calloc(l.w * l.h * l.n, sizeof(box));
   roiBoxes_ = (darknet_ros::RosBox_ *) calloc(l.w * l.h * l.n, sizeof(darknet_ros::RosBox_));
-  probs_ = (float **) calloc(l.w * l.h * l.n, sizeof(float *));
-  for (i = 0; i < l.w * l.h * l.n; ++i)
-    probs_[i] = (float *) calloc(l.classes + 1, sizeof(float));
 
   IplImage* ROS_img = getIplImage();
   buff_[0] = ipl_to_image(ROS_img);
@@ -538,7 +534,10 @@ void YoloObjectDetector::yolo()
     if (!demoPrefix_) {
       fps_ = 1./(what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
-      displayInThread(0);
+      if (viewImage_) {
+        displayInThread(0);
+      }
+      publishInThread();
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demoPrefix_, count);

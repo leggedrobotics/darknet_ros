@@ -165,8 +165,6 @@ class YoloObjectDetector
   image **demoAlphabet_;
   int demoClasses_;
 
-  float **probs_;
-  box *boxes_;
   network *net_;
   image buff_[3];
   image buffLetter_[3];
@@ -180,7 +178,6 @@ class YoloObjectDetector
 
   int demoDelay_ = 0;
   int demoFrame_ = 3;
-  int demoDetections_ = 0;
   float **predictions_;
   int demoIndex_ = 0;
   int demoDone_ = 0;
