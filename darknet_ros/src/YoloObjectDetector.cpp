@@ -350,10 +350,9 @@ void *YoloObjectDetector::detectInThread()
   draw_detections(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_);
 
   // extract the bounding boxes and send them to ROS
-  int total = l.w * l.h * l.n;
   int i, j;
   int count = 0;
-  for (i = 0; i < total; ++i) {
+  for (i = 0; i < nboxes; ++i) {
     float xmin = dets[i].bbox.x - dets[i].bbox.w / 2.;
     float xmax = dets[i].bbox.x + dets[i].bbox.w / 2.;
     float ymin = dets[i].bbox.y - dets[i].bbox.h / 2.;
@@ -369,7 +368,7 @@ void *YoloObjectDetector::detectInThread()
       ymax = 1;
 
     // iterate through possible boxes and collect the bounding boxes
-    for (j = 0; j < l.classes; ++j) {
+    for (j = 0; j < demoClasses_; ++j) {
       if (dets[i].prob[j]) {
         float x_center = (xmin + xmax) / 2;
         float y_center = (ymin + ymax) / 2;
