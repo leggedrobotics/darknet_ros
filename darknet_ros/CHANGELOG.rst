@@ -2,8 +2,8 @@
 Changelog for package darknet_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.3 (2018-04-26)
+------------------
 * Fixed iteration through detection boxes.
 * Merge pull request `#80 <https://github.com/leggedrobotics/darknet_ros/issues/80>`_ from leggedrobotics/feature/yolo3
   Feature/yolo3
