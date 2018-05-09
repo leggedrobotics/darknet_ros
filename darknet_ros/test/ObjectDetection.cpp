@@ -12,6 +12,7 @@
 
 // ROS
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <sensor_msgs/Image.h>
 #include <actionlib/client/simple_action_client.h>
 
@@ -55,7 +56,7 @@ void checkForObjectsResultCB(
   boundingBoxesResults_ = result->bounding_boxes;
 }
 
-bool sendImageToYolo(ros::NodeHandle nh, std::string imageName) {
+bool sendImageToYolo(ros::NodeHandle nh, const std::string& pathToTestImage) {
   //!Check for objects action client.
   CheckForObjectsActionClientPtr checkForObjectsActionClient;
 
@@ -72,12 +73,6 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName) {
 	  std::cout << "[ObjectDetectionTest] sendImageToYolo(): checkForObjects action server has not been advertised." << std::endl;
 	  return false;
   }
-
-  // Path to test image.
-  std::string pathToTestImage = darknetFilePath_;
-  pathToTestImage += "/data/";
-  pathToTestImage += imageName;
-  pathToTestImage += ".jpg";
 
   // Get test image
   cv_bridge::CvImagePtr cv_ptr(new cv_bridge::CvImage);
@@ -106,14 +101,20 @@ bool sendImageToYolo(ros::NodeHandle nh, std::string imageName) {
   return true;
 }
 
-TEST(ObjectDetection, DetectDog)
+TEST(ObjectDetection, DISABLED_DetectDog)
 {
   srand((unsigned int) time(0));
   ros::NodeHandle nodeHandle("~");
 
+  // Path to test image.
+  std::string pathToTestImage = darknetFilePath_;
+  pathToTestImage += "/data/";
+  pathToTestImage += "dog";
+  pathToTestImage += ".jpg";
+
   // Send dog image to yolo.
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, "dog"));
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, "dog"));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
 
   // Evaluate if yolo was able to detect the three objects: dog, bicycle and car.
   bool detectedDog = false;
@@ -154,12 +155,56 @@ TEST(ObjectDetection, DetectDog)
   EXPECT_LT(centerErrorCar, 40.0);
 }
 
+TEST(ObjectDetection, DetectANYmal)
+{
+  srand((unsigned int) time(0));
+  ros::NodeHandle nodeHandle("~");
+
+  // Path to test image.
+  std::string pathToTestImage = ros::package::getPath("darknet_ros");
+  pathToTestImage += "/doc/";
+  pathToTestImage += "quadruped_anymal_and_person";
+  pathToTestImage += ".JPG";
+
+  // Send dog image to yolo.
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
+
+  // Evaluate if yolo was able to detect the three objects: dog, bicycle and car.
+  bool detectedPerson = false;
+  double centerErrorPersonX;
+  double centerErrorPersonY;
+
+  for(unsigned int i = 0; i < boundingBoxesResults_.bounding_boxes.size(); ++i) {
+    double xPosCenter = boundingBoxesResults_.bounding_boxes.at(i).xmin +
+        (boundingBoxesResults_.bounding_boxes.at(i).xmax - boundingBoxesResults_.bounding_boxes.at(i).xmin)*0.5;
+    double yPosCenter = boundingBoxesResults_.bounding_boxes.at(i).ymin +
+        (boundingBoxesResults_.bounding_boxes.at(i).ymax - boundingBoxesResults_.bounding_boxes.at(i).ymin)*0.5;
+
+    if(boundingBoxesResults_.bounding_boxes.at(i).Class == "person") {
+      detectedPerson = true;
+      centerErrorPersonX = std::sqrt(std::pow(xPosCenter - 1650.0, 2));
+      centerErrorPersonY = std::sqrt(std::pow(xPosCenter - 1675.0, 2));
+    }
+  }
+
+  ASSERT_TRUE(detectedPerson);
+  EXPECT_LT(centerErrorPersonX, 30);
+  EXPECT_LT(centerErrorPersonY, 30);
+}
+
 TEST(ObjectDetection, DISABLED_DetectPerson) {
   srand((unsigned int) time(0));
   ros::NodeHandle nodeHandle("~");
 
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, "person"));
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, "person"));
+  // Path to test image.
+  std::string pathToTestImage = darknetFilePath_;
+  pathToTestImage += "/data/";
+  pathToTestImage += "person";
+  pathToTestImage += ".jpg";
+
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
 
   // Evaluate if yolo was able to detect the person.
   bool detectedPerson = false;

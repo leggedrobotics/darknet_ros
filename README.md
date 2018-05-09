@@ -11,6 +11,7 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 **Affiliation: Robotic Systems Lab, ETH Zurich**
 
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
+![Darknet Ros example: Detection image](darknet_ros/doc/quadruped_anymal_and_person_detection.png)
 
 ## Citing
 
@@ -30,8 +31,6 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 [![Build Status](https://ci.leggedrobotics.com/buildStatus/icon?job=github_leggedrobotics/darknet_ros/master)](https://ci.leggedrobotics.com/job/github_leggedrobotics/job/darknet_ros/job/master/)
 
 In order to install darknet_ros, clone the latest version using SSH (see [how to set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)) from this repository into your catkin workspace and compile the package using ROS.
-
-
 
     cd catkin_workspace/src
     git clone --recursive git@github.com:leggedrobotics/darknet_ros.git
