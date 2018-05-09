@@ -11,7 +11,7 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 **Affiliation: Robotic Systems Lab, ETH Zurich**
 
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
-![Darknet Ros example: Detection image](darknet_ros/doc/quadruped_anymal_and_person_detection.png)
+![Darknet Ros example: Detection image](darknet_ros/doc/test_detection_2.png)
 
 ## Citing
 
