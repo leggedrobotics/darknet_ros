@@ -6,9 +6,9 @@ This is a ROS package developed for object detection in camera images. You only 
 
 The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
 
-**Author: Marko Bjelonic, marko.bjelonic@mavt.ethz.ch**
+**Author: [Marko Bjelonic](https://sites.google.com/site/bjelonicmarko/), marko.bjelonic@mavt.ethz.ch**
 
-**Affiliation: Robotic Systems Lab, ETH Zurich**
+**Affiliation: [Robotic Systems Lab](http://www.rsl.ethz.ch/), ETH Zurich**
 
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection_anymal.png)
