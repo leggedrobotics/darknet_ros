@@ -17,6 +17,20 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 
 The YOLO methods used in this software are described in the paper: [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640).
 
+If you are using YOLO V3 for ROS, please add the following citation to your publication:
+
+M. Bjelonic,
+**"YOLO V3 for ROS: Real-Time Object Detection for ROS"**,
+Version 1.1.3, URL: https://github.com/leggedrobotics/darknet_ros, 2018.
+
+    @software{yoloBjelonic2018,
+      author = {Marko Bjelonic},
+      title = {{YOLO V3} for {ROS}: Real-Time Object Detection for {ROS}},
+      url = {https://github.com/leggedrobotics/darknet_ros},
+      version = {1.1.3},
+      year = {2018},
+    }
+
 ## Installation
 
 ### Dependencies
