@@ -13,7 +13,7 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection_anymal.png)
 
-Based on the [Pascal VOC](host.robots.ox.ac.uk:8080/pascal/VOC/) 2012 dataset, YOLO can detect the 20 Pascal object classes:
+Based on the [Pascal VOC](https://pjreddie.com/projects/pascal-voc-dataset-mirror/) 2012 dataset, YOLO can detect the 20 Pascal object classes:
 
 - person
 - bird, cat, cow, dog, horse, sheep
@@ -41,7 +41,7 @@ M. Bjelonic,
 **"YOLO for ROS: Real-Time Object Detection for ROS"**,
 URL: https://github.com/leggedrobotics/darknet_ros, 2018.
 
-    @misc{bjelonicDarknetros2018,
+    @misc{bjelonicYolo2018,
       author = {Marko Bjelonic},
       title = {{YOLO} for {ROS}: Real-Time Object Detection for {ROS}},
       howpublished = {\url{https://github.com/leggedrobotics/darknet_ros}},
