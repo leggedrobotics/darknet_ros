@@ -1,4 +1,4 @@
-# YOLO for ROS: Real-Time Object Detection for ROS
+# YOLO ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
@@ -38,12 +38,12 @@ The YOLO methods used in this software are described in the paper: [You Only Loo
 If you are using YOLO V3 for ROS, please add the following citation to your publication:
 
 M. Bjelonic,
-**"YOLO for ROS: Real-Time Object Detection for ROS"**,
+**"YOLO ROS: Real-Time Object Detection for ROS"**,
 URL: https://github.com/leggedrobotics/darknet_ros, 2018.
 
     @misc{bjelonicYolo2018,
       author = {Marko Bjelonic},
-      title = {{YOLO} for {ROS}: Real-Time Object Detection for {ROS}},
+      title = {{YOLO ROS}: Real-Time Object Detection for {ROS}},
       howpublished = {\url{https://github.com/leggedrobotics/darknet_ros}},
       year = {2016--2018},
     }
