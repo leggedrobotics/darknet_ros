@@ -37,12 +37,12 @@ The YOLO methods used in this software are described in the paper: [You Only Loo
 
 If you are using YOLO V3 for ROS, please add the following citation to your publication:
 
-M. Bjelonic,
+M. Bjelonic, M. Hutter
 **"YOLO ROS: Real-Time Object Detection for ROS"**,
 URL: https://github.com/leggedrobotics/darknet_ros, 2018.
 
     @misc{bjelonicYolo2018,
-      author = {Marko Bjelonic},
+      author = {Marko Bjelonic and Marco Hutter},
       title = {{YOLO ROS}: Real-Time Object Detection for {ROS}},
       howpublished = {\url{https://github.com/leggedrobotics/darknet_ros}},
       year = {2016--2018},
