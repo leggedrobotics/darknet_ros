@@ -1,8 +1,8 @@
-# YOLO V3 for ROS: Real-Time Object Detection for ROS
+# YOLO for ROS: Real-Time Object Detection for ROS
 
 ## Overview
 
-This is a ROS package developed for object detection in camera images. You only look once (YOLO) is a state-of-the-art, real-time object detection system. In the following ROS package you are able to use YOLO on GPU and CPU. The pre-trained model of the convolutional neural network is able to detect pre-trained classes including the data set from VOC and COCO (e.g. aeroplane, bicycle, bird, boat, bottle, bus, car, cat, chair, cow, dining table, dog, horse, motorbike, person, potted plant, sheep, sofa, train and tv monitor) or you can also create a network with your own detection objects. For more information about YOLO, Darknet, available training data and training YOLO see the following link: [YOLO: Real-Time Object Detection](http://pjreddie.com/darknet/yolo/).
+This is a ROS package developed for object detection in camera images. You only look once (YOLO) is a state-of-the-art, real-time object detection system. In the following ROS package you are able to use YOLO (V3) on GPU and CPU. The pre-trained model of the convolutional neural network is able to detect pre-trained classes including the data set from VOC and COCO (e.g. aeroplane, bicycle, bird, boat, bottle, bus, car, cat, chair, cow, dining table, dog, horse, motorbike, person, potted plant, sheep, sofa, train and tv monitor) or you can also create a network with your own detection objects. For more information about YOLO, Darknet, available training data and training YOLO see the following link: [YOLO: Real-Time Object Detection](http://pjreddie.com/darknet/yolo/).
 
 The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
 
@@ -13,6 +13,24 @@ The YOLO packages have been tested under ROS Kinetic and Ubuntu 16.04. This is r
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection.png)
 ![Darknet Ros example: Detection image](darknet_ros/doc/test_detection_anymal.png)
 
+Based on the [Pascal VOC](host.robots.ox.ac.uk:8080/pascal/VOC/) 2012 dataset, YOLO can detect the 20 Pascal object classes:
+
+- person
+- bird, cat, cow, dog, horse, sheep
+- aeroplane, bicycle, boat, bus, car, motorbike, train
+- bottle, chair, dining table, potted plant, sofa, tv/monitor
+
+Based on the [COCO](http://cocodataset.org/#home) dataset, YOLO can detect the 80 COCO object classes:
+
+- person
+- bicycle, car, motorbike, aeroplane, bus, train, truck, boat
+- traffic light, fire hydrant, stop sign, parking meter, bench
+- cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe
+- backpack, umbrella, handbag, tie, suitcase, frisbee, skis, snowboard, sports ball, kite, baseball bat, baseball glove, skateboard, surfboard, tennis racket
+- bottle, wine glass, cup, fork, knife, spoon, bowl
+- banana, apple, sandwich, orange, broccoli, carrot, hot dog, pizza, donut, cake
+- chair, sofa, pottedplant, bed, diningtable, toilet, tvmonitor, laptop, mouse, remote, keyboard, cell phone, microwave, oven, toaster, sink, refrigerator, book, clock, vase, scissors, teddy bear, hair drier, toothbrush
+
 ## Citing
 
 The YOLO methods used in this software are described in the paper: [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640).
@@ -20,15 +38,14 @@ The YOLO methods used in this software are described in the paper: [You Only Loo
 If you are using YOLO V3 for ROS, please add the following citation to your publication:
 
 M. Bjelonic,
-**"YOLO V3 for ROS: Real-Time Object Detection for ROS"**,
-Version 1.1.3, URL: https://github.com/leggedrobotics/darknet_ros, 2018.
+**"YOLO for ROS: Real-Time Object Detection for ROS"**,
+URL: https://github.com/leggedrobotics/darknet_ros, 2018.
 
-    @software{yoloBjelonic2018,
+    @misc{bjelonicDarknetros2018,
       author = {Marko Bjelonic},
-      title = {{YOLO V3} for {ROS}: Real-Time Object Detection for {ROS}},
-      url = {https://github.com/leggedrobotics/darknet_ros},
-      version = {1.1.3},
-      year = {2018},
+      title = {{YOLO} for {ROS}: Real-Time Object Detection for {ROS}},
+      howpublished = {\url{https://github.com/leggedrobotics/darknet_ros}},
+      year = {2016--2018},
     }
 
 ## Installation
