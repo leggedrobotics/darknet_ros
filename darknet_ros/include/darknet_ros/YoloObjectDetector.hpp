@@ -70,6 +70,12 @@ typedef struct
   int num, Class;
 } RosBox_;
 
+typedef struct
+{
+  IplImage* image;
+  std_msgs::Header header;
+} IplImageWithHeader_;
+
 class YoloObjectDetector
 {
  public:
@@ -166,6 +172,7 @@ class YoloObjectDetector
   int demoClasses_;
 
   network *net_;
+  std_msgs::Header headerBuff_[3];
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
@@ -232,7 +239,7 @@ class YoloObjectDetector
 
   void yolo();
 
-  IplImage* getIplImage();
+  IplImageWithHeader_ getIplImageWithHeader();
 
   bool getImageStatus(void);
 
