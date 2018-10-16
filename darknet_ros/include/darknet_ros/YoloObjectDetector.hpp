@@ -178,6 +178,7 @@ class YoloObjectDetector
   int buffId_[3];
   int buffIndex_ = 0;
   IplImage * ipl_;
+  bool ipl_valid_ = false;
   float fps_ = 0;
   float demoThresh_ = 0;
   float demoHier_ = .5;
@@ -200,6 +201,7 @@ class YoloObjectDetector
   int waitKeyDelay_;
   int fullScreen_;
   char *demoPrefix_;
+  bool drawDetections_ = true;
 
   std_msgs::Header imageHeader_;
   cv::Mat camImageCopy_;

@@ -354,7 +354,8 @@ void *YoloObjectDetector::detectInThread()
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_+2) % 3];
-  draw_detections(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_);
+  if (drawDetections_)
+      draw_detections(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_);
 
   // extract the bounding boxes and send them to ROS
   int i, j;
@@ -416,6 +417,7 @@ void *YoloObjectDetector::fetchInThread()
   IplImageWithHeader_ imageAndHeader = getIplImageWithHeader();
   IplImage* ROS_img = imageAndHeader.image;
   ipl_into_image(ROS_img, buff_[buffIndex_]);
+  ipl_valid_ = false;
   headerBuff_[buffIndex_] = imageAndHeader.header;
   {
     boost::shared_lock<boost::shared_mutex> lock(mutexImageCallback_);
@@ -429,6 +431,7 @@ void *YoloObjectDetector::fetchInThread()
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
   show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+  ipl_valid_ = true;
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
   if (c == 27) {
@@ -521,6 +524,7 @@ void YoloObjectDetector::yolo()
   buffLetter_[1] = letterbox_image(buff_[0], net_->w, net_->h);
   buffLetter_[2] = letterbox_image(buff_[0], net_->w, net_->h);
   ipl_ = cvCreateImage(cvSize(buff_[0].w, buff_[0].h), IPL_DEPTH_8U, buff_[0].c);
+  ipl_valid_ = false;
 
   int count = 0;
 
@@ -532,6 +536,13 @@ void YoloObjectDetector::yolo()
       cvMoveWindow("YOLO V3", 0, 0);
       cvResizeWindow("YOLO V3", 640, 480);
     }
+  }
+
+  if (demoPrefix_)
+  {
+      drawDetections_ = true;
+  } else {
+      drawDetections_ = viewImage_;
   }
 
   demoTime_ = what_time_is_it_now();
@@ -585,9 +596,12 @@ bool YoloObjectDetector::isNodeRunning(void)
 void *YoloObjectDetector::publishInThread()
 {
   // Publish image.
-  cv::Mat cvImage = cv::cvarrToMat(ipl_);
-  if (!publishDetectionImage(cv::Mat(cvImage))) {
-    ROS_DEBUG("Detection image has not been broadcasted.");
+  if (ipl_valid_)
+  {
+    cv::Mat cvImage = cv::cvarrToMat(ipl_);
+    if (!publishDetectionImage(cv::Mat(cvImage))) {
+      ROS_DEBUG("Detection image has not been broadcasted.");
+    }
   }
 
   // Publish bounding boxes and detection result.
