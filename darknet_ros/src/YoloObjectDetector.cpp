@@ -121,6 +121,13 @@ void YoloObjectDetector::init()
     strcpy(detectionNames[i], classLabels_[i].c_str());
   }
 
+  int gpu_ix = -1;
+  nodeHandle_.param("gpu_index", gpu_ix, -1);
+  if(gpu_ix >= 0){
+    ROS_INFO("GPU set %s %d", nodeHandle_.getNamespace().c_str(), gpu_ix);
+    cuda_set_device(gpu_ix);
+  }
+
   // Load network.
   setupNetwork(cfg, weights, data, thresh, detectionNames, numClasses_,
                 0, 0, 1, 0.5, 0, 0, 0, 0);
