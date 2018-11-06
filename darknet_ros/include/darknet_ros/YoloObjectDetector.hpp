@@ -196,6 +196,8 @@ class YoloObjectDetector
   double demoTime_;
 
   RosBox_ *roiBoxes_;
+  std_msgs::Header roiBoxes_imageHeader_;
+
   bool viewImage_;
   bool enableConsoleOutput_;
   int waitKeyDelay_;
@@ -209,6 +211,9 @@ class YoloObjectDetector
 
   bool imageStatus_ = false;
   boost::shared_mutex mutexImageStatus_;
+
+  bool imageUpdated_ = false;
+  boost::shared_mutex mutexImageUpdated_;
 
   bool isNodeRunning_ = true;
   boost::shared_mutex mutexNodeStatus_;
@@ -244,6 +249,8 @@ class YoloObjectDetector
   IplImageWithHeader_ getIplImageWithHeader();
 
   bool getImageStatus(void);
+
+  bool getImageUpdated(bool reset = true);
 
   bool isNodeRunning(void);
 

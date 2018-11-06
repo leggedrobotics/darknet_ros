@@ -211,6 +211,12 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
+
+    {
+      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageUpdated_);
+      imageUpdated_ = true;
+    }
+
   }
   return;
 }
@@ -348,12 +354,15 @@ void *YoloObjectDetector::detectInThread()
   if (nms > 0) do_nms_obj(dets, nboxes, l.classes, nms);
 
   if (enableConsoleOutput_) {
-    printf("\033[2J");
-    printf("\033[1;1H");
+    //printf("\033[2J");
+    //printf("\033[1;1H");
+    printf("---------------------------\n");
     printf("\nFPS:%.1f\n",fps_);
+    printf("FrameId:%s\n", headerBuff_[(buffIndex_ + 2)%3].frame_id.c_str());
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_+2) % 3];
+  roiBoxes_imageHeader_ = headerBuff_[(buffIndex_ + 2)%3];
   if (drawDetections_)
       draw_detections(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_);
 
@@ -430,7 +439,21 @@ void *YoloObjectDetector::fetchInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
-  show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+   std::string win_name = headerBuff_[(buffIndex_ + 1)%3].frame_id;
+   win_name = "YOLO V3 " + win_name;
+  //show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+  void * hw = cvGetWindowHandle(win_name.c_str());
+  if (!hw)
+  {
+    cvNamedWindow(win_name.c_str(), CV_WINDOW_NORMAL);
+    if (fullScreen_) {
+      cvSetWindowProperty(win_name.c_str(), CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+    } else {
+      cvMoveWindow(win_name.c_str(), 0, 0);
+      cvResizeWindow(win_name.c_str(), 640, 480);
+    }
+  }
+  show_image_cv(buff_[(buffIndex_ + 1)%3], win_name.c_str(), ipl_);
   ipl_valid_ = true;
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
@@ -487,6 +510,9 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
 
 void YoloObjectDetector::yolo()
 {
+  const auto loop_sleep = std::chrono::milliseconds(1);
+
+
   const auto wait_duration = std::chrono::milliseconds(2000);
   while (!getImageStatus()) {
     printf("Waiting for image.\n");
@@ -528,15 +554,16 @@ void YoloObjectDetector::yolo()
 
   int count = 0;
 
-  if (!demoPrefix_ && viewImage_) {
-    cvNamedWindow("YOLO V3", CV_WINDOW_NORMAL);
-    if (fullScreen_) {
-      cvSetWindowProperty("YOLO V3", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-    } else {
-      cvMoveWindow("YOLO V3", 0, 0);
-      cvResizeWindow("YOLO V3", 640, 480);
-    }
-  }
+//  if (!demoPrefix_ && viewImage_) {
+//	  std::string win_name = "YOLO V3";
+//    cvNamedWindow(win_name.c_str(), CV_WINDOW_NORMAL);
+//    if (fullScreen_) {
+//      cvSetWindowProperty(win_name.c_str(), CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+//    } else {
+//      cvMoveWindow(win_name.c_str(), 0, 0);
+//      cvResizeWindow(win_name.c_str(), 640, 480);
+//    }
+//  }
 
   if (demoPrefix_)
   {
@@ -548,6 +575,13 @@ void YoloObjectDetector::yolo()
   demoTime_ = what_time_is_it_now();
 
   while (!demoDone_) {
+	  
+	while (!getImageUpdated())
+	{
+		//wait until new image received
+      std::this_thread::sleep_for(loop_sleep);
+    }
+	  
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
@@ -586,6 +620,19 @@ bool YoloObjectDetector::getImageStatus(void)
   boost::shared_lock<boost::shared_mutex> lock(mutexImageStatus_);
   return imageStatus_;
 }
+
+
+bool YoloObjectDetector::getImageUpdated(bool reset)
+{
+  boost::shared_lock<boost::shared_mutex> lock(mutexImageUpdated_);
+  bool st = imageUpdated_;
+  if (reset)
+  {
+    imageUpdated_ = false;
+  }
+  return st;
+}
+
 
 bool YoloObjectDetector::isNodeRunning(void)
 {
@@ -642,12 +689,18 @@ void *YoloObjectDetector::publishInThread()
     }
     boundingBoxesResults_.header.stamp = ros::Time::now();
     boundingBoxesResults_.header.frame_id = "detection";
-    boundingBoxesResults_.image_header = headerBuff_[(buffIndex_ + 1) % 3];
+    boundingBoxesResults_.image_header = roiBoxes_imageHeader_; //headerBuff_[(buffIndex_ + 1) % 3];
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
     std_msgs::Int8 msg;
     msg.data = 0;
     objectPublisher_.publish(msg);
+
+	// publish empty list
+    boundingBoxesResults_.header.stamp = ros::Time::now();
+    boundingBoxesResults_.header.frame_id = "detection";
+    boundingBoxesResults_.image_header = roiBoxes_imageHeader_; //headerBuff_[(buffIndex_ + 1) % 3];
+    boundingBoxesPublisher_.publish(boundingBoxesResults_);
   }
   if (isCheckingForObjects()) {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
