@@ -8,7 +8,7 @@
 
   <!-- Include main launch file -->
   <include file="$(find darknet_ros)/launch/darknet_ros.launch">
-    <arg name="network_param_file"    value="$(arg network_param_file)"
+    <arg name="network_param_file"    value="$(arg network_param_file)"/>
   </include>
 
 </launch>
