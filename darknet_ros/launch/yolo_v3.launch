@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <launch>
-  <!-- Console launch prefix -->
-  <arg name="launch_prefix" default=""/>
-
-  <!-- Config and weights folder. -->
-  <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
-  <arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
-
-  <!-- ROS and network parameter files -->
-  <arg name="ros_param_file"             default="$(find darknet_ros)/config/ros.yaml"/>
+  
+  <!-- Use YOLOv3 -->
   <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov3.yaml"/>
 
 
   <!-- Include main launch file -->
   <include file="$(find darknet_ros)/launch/darknet_ros.launch">
-    <arg name="launch_prefix"         value="$(arg launch_prefix)"
-    <arg name="yolo_weights_path"     value="$(arg yolo_weights_path)"
-    <arg name="yolo_config_path"      value="$(arg yolo_config_path)"
-    <arg name="ros_param_file"        value="$(arg ros_param_file)"
     <arg name="network_param_file"    value="$(arg network_param_file)"
   </include>
 
