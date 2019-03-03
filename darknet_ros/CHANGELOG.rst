@@ -2,6 +2,27 @@
 Changelog for package darknet_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#141 <https://github.com/leggedrobotics/darknet_ros/issues/141>`_ from lorenwel/feature/launch_file_arg
+  Added arg for launch file parameter files
+* Fixed synatx error
+* Removed unnecessary args
+* Adapted yolo_v3.launch to new launch file
+* Added launch file arguments for parameter files
+* Merge branch 'Texas-Aerial-Robotics-headerFixForUpsteam'
+* Merge branch 'headerFixForUpsteam' of https://github.com/Texas-Aerial-Robotics/darknet_ros into Texas-Aerial-Robotics-headerFixForUpsteam
+* Remove unused variable
+* Merge branch 'headerFixForUpsteam' of https://github.com/Texas-Aerial-Robotics/darknet_ros into Texas-Aerial-Robotics-headerFixForUpsteam
+* Multithreading mismatched image header fix
+* Forgot to add image.
+* Cropped test image.
+* Changed image for test.
+* Changed resame image.
+* Added new images for test.
+* Removed twice loading of weightfile.
+* Contributors: Lorenz Wellhausen, Marko Bjelonic, Umer Salman, lorenwel
+
 1.1.3 (2018-04-26)
 ------------------
 * Fixed iteration through detection boxes.

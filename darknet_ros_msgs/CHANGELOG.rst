@@ -2,6 +2,9 @@
 Changelog for package darknet_ros_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.3 (2018-04-26)
 ------------------
 * Fixed formatting part 2.
