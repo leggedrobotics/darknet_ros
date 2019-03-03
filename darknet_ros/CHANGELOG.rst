@@ -2,8 +2,8 @@
 Changelog for package darknet_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.4 (2019-03-03)
+------------------
 * Merge pull request `#141 <https://github.com/leggedrobotics/darknet_ros/issues/141>`_ from lorenwel/feature/launch_file_arg
   Added arg for launch file parameter files
 * Fixed synatx error
