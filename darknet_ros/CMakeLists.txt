@@ -3,16 +3,17 @@ project(darknet_ros)
 
 # Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "-Wall -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable -Wfatal-errors -fPIC ${CMAKE_C_FLAGS}")
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
   NAMES "README.md"
   HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
-message("Darknet path dir = ${DARKNET_PATH}")
+message(STATUS "Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
 # Find CUDA
-FIND_PACKAGE(CUDA)
+find_package(CUDA QUIET)
 if (CUDA_FOUND)
   find_package(CUDA REQUIRED)
   message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
@@ -34,14 +35,14 @@ else()
 endif()
 
 # Find X11
-MESSAGE ( STATUS "Searching for X11..." )
-FIND_PACKAGE ( X11 REQUIRED )
-IF ( X11_FOUND )
-  INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
-  LINK_LIBRARIES ( ${X11_LIBRARIES} )
-  MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
-  MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
-ENDIF ( X11_FOUND )
+message ( STATUS "Searching for X11..." )
+find_package ( X11 REQUIRED )
+if ( X11_FOUND )
+  include_directories ( ${X11_INCLUDE_DIR} )
+  link_libraries ( ${X11_LIBRARIES} )
+  message ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
+  message ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
+endif ( X11_FOUND )
 
 # Find rquired packeges
 find_package(Boost REQUIRED COMPONENTS thread)
