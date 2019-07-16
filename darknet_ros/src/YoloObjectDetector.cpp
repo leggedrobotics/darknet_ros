@@ -11,7 +11,7 @@
 
 // Check for xServer
 #include <X11/Xlib.h>
-
+#define UNIQUE_FRAMES
 #ifdef DARKNET_FILE_PATH
 std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #else
@@ -326,6 +326,14 @@ detection *YoloObjectDetector::avgPredictions(network *net, int *nboxes)
 
 void *YoloObjectDetector::detectInThread()
 {
+  #ifdef UNIQUE_FRAMES
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 2) % 3].seq) {
+    return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 2) % 3].seq;
+  #endif
+
   running_ = 1;
   float nms = .4;
 
@@ -421,6 +429,14 @@ void *YoloObjectDetector::fetchInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
+  #ifdef UNIQUE_FRAMES
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 1)%3].seq) {
+      return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 1)%3].seq;
+  #endif
+
   show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
@@ -534,8 +550,17 @@ void YoloObjectDetector::yolo()
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
+#ifdef UNIQUE_FRAMES
+      static int prevSeq;
+      if (prevSeq!=headerBuff_[buffIndex_].seq) {
       fps_ = 1./(what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
+      prevSeq = headerBuff_[buffIndex_].seq;
+      }
+#else
+      fps_ = 1./(what_time_is_it_now() - demoTime_);
+      demoTime_ = what_time_is_it_now();
+#endif
       if (viewImage_) {
         displayInThread(0);
       }
@@ -578,6 +603,13 @@ bool YoloObjectDetector::isNodeRunning(void)
 void *YoloObjectDetector::publishInThread()
 {
   // Publish image.
+  #ifdef UNIQUE_FRAMES
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 1)%3].seq) {
+      return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 1)%3].seq;
+  #endif
   cv::Mat cvImage = cv::cvarrToMat(ipl_);
   if (!publishDetectionImage(cv::Mat(cvImage))) {
     ROS_DEBUG("Detection image has not been broadcasted.");
