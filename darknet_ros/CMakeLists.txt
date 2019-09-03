@@ -142,7 +142,6 @@ if (CUDA_FOUND)
     m
     pthread
     stdc++
-    cuda
     cudart
     cublas
     curand
