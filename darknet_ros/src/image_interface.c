@@ -8,6 +8,12 @@
 
 #include "darknet_ros/image_interface.h"
 
+static float get_pixel(image m, int x, int y, int c)
+{
+    assert(x < m.w && y < m.h && c < m.c);
+    return m.data[c*m.h*m.w + y*m.w + x];
+}
+
 image **load_alphabet_with_file(char *datafile) {
   int i, j;
   const int nsize = 8;
@@ -26,3 +32,21 @@ image **load_alphabet_with_file(char *datafile) {
   }
   return alphabets;
 }
+
+#ifdef OPENCV
+void generate_image(image p, IplImage *disp)
+{
+    int x,y,k;
+    if(p.c == 3) rgbgr_image(p);
+    //normalize_image(copy);
+
+    int step = disp->widthStep;
+    for(y = 0; y < p.h; ++y){
+        for(x = 0; x < p.w; ++x){
+            for(k= 0; k < p.c; ++k){
+                disp->imageData[y*step + x*p.c + k] = (unsigned char)(get_pixel(p,x,y,k)*255);
+            }
+        }
+    }
+}
+#endif
