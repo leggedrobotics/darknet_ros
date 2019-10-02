@@ -541,6 +541,8 @@ void YoloObjectDetector::yolo()
       demoTime_ = what_time_is_it_now();
       if (viewImage_) {
         displayInThread(0);
+      } else {
+        generate_image(buff_[(buffIndex_ + 1)%3], ipl_);
       }
       publishInThread();
     } else {
