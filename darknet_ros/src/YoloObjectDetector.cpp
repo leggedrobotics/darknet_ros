@@ -614,6 +614,7 @@ void *YoloObjectDetector::publishInThread()
           int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
 
           boundingBox.Class = classLabels_[i];
+          boundingBox.id = i;
           boundingBox.probability = rosBoxes_[i][j].prob;
           boundingBox.xmin = xmin;
           boundingBox.ymin = ymin;
