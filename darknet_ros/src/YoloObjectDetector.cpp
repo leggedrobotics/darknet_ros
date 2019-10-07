@@ -7,11 +7,13 @@
  */
 
 // yolo object detector
+# cpp 헤더와 extern "C"를 포함한 c 헤더 include 
 #include "darknet_ros/YoloObjectDetector.hpp"
 
 // Check for xServer
 #include <X11/Xlib.h>
 
+# CMakeList Line 8번에 정의
 #ifdef DARKNET_FILE_PATH
 std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #else
@@ -25,6 +27,7 @@ char *weights;
 char *data;
 char **detectionNames;
 
+# 노드의 첫 시작    
 YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
     : nodeHandle_(nh),
       imageTransport_(nodeHandle_),
@@ -36,6 +39,12 @@ YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
   ROS_INFO("[YoloObjectDetector] Node started.");
 
   // Read parameters from config file.
+  /* 
+  numClasses
+  classLabels
+  rosBoxes
+  rosBoxCounter 초기화
+  */        
   if (!readParameters()) {
     ros::requestShutdown();
   }
@@ -59,6 +68,7 @@ bool YoloObjectDetector::readParameters()
   nodeHandle_.param("image_view/wait_key_delay", waitKeyDelay_, 3);
   nodeHandle_.param("image_view/enable_console_output", enableConsoleOutput_, false);
 
+  // Xserver란 GUI 환경을 말한다. 기본적으로 리눅스는 콘솔(텍스트)환경에서 이뤄지기 때문이다 
   // Check if Xserver is running on Linux.
   if (XOpenDisplay(NULL)) {
     // Do nothing!
@@ -68,6 +78,7 @@ bool YoloObjectDetector::readParameters()
     viewImage_ = false;
   }
 
+  // vector 크기 초기화
   // Set vector sizes.
   nodeHandle_.param("yolo_model/detection_classes/names", classLabels_,
                     std::vector<std::string>(0));
@@ -89,7 +100,35 @@ void YoloObjectDetector::init()
   std::string configModel;
   std::string weightsModel;
 
+    /*
+    <launch>
+    <!-- Console launch prefix -->
+    <arg name="launch_prefix" default=""/>
+
+    <!-- Config and weights folder. -->
+    <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
+    <arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
+
+    <!-- ROS and network parameter files -->
+    <arg name="ros_param_file"             default="$(find darknet_ros)/config/ros.yaml"/>
+    <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov2-tiny.yaml"/>
+
+    <!-- Load parameters -->
+    <rosparam command="load" ns="darknet_ros" file="$(arg ros_param_file)"/>
+    <rosparam command="load" ns="darknet_ros" file="$(arg network_param_file)"/>
+
+    <!-- Start darknet and ros wrapper -->
+    <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
+        <param name="weights_path"          value="$(arg yolo_weights_path)" />
+        <param name="config_path"           value="$(arg yolo_config_path)" />
+    </node>
+
+    <!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->
+    </launch>
+    */
+  
   // Threshold of object detection.
+  // 임계점 설정, 30% 이상만 추출
   float thresh;
   nodeHandle_.param("yolo_model/threshold/value", thresh, (float) 0.3);
 
@@ -155,6 +194,7 @@ void YoloObjectDetector::init()
   nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
   nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
 
+  /* /camera/image_view topic으로 받으면서 cameraCallback 함수 호출*/
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize,
                                                &YoloObjectDetector::cameraCallback, this);
   objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName,
@@ -185,6 +225,10 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
   cv_bridge::CvImagePtr cam_image;
 
+  /* 
+  Converting ROS image messages to OpenCV images
+  http://wiki.ros.org/cv_bridge/Tutorials/UsingCvBridgeToConvertBetweenROSImagesAndOpenCVImages
+  */  
   try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   } catch (cv_bridge::Exception& e) {
