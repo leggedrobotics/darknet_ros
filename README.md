@@ -22,7 +22,7 @@ Based on the [Pascal VOC](https://pjreddie.com/projects/pascal-voc-dataset-mirro
 
 Based on the [COCO](http://cocodataset.org/#home) dataset, YOLO can detect the 80 COCO object classes:
 
-- person
+- person/people
 - bicycle, car, motorbike, aeroplane, bus, train, truck, boat
 - traffic light, fire hydrant, stop sign, parking meter, bench
 - cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe
