@@ -7,13 +7,13 @@
  */
 
 // yolo object detector
-# cpp 헤더와 extern "C"를 포함한 c 헤더 include 
+// cpp 헤더와 extern "C"를 포함한 c 헤더 include 
 #include "darknet_ros/YoloObjectDetector.hpp"
 
 // Check for xServer
 #include <X11/Xlib.h>
 
-# CMakeList Line 8번에 정의
+// CMakeList Line 8번에 정의
 #ifdef DARKNET_FILE_PATH
 std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #else
@@ -27,7 +27,7 @@ char *weights;
 char *data;
 char **detectionNames;
 
-# 노드의 첫 시작    
+// 노드의 첫 시작    
 YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
     : nodeHandle_(nh),
       imageTransport_(nodeHandle_),
