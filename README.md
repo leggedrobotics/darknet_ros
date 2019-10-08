@@ -146,7 +146,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
 #### Published Topics
 
-* **`object_detector`** ([std_msgs::Int8])
+* **`found_object`** ([std_msgs::Int8])
 
     Publishes the number of detected objects.
 
