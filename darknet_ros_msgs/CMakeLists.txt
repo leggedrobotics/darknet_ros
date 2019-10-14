@@ -17,6 +17,7 @@ add_message_files(
   FILES
     BoundingBox.msg
     BoundingBoxes.msg
+    ObjectCount.msg
 )
 
 add_action_files(
