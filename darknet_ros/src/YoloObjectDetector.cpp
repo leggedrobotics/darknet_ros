@@ -157,9 +157,9 @@ void YoloObjectDetector::init()
 
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize,
                                                &YoloObjectDetector::cameraCallback, this);
-  objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName,
-                                                           objectDetectorQueueSize,
-                                                           objectDetectorLatch);
+  objectPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::ObjectCount>(objectDetectorTopicName,
+                                                                            objectDetectorQueueSize,
+                                                                            objectDetectorLatch);
   boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>(
       boundingBoxesTopicName, boundingBoxesQueueSize, boundingBoxesLatch);
   detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName,
@@ -599,8 +599,10 @@ void *YoloObjectDetector::publishInThread()
       }
     }
 
-    std_msgs::Int8 msg;
-    msg.data = num;
+    darknet_ros_msgs::ObjectCount msg;
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = "detection";
+    msg.count = num;
     objectPublisher_.publish(msg);
 
     for (int i = 0; i < numClasses_; i++) {
@@ -629,8 +631,10 @@ void *YoloObjectDetector::publishInThread()
     boundingBoxesResults_.image_header = headerBuff_[(buffIndex_ + 1) % 3];
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
-    std_msgs::Int8 msg;
-    msg.data = 0;
+    darknet_ros_msgs::ObjectCount msg;
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = "detection";
+    msg.count = 0;
     objectPublisher_.publish(msg);
   }
   if (isCheckingForObjects()) {
