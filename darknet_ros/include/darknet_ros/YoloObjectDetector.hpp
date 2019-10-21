@@ -20,7 +20,6 @@
 // ROS
 #include <ros/ros.h>
 #include <std_msgs/Header.h>
-#include <std_msgs/Int8.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Image.h>
@@ -36,6 +35,7 @@
 // darknet_ros_msgs
 #include <darknet_ros_msgs/BoundingBoxes.h>
 #include <darknet_ros_msgs/BoundingBox.h>
+#include <darknet_ros_msgs/ObjectCount.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 
 // Darknet.
