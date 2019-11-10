@@ -214,23 +214,17 @@ class YoloObjectDetector
   int actionId_;
   boost::shared_mutex mutexActionStatus_;
 
-  // double getWallTime();
-
   int sizeNetwork(network *net);
 
   void rememberNetwork(network *net);
 
   detection *avgPredictions(network *net, int *nboxes);
 
-  void *detectInThread();
+  void detectInThread();
 
-  void *fetchInThread();
+  void fetchInThread();
 
-  void *displayInThread(void *ptr);
-
-  void *displayLoop(void *ptr);
-
-  void *detectLoop(void *ptr);
+  void displayInThread();
 
   void setupNetwork(char *cfgfile, char *weightfile, char *datafile, float thresh,
                     char **names, int classes,
@@ -241,11 +235,11 @@ class YoloObjectDetector
 
   IplImageWithHeader_ getIplImageWithHeader();
 
-  bool getImageStatus(void);
+  bool getImageStatus();
 
-  bool isNodeRunning(void);
+  bool isNodeRunning();
 
-  void *publishInThread();
+  void publishInThread();
 };
 
 } /* namespace darknet_ros*/

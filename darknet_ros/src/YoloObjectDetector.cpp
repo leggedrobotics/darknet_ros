@@ -205,7 +205,6 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
   }
-  return;
 }
 
 void YoloObjectDetector::checkForObjectsActionGoalCB()
@@ -241,7 +240,6 @@ void YoloObjectDetector::checkForObjectsActionGoalCB()
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
   }
-  return;
 }
 
 void YoloObjectDetector::checkForObjectsActionPreemptCB()
@@ -269,15 +267,6 @@ bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
   ROS_DEBUG("Detection image has been published.");
   return true;
 }
-
-// double YoloObjectDetector::getWallTime()
-// {
-//   struct timeval time;
-//   if (gettimeofday(&time, NULL)) {
-//     return 0;
-//   }
-//   return (double) time.tv_sec + (double) time.tv_usec * .000001;
-// }
 
 int YoloObjectDetector::sizeNetwork(network *net)
 {
@@ -311,7 +300,7 @@ detection *YoloObjectDetector::avgPredictions(network *net, int *nboxes)
   int count = 0;
   fill_cpu(demoTotal_, 0, avg_, 1);
   for(j = 0; j < demoFrame_; ++j){
-    axpy_cpu(demoTotal_, 1./demoFrame_, predictions_[j], 1, avg_, 1);
+    axpy_cpu(demoTotal_, 1.f/demoFrame_, predictions_[j], 1, avg_, 1);
   }
   for(i = 0; i < net->n; ++i){
     layer l = net->layers[i];
@@ -324,7 +313,7 @@ detection *YoloObjectDetector::avgPredictions(network *net, int *nboxes)
   return dets;
 }
 
-void *YoloObjectDetector::detectInThread()
+void YoloObjectDetector::detectInThread()
 {
   running_ = 1;
   float nms = .4;
@@ -401,10 +390,9 @@ void *YoloObjectDetector::detectInThread()
   free_detections(dets, nboxes);
   demoIndex_ = (demoIndex_ + 1) % demoFrame_;
   running_ = 0;
-  return 0;
 }
 
-void *YoloObjectDetector::fetchInThread()
+void YoloObjectDetector::fetchInThread()
 {
   IplImageWithHeader_ imageAndHeader = getIplImageWithHeader();
   IplImage* ROS_img = imageAndHeader.image;
@@ -416,17 +404,16 @@ void *YoloObjectDetector::fetchInThread()
   }
   rgbgr_image(buff_[buffIndex_]);
   letterbox_image_into(buff_[buffIndex_], net_->w, net_->h, buffLetter_[buffIndex_]);
-  return 0;
 }
 
-void *YoloObjectDetector::displayInThread(void *ptr)
+void YoloObjectDetector::displayInThread()
 {
   show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
   if (c == 27) {
       demoDone_ = 1;
-      return 0;
+      return;
   } else if (c == 82) {
       demoThresh_ += .02;
   } else if (c == 84) {
@@ -437,21 +424,6 @@ void *YoloObjectDetector::displayInThread(void *ptr)
   } else if (c == 81) {
       demoHier_ -= .02;
       if(demoHier_ <= .0) demoHier_ = .0;
-  }
-  return 0;
-}
-
-void *YoloObjectDetector::displayLoop(void *ptr)
-{
-  while (1) {
-    displayInThread(0);
-  }
-}
-
-void *YoloObjectDetector::detectLoop(void *ptr)
-{
-  while (1) {
-    detectInThread();
   }
 }
 
@@ -534,10 +506,20 @@ void YoloObjectDetector::yolo()
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
-      fps_ = 1./(what_time_is_it_now() - demoTime_);
+      fps_ = 1.f/(what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
       if (viewImage_) {
-        displayInThread(0);
+        displayInThread();
+      } else {
+        const auto& p = buff_[(buffIndex_ + 1)%3];
+        int step = ipl_->widthStep;
+        for(int y = 0; y < p.h; ++y){
+          for(int x = 0; x < p.w; ++x){
+            for(int k= 0; k < p.c; ++k){
+              ipl_->imageData[y*step + x*p.c + k] = (unsigned char)(p.data[k*p.h*p.w + y*p.w + x]*255);
+            }
+          }
+        }
       }
       publishInThread();
     } else {
@@ -563,19 +545,19 @@ IplImageWithHeader_ YoloObjectDetector::getIplImageWithHeader()
   return header;
 }
 
-bool YoloObjectDetector::getImageStatus(void)
+bool YoloObjectDetector::getImageStatus()
 {
   boost::shared_lock<boost::shared_mutex> lock(mutexImageStatus_);
   return imageStatus_;
 }
 
-bool YoloObjectDetector::isNodeRunning(void)
+bool YoloObjectDetector::isNodeRunning()
 {
   boost::shared_lock<boost::shared_mutex> lock(mutexNodeStatus_);
   return isNodeRunning_;
 }
 
-void *YoloObjectDetector::publishInThread()
+void YoloObjectDetector::publishInThread()
 {
   // Publish image.
   cv::Mat cvImage = cv::cvarrToMat(ipl_);
@@ -640,8 +622,6 @@ void *YoloObjectDetector::publishInThread()
     rosBoxes_[i].clear();
     rosBoxCounter_[i] = 0;
   }
-
-  return 0;
 }
 
 
