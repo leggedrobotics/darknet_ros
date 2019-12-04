@@ -138,7 +138,7 @@ set(DARKNET_CUDA_FILES
 if (CUDA_FOUND)
 
   link_directories(
-    ${CUDA_TOOLKIT_ROOT_DIR}/lib
+    ${CUDA_TOOLKIT_ROOT_DIR}/lib64
   )
 
   cuda_add_library(${PROJECT_NAME}_lib
