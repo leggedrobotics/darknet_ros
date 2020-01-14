@@ -16,15 +16,15 @@
 #include <pthread.h>
 #include <thread>
 #include <chrono>
+#include <shared_mutex>
 
 // ROS
-#include <ros/ros.h>
-#include <std_msgs/Header.h>
-#include <actionlib/server/simple_action_server.h>
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/Image.h>
-#include <geometry_msgs/Point.h>
-#include <image_transport/image_transport.h>
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "std_msgs/msg/header.hpp"
+#include "sensor_msgs/msg/image.hpp"
+#include "geometry_msgs/msg/point.hpp"
+#include "image_transport/image_transport.h"
 
 // OpenCv
 #include <opencv2/imgproc/imgproc.hpp>
@@ -33,10 +33,10 @@
 #include <cv_bridge/cv_bridge.h>
 
 // darknet_ros_msgs
-#include <darknet_ros_msgs/BoundingBoxes.h>
-#include <darknet_ros_msgs/BoundingBox.h>
-#include <darknet_ros_msgs/ObjectCount.h>
-#include <darknet_ros_msgs/CheckForObjectsAction.h>
+#include "darknet_ros_msgs/msg/bounding_boxes.hpp"
+#include "darknet_ros_msgs/msg/bounding_box.hpp"
+#include "darknet_ros_msgs/msg/object_count.hpp"
+#include "darknet_ros_msgs/action/check_for_objects.hpp"
 
 // Darknet.
 #ifdef GPU
@@ -73,21 +73,26 @@ typedef struct
 typedef struct
 {
   IplImage* image;
-  std_msgs::Header header;
+  std_msgs::msg::Header header;
 } IplImageWithHeader_;
 
-class YoloObjectDetector
+class YoloObjectDetector : public rclcpp::Node
 {
  public:
   /*!
    * Constructor.
    */
-  explicit YoloObjectDetector(ros::NodeHandle nh);
+  explicit YoloObjectDetector();
 
   /*!
    * Destructor.
    */
   ~YoloObjectDetector();
+
+  /*!
+   * Initialize the ROS connections.
+   */
+  void init();
 
  private:
   /*!
@@ -97,25 +102,34 @@ class YoloObjectDetector
   bool readParameters();
 
   /*!
-   * Initialize the ROS connections.
-   */
-  void init();
-
-  /*!
    * Callback of camera.
    * @param[in] msg image pointer.
    */
-  void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
+  void cameraCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+
+
+  //! Typedefs.
+  using CheckForObjectsAction = darknet_ros_msgs::action::CheckForObjects;
+  using GoalHandleCheckForObjectsAction = rclcpp_action::ServerGoalHandle<CheckForObjectsAction>;
 
   /*!
    * Check for objects action goal callback.
    */
-  void checkForObjectsActionGoalCB();
+  rclcpp_action::GoalResponse checkForObjectsActionGoalCB(
+    const rclcpp_action::GoalUUID & uuid,
+    std::shared_ptr<const CheckForObjectsAction::Goal> goal);
 
   /*!
    * Check for objects action preempt callback.
    */
-  void checkForObjectsActionPreemptCB();
+  rclcpp_action::CancelResponse checkForObjectsActionPreemptCB(
+    const std::shared_ptr<GoalHandleCheckForObjectsAction> goal_handle);
+
+  /*!ºº
+   * Check for objects action accept callback.
+   */
+  void checkForObjectsActionAcceptedCB(
+    const std::shared_ptr<GoalHandleCheckForObjectsAction> goal_handle);
 
   /*!
    * Check if a preempt for the check for objects action has been requested.
@@ -129,39 +143,35 @@ class YoloObjectDetector
    */
   bool publishDetectionImage(const cv::Mat& detectionImage);
 
-  //! Typedefs.
-  typedef actionlib::SimpleActionServer<darknet_ros_msgs::CheckForObjectsAction> CheckForObjectsActionServer;
-  typedef std::shared_ptr<CheckForObjectsActionServer> CheckForObjectsActionServerPtr;
-
-  //! ROS node handle.
-  ros::NodeHandle nodeHandle_;
-
   //! Class labels.
   int numClasses_;
   std::vector<std::string> classLabels_;
 
   //! Check for objects action server.
-  CheckForObjectsActionServerPtr checkForObjectsActionServer_;
+  rclcpp_action::Server<CheckForObjectsAction>::SharedPtr checkForObjectsActionServer_;
+  bool action_active_;
+  bool preempt_requested_;
+  std::shared_ptr<GoalHandleCheckForObjectsAction> goal_handle_;
 
   //! Advertise and subscribe to image topics.
-  image_transport::ImageTransport imageTransport_;
+  std::shared_ptr<image_transport::ImageTransport> it_;
 
   //! ROS subscriber and publisher.
   image_transport::Subscriber imageSubscriber_;
-  ros::Publisher objectPublisher_;
-  ros::Publisher boundingBoxesPublisher_;
+  rclcpp::Publisher<darknet_ros_msgs::msg::ObjectCount>::SharedPtr objectPublisher_;
+  rclcpp::Publisher<darknet_ros_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesPublisher_;
 
   //! Detected objects.
   std::vector<std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
-  darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
+  darknet_ros_msgs::msg::BoundingBoxes boundingBoxesResults_;
 
   //! Camera related parameters.
   int frameWidth_;
   int frameHeight_;
 
   //! Publisher of the bounding box image.
-  ros::Publisher detectionImagePublisher_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr detectionImagePublisher_;
 
   // Yolo running on thread.
   std::thread yoloThread_;
@@ -172,7 +182,7 @@ class YoloObjectDetector
   int demoClasses_;
 
   network *net_;
-  std_msgs::Header headerBuff_[3];
+  std_msgs::msg::Header headerBuff_[3];
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
@@ -201,18 +211,18 @@ class YoloObjectDetector
   int fullScreen_;
   char *demoPrefix_;
 
-  std_msgs::Header imageHeader_;
+  std_msgs::msg::Header imageHeader_;
   cv::Mat camImageCopy_;
-  boost::shared_mutex mutexImageCallback_;
+  std::shared_mutex mutexImageCallback_;
 
   bool imageStatus_ = false;
-  boost::shared_mutex mutexImageStatus_;
+  std::shared_mutex mutexImageStatus_;
 
   bool isNodeRunning_ = true;
-  boost::shared_mutex mutexNodeStatus_;
+  std::shared_mutex mutexNodeStatus_;
 
   int actionId_;
-  boost::shared_mutex mutexActionStatus_;
+  std::shared_mutex mutexActionStatus_;
 
   // double getWallTime();
 

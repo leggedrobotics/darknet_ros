@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5)
 project(darknet_ros)
 
-# Set c++11 cmake flags
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-set(CMAKE_C_FLAGS "-Wall -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable -Wfatal-errors -fPIC ${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_STANDARD 17)
+
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -45,46 +44,40 @@ if ( X11_FOUND )
 endif ( X11_FOUND )
 
 # Find rquired packeges
-find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-find_package(catkin REQUIRED
-  COMPONENTS
-    cv_bridge
-    roscpp
-    rospy
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(darknet_ros_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+
+set(dependencies
+    rclcpp
+    rclpy
+    rclcpp_action
     std_msgs
-    actionlib
-    darknet_ros_msgs
     image_transport
+    cv_bridge
+    sensor_msgs
+    darknet_ros_msgs
+    ament_index_cpp
 )
 
 # Enable OPENCV in darknet
 add_definitions(-DOPENCV)
 add_definitions(-O4 -g)
 
-catkin_package(
-  INCLUDE_DIRS
-    include
-  LIBRARIES
-    ${PROJECT_NAME}_lib
-  CATKIN_DEPENDS
-    cv_bridge
-    roscpp
-    actionlib
-    rospy
-    std_msgs
-    darknet_ros_msgs
-    image_transport
-  DEPENDS
-    Boost
-)
-
 include_directories(
   ${DARKNET_PATH}/src
   ${DARKNET_PATH}/include
   include
-  ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -145,6 +138,8 @@ if (CUDA_FOUND)
     ${PROJECT_LIB_FILES} ${DARKNET_CORE_FILES}
     ${DARKNET_CUDA_FILES}
   )
+  
+  ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
 
   target_link_libraries(${PROJECT_NAME}_lib
     cuda
@@ -156,16 +151,20 @@ if (CUDA_FOUND)
   cuda_add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
   )
+  
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 else()
 
   add_library(${PROJECT_NAME}_lib
     ${PROJECT_LIB_FILES} ${DARKNET_CORE_FILES}
   )
+  ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
 
   add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
   )
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 endif()
 
@@ -173,7 +172,6 @@ target_link_libraries(${PROJECT_NAME}_lib
   m
   pthread
   stdc++
-  ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
@@ -183,23 +181,17 @@ target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
 )
 
-add_dependencies(${PROJECT_NAME}_lib
-  darknet_ros_msgs_generate_messages_cpp
+
+install(TARGETS ${PROJECT_NAME}_lib ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS ${PROJECT_NAME}_lib
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 install(
-  DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DIRECTORY include/
+  DESTINATION include/
   FILES_MATCHING PATTERN "*.h"
 )
 
@@ -220,11 +212,14 @@ if (NOT EXISTS "${FILE}")
   execute_process(COMMAND wget http://pjreddie.com/media/files/yolov3.weights -P ${PATH})
 endif()
 
+install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
+install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
+
 #############
 ## Testing ##
 #############
 
-if(CATKIN_ENABLE_TESTING)
+if(BUILD_TESTING)
   # Download yolov2.weights
   set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
   set(FILE "${PATH}/yolov2.weights")
@@ -234,15 +229,24 @@ if(CATKIN_ENABLE_TESTING)
     execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2.weights -P ${PATH})
   endif()
 
-  find_package(rostest REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 
-  # Object detection in images.
-  add_rostest_gtest(${PROJECT_NAME}_object_detection-test
-    test/object_detection.test
-    test/test_main.cpp
-    test/ObjectDetection.cpp
-  )
-  target_link_libraries(${PROJECT_NAME}_object_detection-test
-    ${catkin_LIBRARIES}
-  )
+  find_package(ament_cmake_gtest REQUIRED)
+  
+  #ament_add_gtest(${PROJECT_NAME}_object_detection-test
+  #  test/object_detection.test
+  #  test/test_main.cpp
+  #  test/ObjectDetection.cpp
+  #)
+  #target_link_libraries(${PROJECT_NAME}_object_detection-test
+  #  ${PROJECT_NAME}_lib
+  #)
 endif()
+
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME}_lib)
+ament_export_dependencies(${dependencies})
+
+ament_package()
