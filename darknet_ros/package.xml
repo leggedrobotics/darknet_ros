@@ -11,8 +11,6 @@
   
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>boost</depend>
-
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
   <depend>rclcpp_action</depend>
