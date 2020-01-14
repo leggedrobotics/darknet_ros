@@ -101,6 +101,8 @@ And the pre-trained weight from YOLO v3 can be found here:
     wget http://pjreddie.com/media/files/yolov3-tiny.weights
     wget http://pjreddie.com/media/files/yolov3.weights
 
+There are more pre-trained weights from different data sets reported [here](https://pjreddie.com/darknet/yolo/).
+
 ### Use your own detection objects
 
 In order to use your own detection objects you need to provide your weights and your cfg file inside the directories:
