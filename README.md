@@ -98,7 +98,7 @@ And weights from the VOC data set can be found here:
 
 And the pre-trained weight from YOLO v3 can be found here:
 
-    wget http://pjreddie.com/media/files/yolov3-voc.weights
+    wget http://pjreddie.com/media/files/yolov3-tiny.weights
     wget http://pjreddie.com/media/files/yolov3.weights
 
 ### Use your own detection objects
