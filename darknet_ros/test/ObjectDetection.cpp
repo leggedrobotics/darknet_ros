@@ -11,13 +11,11 @@
 #include <gtest/gtest.h>
 
 // ROS
-#include <ros/ros.h>
-#include <ros/package.h>
+#include "rclcpp/rclcpp.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
 #include <sensor_msgs/Image.h>
 #include <actionlib/client/simple_action_client.h>
 
-// boost
-#include <boost/thread.hpp>
 
 // OpenCV2.
 #include <opencv2/core/core.hpp>
