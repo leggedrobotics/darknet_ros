@@ -34,17 +34,17 @@ image **load_alphabet_with_file(char *datafile) {
 }
 
 #ifdef OPENCV
-void generate_image(image p, IplImage *disp)
+void generate_image(image p, cv::Mat disp)
 {
     int x,y,k;
     if(p.c == 3) rgbgr_image(p);
     //normalize_image(copy);
 
-    int step = disp->widthStep;
+    int step = disp.step[0];
     for(y = 0; y < p.h; ++y){
         for(x = 0; x < p.w; ++x){
             for(k= 0; k < p.c; ++k){
-                disp->imageData[y*step + x*p.c + k] = (unsigned char)(get_pixel(p,x,y,k)*255);
+                disp.data[y*step + x*p.c + k] = (unsigned char)(get_pixel(p,x,y,k)*255);
             }
         }
     }
