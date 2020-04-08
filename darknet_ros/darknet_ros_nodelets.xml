@@ -1,0 +1,7 @@
+<library path="lib/libdarknet_ros_lib">
+  <class name="darknet_ros/YoloObjectDetectorNodelet"
+         type="darknet_ros::YoloObjectDetectorNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>This is the nodelet of darknet yolo v3.</description>
+  </class>
+</library>

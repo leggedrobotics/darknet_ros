@@ -20,8 +20,13 @@
   <depend>message_generation</depend>
   <depend>darknet_ros_msgs</depend>
   <depend>actionlib</depend>
+  <depend>nodelet</depend>
 
   <!-- Test dependencies -->
   <test_depend>rostest</test_depend>
   <test_depend>wget</test_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/darknet_ros_nodelets.xml" />
+  </export>
 </package>

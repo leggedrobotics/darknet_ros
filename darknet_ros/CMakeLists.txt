@@ -57,6 +57,7 @@ find_package(catkin REQUIRED
     actionlib
     darknet_ros_msgs
     image_transport
+    nodelet
 )
 
 # Enable OPENCV in darknet
@@ -89,7 +90,9 @@ include_directories(
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.c
+    src/YoloObjectDetector.cpp
+    src/YoloObjectDetectorNodelet.cpp
+    src/image_interface.c
 )
 
 set(DARKNET_CORE_FILES

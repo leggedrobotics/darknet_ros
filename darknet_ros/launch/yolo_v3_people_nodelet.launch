@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+  <!--  name of nodelet manager-->
+  <arg name="nodelet_manager" default=""/>
+
+  <!-- Console launch prefix -->
+  <arg name="launch_prefix" default=""/>
+
+  <!-- Config and weights folder. -->
+  <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
+  <arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
+
+  <!-- Load parameters -->
+  <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/ros.yaml"/>
+  <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/yolov3_people.yaml"/>
+
+ <machine name="MPC2" address="$(env MPC2_IP)" env-loader="$(find ufr_launch)/scripts/env-loader.sh" user="$(env USER)"/>
+ 
+  <!-- Start people detection nodelet manager-->
+  <node machine="MPC2" pkg="nodelet" type="nodelet" args="standalone darknet_ros/YoloObjectDetectorNodelet" 
+        name="darknet_ros" launch-prefix="$(arg launch_prefix)" output="screen">
+    <param name="weights_path"          value="$(arg yolo_weights_path)" />
+    <param name="config_path"           value="$(arg yolo_config_path)" />
+  </node>
+
+</launch>
