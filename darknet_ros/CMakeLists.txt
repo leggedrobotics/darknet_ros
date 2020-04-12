@@ -82,7 +82,7 @@ include_directories(
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.c
+    src/YoloObjectDetector.cpp                    src/image_interface.cpp
 )
 
 set(DARKNET_CORE_FILES
