@@ -459,7 +459,7 @@ void *YoloObjectDetector::fetchInThread()
 {
   {
     std::shared_lock<std::shared_mutex> lock(mutexImageCallback_);
-    MatWithHeader_ imageAndHeader = getIplImageWithHeader();
+    MatWithHeader_ imageAndHeader = getMatImageWithHeader();
     cv::Mat ROS_img = imageAndHeader.image;
     buff_[buffIndex_] = mat_to_image_(ROS_img);
     headerBuff_[buffIndex_] = imageAndHeader.header;
@@ -554,7 +554,7 @@ void YoloObjectDetector::yolo()
 
   {
     std::shared_lock<std::shared_mutex> lock(mutexImageCallback_);
-    MatWithHeader_ imageAndHeader = getIplImageWithHeader();
+    MatWithHeader_ imageAndHeader = getMatImageWithHeader();
     cv::Mat ROS_img = imageAndHeader.image;
     buff_[0] = mat_to_image_(ROS_img);
     headerBuff_[0] = imageAndHeader.header;
@@ -566,7 +566,7 @@ void YoloObjectDetector::yolo()
   buffLetter_[0] = letterbox_image(buff_[0], net_->w, net_->h);
   buffLetter_[1] = letterbox_image(buff_[0], net_->w, net_->h);
   buffLetter_[2] = letterbox_image(buff_[0], net_->w, net_->h);
-  ipl_ = cv::Mat(buff_[0].h, buff_[0].w, CV_8UC(buff_[0].c));
+  mat_ = cv::Mat(buff_[0].h, buff_[0].w, CV_8UC(buff_[0].c));
 
   int count = 0;
 
@@ -592,7 +592,7 @@ void YoloObjectDetector::yolo()
       if (viewImage_) {
         displayInThread(0);
       } else {
-        generate_image(buff_[(buffIndex_ + 1)%3], ipl_);
+        generate_image(buff_[(buffIndex_ + 1)%3], mat_);
       }
       publishInThread();
     } else {
@@ -610,7 +610,7 @@ void YoloObjectDetector::yolo()
 
 }
 
-MatWithHeader_ YoloObjectDetector::getIplImageWithHeader()
+MatWithHeader_ YoloObjectDetector::getMatImageWithHeader()
 {
   MatWithHeader_ header {camImageCopy_, imageHeader_};
   return header;
@@ -631,7 +631,7 @@ bool YoloObjectDetector::isNodeRunning(void)
 void *YoloObjectDetector::publishInThread()
 {
   // Publish image.
-  cv::Mat cvImage = ipl_;
+  cv::Mat cvImage = mat_;
   if (!publishDetectionImage(cv::Mat(cvImage))) {
     RCLCPP_DEBUG(get_logger(), "Detection image has not been broadcasted.");
   }

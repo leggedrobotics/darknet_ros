@@ -187,7 +187,7 @@ class YoloObjectDetector : public rclcpp::Node
   image buffLetter_[3];
   int buffId_[3];
   int buffIndex_ = 0;
-  cv::Mat ipl_;
+  cv::Mat mat_;
   float fps_ = 0;
   float demoThresh_ = 0;
   float demoHier_ = .5;
@@ -249,7 +249,7 @@ class YoloObjectDetector : public rclcpp::Node
 
   void yolo();
 
-  MatWithHeader_ getIplImageWithHeader();
+  MatWithHeader_ getMatImageWithHeader();
 
   bool getImageStatus(void);
 
