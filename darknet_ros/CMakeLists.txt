@@ -4,6 +4,7 @@ project(darknet_ros)
 # Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "-Wall -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable -Wfatal-errors -fPIC ${CMAKE_C_FLAGS}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -250,3 +251,17 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 endif()
+
+#########################
+###   CLANG TOOLING   ###
+#########################
+find_package(cmake_clang_tools QUIET)
+if (cmake_clang_tools_FOUND)
+  message(STATUS "Run clang tooling")
+  add_clang_tooling(
+    TARGETS ${PROJECT_NAME}
+    SOURCE_DIRS ${CMAKE_CURRENT_LIST_DIR}/src ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/test
+    CT_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/include
+    CF_WERROR
+  )
+endif (cmake_clang_tools_FOUND)
