@@ -44,7 +44,7 @@ if ( X11_FOUND )
 endif ( X11_FOUND )
 
 # Find rquired packeges
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(ament_cmake REQUIRED)
@@ -82,7 +82,7 @@ include_directories(
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.c
+    src/YoloObjectDetector.cpp                    src/image_interface.cpp
 )
 
 set(DARKNET_CORE_FILES
