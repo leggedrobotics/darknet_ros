@@ -30,4 +30,4 @@ image_view:
 
   enable_opencv: true
   wait_key_delay: 1
-  enable_console_output: true
+  enable_console_output: false

@@ -16,7 +16,7 @@ namespace darknet_ros
 {
 
 YoloObjectDetectorNodelet::YoloObjectDetectorNodelet():
-  nh_("darknet_ros")  // YoloObjectDetector(nh_)call super constructor for base class
+  nh_("darknet_ros")
 {
   yolo_object_detector = std::unique_ptr<YoloObjectDetector>(new YoloObjectDetector(nh_));
 }

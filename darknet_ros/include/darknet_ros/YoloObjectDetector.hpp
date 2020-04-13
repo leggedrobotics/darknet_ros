@@ -150,6 +150,7 @@ class YoloObjectDetector
   image_transport::Subscriber imageSubscriber_;
   ros::Publisher objectPublisher_;
   ros::Publisher boundingBoxesPublisher_;
+  ros::Publisher imageAcknowledgePublisher_; // UFR change
 
   //! Detected objects.
   std::vector<std::vector<RosBox_> > rosBoxes_;
@@ -200,6 +201,7 @@ class YoloObjectDetector
   int waitKeyDelay_;
   int fullScreen_;
   char *demoPrefix_;
+  int prevSeq_ = 0;
 
   std_msgs::Header imageHeader_;
   cv::Mat camImageCopy_;

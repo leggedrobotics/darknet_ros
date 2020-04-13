@@ -18,6 +18,14 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #error Path of darknet repository is not defined in CMakeLists.txt.
 #endif
 
+/**** UFR changes ****/
+static float get_pixel(image m, int x, int y, int c)
+{
+    assert(x < m.w && y < m.h && c < m.c);
+    return m.data[c*m.h*m.w + y*m.w + x];
+}
+/**** UFR changes ****/
+
 namespace darknet_ros {
 
 char *cfg;
@@ -165,6 +173,8 @@ void YoloObjectDetector::init()
   detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName,
                                                                        detectionImageQueueSize,
                                                                        detectionImageLatch);
+  //image acknowledge publisher
+  imageAcknowledgePublisher_ = nodeHandle_.advertise<std_msgs::Header>("image_acknowledge", 1); // UFR change
 
   // Action servers.
   std::string checkForObjectsActionName;
@@ -193,6 +203,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   }
 
   if (cam_image) {
+    
     {
       boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
       imageHeader_ = msg->header;
@@ -204,6 +215,9 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
+
+    //publish acknowldegement 
+    imageAcknowledgePublisher_.publish(msg->header); // UFR change
   }
   return;
 }
@@ -326,6 +340,13 @@ detection *YoloObjectDetector::avgPredictions(network *net, int *nboxes)
 
 void *YoloObjectDetector::detectInThread()
 {
+
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 2) % 3].seq) {
+    return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 2) % 3].seq;
+
   running_ = 1;
   float nms = .4;
 
@@ -347,6 +368,7 @@ void *YoloObjectDetector::detectInThread()
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_+2) % 3];
+  ROS_INFO_STREAM("\nNo Boxes: " << nboxes <<"\nthresh: " << demoThresh_ << "\nclasses: " << demoClasses_);
   draw_detections(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_);
 
   // extract the bounding boxes and send them to ROS
@@ -421,7 +443,54 @@ void *YoloObjectDetector::fetchInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
-  show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 1)%3].seq) {
+      return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 1)%3].seq;
+  
+  /*****UFR changes*****/
+  //show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+  image p = buff_[(buffIndex_ + 1)%3];
+  std::string name = "YOLO V3";
+  IplImage *disp = ipl_;
+
+  int x,y,k;
+  if(p.c == 3) rgbgr_image(p);
+  //normalize_image(copy);
+
+  char buff[256];
+  //sprintf(buff, "%s (%d)", name, windows);
+  sprintf(buff, "%s", name.c_str());
+
+  int step = disp->widthStep;
+
+  for(y = 0; y < p.h; ++y){
+      for(x = 0; x < p.w; ++x){
+          for(k= 0; k < p.c; ++k){
+              disp->imageData[y*step + x*p.c + k] = (unsigned char)(get_pixel(p,x,y,k)*255);
+          }
+      }
+  }
+  if(0){
+      int w = 448;
+      int h = w*p.h/p.w;
+      if(h > 1000){
+          h = 1000;
+          w = h*p.w/p.h;
+      }
+      IplImage *buffer = disp;
+      disp = cvCreateImage(cvSize(w, h), buffer->depth, buffer->nChannels);
+      cvResize(buffer, disp, CV_INTER_LINEAR);
+      cvReleaseImage(&buffer);
+  }
+  if (viewImage_)
+  {
+    cvNamedWindow(buff, CV_WINDOW_NORMAL); 
+    cvShowImage(buff, disp);
+  }
+  /*****UFR changes*****/
+
   int c = cv::waitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
   if (c == 27) {
@@ -533,8 +602,11 @@ void YoloObjectDetector::yolo()
   demoTime_ = what_time_is_it_now();
 
   while (!demoDone_) {
+    
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
+
+    // if (prevSeq_ != headerBuff_[buffIndex_].seq) {
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
       fps_ = 1./(what_time_is_it_now() - demoTime_);
@@ -545,14 +617,21 @@ void YoloObjectDetector::yolo()
         generate_image(buff_[(buffIndex_ + 1)%3], ipl_);
       }
       publishInThread();
+      prevSeq_ = headerBuff_[buffIndex_].seq;
+
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demoPrefix_, count);
       save_image(buff_[(buffIndex_ + 1) % 3], name);
     }
+    ROS_INFO("~~~~IN LOOP~~~~~");
     fetch_thread.join();
     detect_thread.join();
     ++count;
+    // } else {
+    //   fetch_thread.join();  
+    // }
+
     if (!isNodeRunning()) {
       demoDone_ = true;
     }
