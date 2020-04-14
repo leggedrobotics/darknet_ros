@@ -13,6 +13,7 @@
   <depend>libopencv-dev</depend>
   <depend>libx11</depend>
   <depend>libxt-dev</depend>
+  <depend>libxext</depend>
 
   <depend>roscpp</depend>
   <depend>rospy</depend>
