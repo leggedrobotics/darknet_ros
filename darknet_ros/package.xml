@@ -14,7 +14,6 @@
   <depend>libx11</depend>
 
   <depend>roscpp</depend>
-  <depend>cmake_clang_tools</depend>
   <depend>rospy</depend>
   <depend>std_msgs</depend>
   <depend>image_transport</depend>
