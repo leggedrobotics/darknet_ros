@@ -602,35 +602,31 @@ void YoloObjectDetector::yolo()
   demoTime_ = what_time_is_it_now();
 
   while (!demoDone_) {
-    
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
-
-    // if (prevSeq_ != headerBuff_[buffIndex_].seq) {
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
-      fps_ = 1./(what_time_is_it_now() - demoTime_);
-      demoTime_ = what_time_is_it_now();
+      static int prevSeq;
+      if (prevSeq!=headerBuff_[buffIndex_].seq) {
+        fps_ = 1./(what_time_is_it_now() - demoTime_);
+        demoTime_ = what_time_is_it_now();
+        prevSeq_ = headerBuff_[buffIndex_].seq;
+      }
       if (viewImage_) {
         displayInThread(0);
       } else {
         generate_image(buff_[(buffIndex_ + 1)%3], ipl_);
       }
       publishInThread();
-      prevSeq_ = headerBuff_[buffIndex_].seq;
 
     } else {
       char name[256];
       sprintf(name, "%s_%08d", demoPrefix_, count);
       save_image(buff_[(buffIndex_ + 1) % 3], name);
     }
-    ROS_INFO("~~~~IN LOOP~~~~~");
     fetch_thread.join();
     detect_thread.join();
     ++count;
-    // } else {
-    //   fetch_thread.join();  
-    // }
 
     if (!isNodeRunning()) {
       demoDone_ = true;
@@ -660,6 +656,13 @@ bool YoloObjectDetector::isNodeRunning(void)
 
 void *YoloObjectDetector::publishInThread()
 {
+
+  static int prevSeq;
+  if (prevSeq==headerBuff_[(buffIndex_ + 1)%3].seq) {
+      return 0;
+  }
+  prevSeq = headerBuff_[(buffIndex_ + 1)%3].seq;
+
   // Publish image.
   cv::Mat cvImage = cv::cvarrToMat(ipl_);
   if (!publishDetectionImage(cv::Mat(cvImage))) {
