@@ -3,7 +3,6 @@ project(darknet_ros)
 
 set(CMAKE_CXX_STANDARD 17)
 
-
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
   NAMES "README.md"
@@ -71,7 +70,7 @@ set(dependencies
 )
 
 # Enable OPENCV in darknet
-add_definitions(-DOPENCV)
+# add_definitions(-DOPENCV)
 add_definitions(-O4 -g)
 
 include_directories(
@@ -128,6 +127,8 @@ set(DARKNET_CUDA_FILES
     ${DARKNET_PATH}/src/convolutional_kernels.cu  ${DARKNET_PATH}/src/maxpool_layer_kernels.cu
 )
 
+set_source_files_properties(${PROJECT_LIB_FILES} PROPERTIES LANGUAGE CXX)
+
 if (CUDA_FOUND)
 
   link_directories(
@@ -156,10 +157,15 @@ if (CUDA_FOUND)
 
 else()
 
+  add_library(${PROJECT_NAME}_core_lib
+    ${DARKNET_CORE_FILES}
+  )
+
   add_library(${PROJECT_NAME}_lib
-    ${PROJECT_LIB_FILES} ${DARKNET_CORE_FILES}
+    ${PROJECT_LIB_FILES}
   )
   ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
+  target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
 
   add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
@@ -176,11 +182,13 @@ target_link_libraries(${PROJECT_NAME}_lib
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
+target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
 
 target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
+  ${PROJECT_NAME}_core_lib
 )
-
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DOPENCV)
 
 install(TARGETS ${PROJECT_NAME}_lib ${PROJECT_NAME}
   ARCHIVE DESTINATION lib

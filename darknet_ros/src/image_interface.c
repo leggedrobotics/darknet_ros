@@ -17,13 +17,13 @@ static float get_pixel(image m, int x, int y, int c)
 image **load_alphabet_with_file(char *datafile) {
   int i, j;
   const int nsize = 8;
-  image **alphabets = calloc(nsize, sizeof(image));
+  image **alphabets = (image**)calloc(nsize, sizeof(image));
   char* labels = "/labels/%d_%d.png";
   char * files = (char *) malloc(1 + strlen(datafile)+ strlen(labels) );
   strcpy(files, datafile);
   strcat(files, labels);
   for(j = 0; j < nsize; ++j){
-    alphabets[j] = calloc(128, sizeof(image));
+    alphabets[j] = (image*)calloc(128, sizeof(image));
     for(i = 32; i < 127; ++i){
       char buff[256];
       sprintf(buff, files, i, j);
