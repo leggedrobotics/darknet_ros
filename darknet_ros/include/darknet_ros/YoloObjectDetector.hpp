@@ -55,11 +55,16 @@ extern "C" {
 #include "parser.h"
 #include "region_layer.h"
 #include "utils.h"
+
+#include "image.h"
+image mat_to_image(cv::Mat mat);
+cv::Mat image_to_mat(image img);
 }
 
-extern "C" void ipl_into_image(IplImage* src, image im);
-extern "C" image ipl_to_image(IplImage* src);
-extern "C" void show_image_cv(image p, const char* name, IplImage* disp);
+#include "image_opencv.h"
+
+
+#include "blas.h"
 
 namespace darknet_ros {
 
@@ -70,7 +75,7 @@ typedef struct {
 } RosBox_;
 
 typedef struct {
-  IplImage* image;
+  cv::Mat image;
   std_msgs::Header header;
 } IplImageWithHeader_;
 
@@ -174,7 +179,7 @@ class YoloObjectDetector {
   image buffLetter_[3];
   int buffId_[3];
   int buffIndex_ = 0;
-  IplImage* ipl_;
+  cv::Mat ipl_;
   float fps_ = 0;
   float demoThresh_ = 0;
   float demoHier_ = .5;
