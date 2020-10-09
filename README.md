@@ -6,7 +6,7 @@ This is a ROS package developed for object detection in camera images. You only 
 
 The YOLO packages have been tested under ROS Melodic and Ubuntu 18.04. This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
 
-**Author: [Marko Bjelonic](http://www.markobjelonic.me), marko.bjelonic@mavt.ethz.ch**
+**Author: [Marko Bjelonic](https://www.markobjelonic.com), marko.bjelonic@mavt.ethz.ch**
 
 **Affiliation: [Robotic Systems Lab](http://www.rsl.ethz.ch/), ETH Zurich**
 
@@ -98,8 +98,10 @@ And weights from the VOC data set can be found here:
 
 And the pre-trained weight from YOLO v3 can be found here:
 
-    wget http://pjreddie.com/media/files/yolov3-voc.weights
+    wget http://pjreddie.com/media/files/yolov3-tiny.weights
     wget http://pjreddie.com/media/files/yolov3.weights
+
+There are more pre-trained weights from different data sets reported [here](https://pjreddie.com/darknet/yolo/).
 
 ### Use your own detection objects
 
@@ -126,7 +128,7 @@ You will see the image above popping up.
 
 ## Basic Usage
 
-In order to get YOLO ROS: Real-Time Object Detection for ROS to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darkned_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
+In order to get YOLO ROS: Real-Time Object Detection for ROS to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darknet_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
 
 ## Nodes
 
@@ -136,7 +138,7 @@ This is the main YOLO ROS: Real-Time Object Detection for ROS node. It uses the 
 
 ### ROS related parameters
 
-You can change the names and other parameters of the publishers, subscribers and actions inside `darkned_ros/config/ros.yaml`.
+You can change the names and other parameters of the publishers, subscribers and actions inside `darknet_ros/config/ros.yaml`.
 
 #### Subscribed Topics
 
@@ -166,7 +168,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
 ### Detection related parameters
 
-You can change the parameters that are related to the detection by adding a new config file that looks similar to `darkned_ros/config/yolo.yaml`.
+You can change the parameters that are related to the detection by adding a new config file that looks similar to `darknet_ros/config/yolo.yaml`.
 
 * **`image_view/enable_opencv`** (bool)
 
@@ -178,11 +180,11 @@ You can change the parameters that are related to the detection by adding a new 
 
 * **`yolo_model/config_file/name`** (string)
 
-    Name of the cfg file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/cfg/`.
+    Name of the cfg file of the network that is used for detection. The code searches for this name inside `darknet_ros/yolo_network_config/cfg/`.
 
 * **`yolo_model/weight_file/name`** (string)
 
-    Name of the weights file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/weights/`.
+    Name of the weights file of the network that is used for detection. The code searches for this name inside `darknet_ros/yolo_network_config/weights/`.
 
 * **`yolo_model/threshold/value`** (float)
 
@@ -190,4 +192,4 @@ You can change the parameters that are related to the detection by adding a new 
 
 * **`yolo_model/detection_classes/names`** (array of strings)
 
-    Detection names of the network used by the cfg and weights file inside `darkned_ros/yolo_network_config/`.
+    Detection names of the network used by the cfg and weights file inside `darknet_ros/yolo_network_config/`.

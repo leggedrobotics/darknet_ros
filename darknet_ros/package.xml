@@ -10,6 +10,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>boost</depend>
+  <depend>libopencv-dev</depend>
+  <depend>libx11</depend>
+  <depend>libxt-dev</depend>
+  <depend>libxext</depend>
 
   <depend>roscpp</depend>
   <depend>rospy</depend>

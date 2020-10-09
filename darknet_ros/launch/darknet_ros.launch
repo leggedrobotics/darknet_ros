@@ -3,6 +3,8 @@
 <launch>
   <!-- Console launch prefix -->
   <arg name="launch_prefix" default=""/>
+  <arg name="image" default="/camera/rgb/image_raw" />
+  <arg name="gpu_index" default="0"/>
 
   <!-- Config and weights folder. -->
   <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
@@ -20,7 +22,9 @@
   <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
     <param name="weights_path"          value="$(arg yolo_weights_path)" />
     <param name="config_path"           value="$(arg yolo_config_path)" />
-  </node>
+    <remap from="camera/rgb/image_raw"  to="$(arg image)" />
+    <param name="gpu_index" value="$(arg gpu_index)" />
+   </node>
 
  <!--<node name="republish" type="republish" pkg="image_transport" output="screen" 	args="compressed in:=/front_camera/image_raw raw out:=/camera/image_raw" /> -->
 </launch>
