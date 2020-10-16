@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_ros)
 
+set(BUILD_AS_CPP ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../darknet ${CMAKE_BINARY_DIR}/darknet)
 
 # Set c++11 cmake flags
@@ -41,7 +42,7 @@ endif()
 message ( STATUS "Searching for X11..." )
 find_package ( X11 REQUIRED )
 if ( X11_FOUND )
-  include_directories ( ${X11_INCLUDE_DIR} )
+    include_directories (SYSTEM ${X11_INCLUDE_DIR} )
   link_libraries ( ${X11_LIBRARIES} )
   message ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
   message ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
@@ -50,7 +51,7 @@ endif ( X11_FOUND )
 # Find rquired packeges
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 find_package(catkin REQUIRED
   COMPONENTS
     cv_bridge
@@ -92,7 +93,8 @@ include_directories(SYSTEM
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.cpp
+    src/YoloObjectDetector.cpp
+    src/image_interface.cpp
 )
 
 if (CUDA_FOUND)

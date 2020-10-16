@@ -45,26 +45,19 @@
 #include "curand.h"
 #endif
 
-extern "C" {
 #include <sys/time.h>
 #include "box.h"
 #include "cost_layer.h"
-#include "darknet_ros/image_interface.h"
 #include "detection_layer.h"
 #include "network.h"
 #include "parser.h"
 #include "region_layer.h"
 #include "utils.h"
 
-#include "image.h"
-image mat_to_image(cv::Mat mat);
-cv::Mat image_to_mat(image img);
-}
-
 #include "image_opencv.h"
-
-
 #include "blas.h"
+
+#include "darknet_ros/image_interface.h"
 
 namespace darknet_ros {
 
