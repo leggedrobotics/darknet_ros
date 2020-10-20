@@ -159,6 +159,8 @@ class YoloObjectDetector {
 
   //! Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
+  ros::Publisher imageRePublisher_;
+  cv_bridge::CvImagePtr cam_image;
 
   // Yolo running on thread.
   std::thread yoloThread_;

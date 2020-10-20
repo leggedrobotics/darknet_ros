@@ -18,7 +18,7 @@
   <rosparam command="load" ns="darknet_ros" file="$(arg network_param_file)"/>
 
   <!-- Start darknet and ros wrapper -->
-  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen" launch-prefix="$(arg launch_prefix)">
+  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" launch-prefix="$(arg launch_prefix)">
     <param name="weights_path"          value="$(arg yolo_weights_path)" />
     <param name="config_path"           value="$(arg yolo_config_path)" />
     <remap from="camera/rgb/image_raw"  to="$(arg image)" />

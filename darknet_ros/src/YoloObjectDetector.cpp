@@ -146,6 +146,9 @@ void YoloObjectDetector::init() {
       nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>(boundingBoxesTopicName, boundingBoxesQueueSize, boundingBoxesLatch);
   detectionImagePublisher_ =
       nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName, detectionImageQueueSize, detectionImageLatch);
+  imageRePublisher_ = 
+      nodeHandle_.advertise<sensor_msgs::Image>("image_raw", detectionImageQueueSize, detectionImageLatch);
+
 
   // Action servers.
   std::string checkForObjectsActionName;
@@ -159,7 +162,7 @@ void YoloObjectDetector::init() {
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
   ROS_DEBUG("[YoloObjectDetector] USB image received.");
 
-  cv_bridge::CvImagePtr cam_image;
+ 
 
   try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -227,7 +230,7 @@ bool YoloObjectDetector::isCheckingForObjects() const {
   return (ros::ok() && checkForObjectsActionServer_->isActive() && !checkForObjectsActionServer_->isPreemptRequested());
 }
 
-bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage) {
+bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage) {  
   if (detectionImagePublisher_.getNumSubscribers() < 1) return false;
   cv_bridge::CvImage cvImage;
   cvImage.header.stamp = ros::Time::now();
@@ -235,6 +238,7 @@ bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage) {
   cvImage.encoding = sensor_msgs::image_encodings::BGR8;
   cvImage.image = detectionImage;
   detectionImagePublisher_.publish(*cvImage.toImageMsg());
+  
   ROS_DEBUG("Detection image has been published.");
   return true;
 }
@@ -585,6 +589,14 @@ void* YoloObjectDetector::publishInThread() {
     msg.count = 0;
     objectPublisher_.publish(msg);
   }
+  
+  cv_bridge::CvImage cvCamImage;
+  cvCamImage.header.stamp     = ros::Time::now();
+  cvCamImage.header.frame_id  = "image_raw";
+  cvCamImage.encoding         = sensor_msgs::image_encodings::BGR8;
+  cvCamImage.image            = cam_image->image;
+  imageRePublisher_.publish(*cvCamImage.toImageMsg());
+
   if (isCheckingForObjects()) {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");
     darknet_ros_msgs::CheckForObjectsResult objectsActionResult;
