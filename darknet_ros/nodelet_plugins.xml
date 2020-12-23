@@ -1,8 +1,8 @@
 <library path="lib/libdarknet_ros_nodelet">
 
-  <!-- Darknet ROS Plugin -->
+  <!-- Darknet Ros Plugin -->
   <class name="darknet_ros_nodelet" type="DarknetRosNodelet" base_class_type="nodelet::Nodelet">
-    <description>Darknet ROS Nodelet.</description>
+    <description>Darknet Ros Nodelet.</description>
   </class>
 
 </library>

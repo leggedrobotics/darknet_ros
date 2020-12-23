@@ -26,11 +26,12 @@
   <depend>actionlib</depend>
   <depend>nodelet</depend>
 
-  <export>
-    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
-  </export>
-
   <!-- Test dependencies -->
   <test_depend>rostest</test_depend>
   <test_depend>wget</test_depend>
+
+  <!-- Export nodelet plugins -->
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>  
 </package>
