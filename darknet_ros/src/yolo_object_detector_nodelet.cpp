@@ -1,8 +1,5 @@
 /*
- * yolo_object_detector_nodelet.cpp
- *
- *  Created on: Dec 19, 2016
- *      Author: Marko Bjelonic
+ *   Author: Marko Bjelonic
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
@@ -14,16 +11,18 @@
 class DarknetRosNodelet : public nodelet::Nodelet {
  public:
   DarknetRosNodelet() = default;
-  ~DarknetRosNodelet() = default;
+  ~DarknetRosNodelet() {
+    if (darknetRos_) delete darknetRos_;
+  }
 
  private:
   virtual void onInit() {
     ros::NodeHandle NodeHandle("~");
     NodeHandle = getPrivateNodeHandle();
-    darknet_ros_ = new darknet_ros::YoloObjectDetector(NodeHandle);
+    darknetRos_ = new darknet_ros::YoloObjectDetector(NodeHandle);
   }
 
-  darknet_ros::YoloObjectDetector* darknet_ros_;
+  darknet_ros::YoloObjectDetector* darknetRos_;
 };
 
 // Declare as a Plug-in
