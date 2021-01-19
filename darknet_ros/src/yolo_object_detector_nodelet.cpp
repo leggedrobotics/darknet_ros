@@ -1,5 +1,5 @@
 /*
- *   Author: Marko Bjelonic
+ *   Author: Timon Homberger
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
