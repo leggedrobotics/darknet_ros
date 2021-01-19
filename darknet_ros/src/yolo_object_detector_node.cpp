@@ -1,5 +1,5 @@
 /*
- * yolo_obstacle_detector_node.cpp
+ * yolo_object_detector_node.cpp
  *
  *  Created on: Dec 19, 2016
  *      Author: Marko Bjelonic

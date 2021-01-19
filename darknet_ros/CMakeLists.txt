@@ -58,6 +58,7 @@ find_package(catkin REQUIRED
     actionlib
     darknet_ros_msgs
     image_transport
+    nodelet
 )
 
 # Enable OPENCV in darknet
@@ -77,6 +78,7 @@ catkin_package(
     std_msgs
     darknet_ros_msgs
     image_transport
+    nodelet
   DEPENDS
     Boost
 )
@@ -158,6 +160,10 @@ if (CUDA_FOUND)
     src/yolo_object_detector_node.cpp
   )
 
+  cuda_add_library(${PROJECT_NAME}_nodelet
+    src/yolo_object_detector_nodelet.cpp
+  )
+
 else()
 
   add_library(${PROJECT_NAME}_lib
@@ -166,6 +172,10 @@ else()
 
   add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
+  )
+
+  add_library(${PROJECT_NAME}_nodelet
+    src/yolo_object_detector_nodelet.cpp
   )
 
 endif()
@@ -181,6 +191,10 @@ target_link_libraries(${PROJECT_NAME}_lib
 )
 
 target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_lib
+)
+
+target_link_libraries(${PROJECT_NAME}_nodelet
   ${PROJECT_NAME}_lib
 )
 
