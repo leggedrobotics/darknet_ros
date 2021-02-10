@@ -484,29 +484,53 @@ void YoloObjectDetector::yolo() {
   }
 
   demoTime_ = what_time_is_it_now();
-
-  while (!demoDone_) {
+  // TODO: see issue of bounding boxes calculated multiple times per image: https://github.com/leggedrobotics/darknet_ros/issues/150
+  // Fix0: keep track of what std_msgs::Header id this is (consecutively increasing)
+  int prevSeq_ = 0;
+  while (!demoDone_)
+  {
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
-    detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
-    if (!demoPrefix_) {
-      fps_ = 1. / (what_time_is_it_now() - demoTime_);
-      demoTime_ = what_time_is_it_now();
-      if (viewImage_) {
-        displayInThread(0);
-      } else {
-        generate_image(buff_[(buffIndex_ + 1) % 3], ipl_);
+
+    // Fix1: check this isn't an image already seen
+    if (prevSeq_ != headerBuff_[buffIndex_].seq)
+    {
+      // Fix2: only detect if this is an image we haven't see before
+      detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+
+      if (!demoPrefix_)
+      {
+        fps_ = 1. / (what_time_is_it_now() - demoTime_);
+        demoTime_ = what_time_is_it_now();
+        if (viewImage_)
+        {
+          displayInThread(0);
+        }
+        else
+        {
+          generate_image(buff_[(buffIndex_ + 1) % 3], ipl_);
+        }
+        publishInThread();
       }
-      publishInThread();
-    } else {
-      char name[256];
-      sprintf(name, "%s_%08d", demoPrefix_, count);
-      save_image(buff_[(buffIndex_ + 1) % 3], name);
+      else
+      {
+        char name[256];
+        sprintf(name, "%s_%08d", demoPrefix_, count);
+        save_image(buff_[(buffIndex_ + 1) % 3], name);
+      }
+      // Fix3: increment the new sequence number to avoid detecting more than once
+      prevSeq_ = headerBuff_[buffIndex_].seq;
+      fetch_thread.join();
+      detect_thread.join();
+      ++count;
     }
-    fetch_thread.join();
-    detect_thread.join();
-    ++count;
-    if (!isNodeRunning()) {
+    else
+    {
+      // Fix4: no detection made, so let thread execution complete so that it can be destroyed safely
+      fetch_thread.join();
+    }
+    if (!isNodeRunning())
+    {
       demoDone_ = true;
     }
   }
