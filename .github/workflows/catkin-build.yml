@@ -12,8 +12,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      
-    - name: Build
+
+    - name: workspace
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        mkdir -p $HOME/ws/src
+        ln -s ${{github.workspace}} $HOME/ws/src/darknet_ros
+
+    - name: rosdep install
+      working-directory: $HOME/ws
+      shell: bash
+      run: |
+        source /opt/ros/$ROS_DISTRO/setup.bash
+        rosdep install --from-paths src --ignore-src -r -y
+
+    - name: catkin build
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
