@@ -22,10 +22,14 @@ jobs:
         rosdep install --from-paths src --ignore-src -r -y
 
     - name: catkin_make
+      shell: bash
       run: |
+        source /opt/ros/$ROS_DISTRO/setup.bash
         catkin_make -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: catkin_make run_tests
+      shell: bash
       run: |
+        source /opt/ros/$ROS_DISTRO/setup.bash
         catkin_make run_tests
 
