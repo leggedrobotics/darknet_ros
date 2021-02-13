@@ -41,4 +41,5 @@ jobs:
       run: |
         source /opt/ros/$ROS_DISTRO/setup.bash
         catkin_make run_tests
+        catkin_test_results
 
