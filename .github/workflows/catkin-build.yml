@@ -13,34 +13,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        path: repo
-
-    - name: workspace
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: |
-        mkdir -p ${{github.workspace}}/ws/src
-        ln -s ${{github.workspace}}/repo ${{github.workspace}}/ws/src/darknet_ros
+        path: src/darknet_ros 
 
     - name: rosdep install
-      working-directory: ${{github.workspace}}/ws
-      shell: bash
       run: |
-        source /opt/ros/$ROS_DISTRO/setup.bash
         rosdep update
         rosdep install --from-paths src --ignore-src -r -y
 
     - name: catkin_make
-      working-directory: ${{github.workspace}}/ws
-      shell: bash
       run: |
-        source /opt/ros/$ROS_DISTRO/setup.bash
         catkin_make -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: catkin_make run_tests
-      working-directory: ${{github.workspace}}/ws
-      shell: bash
       run: |
-        source /opt/ros/$ROS_DISTRO/setup.bash
         catkin_make run_tests
 
