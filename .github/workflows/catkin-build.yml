@@ -32,4 +32,4 @@ jobs:
       shell: bash
       run: |
         source /opt/ros/$ROS_DISTRO/setup.bash
-        catkin build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        catkin_make -DCMAKE_BUILD_TYPE=$BUILD_TYPE
