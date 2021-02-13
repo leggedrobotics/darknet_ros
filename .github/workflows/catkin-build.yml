@@ -11,6 +11,12 @@ jobs:
     container: ros:melodic
 
     steps:
+    - name: update git
+      run: |
+        add-apt-repository ppa:git-core/ppa
+        apt-get update
+        apt-get install git
+
     - uses: actions/checkout@v2
       with:
         path: src/darknet_ros 
