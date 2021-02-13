@@ -1,0 +1,19 @@
+name: Build
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ros:melodic
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Build
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: catkin build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
