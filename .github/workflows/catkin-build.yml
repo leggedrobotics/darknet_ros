@@ -14,6 +14,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: src/darknet_ros 
+        submodules: 'recursive'
 
     - name: rosdep install
       run: |
