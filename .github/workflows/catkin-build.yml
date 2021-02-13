@@ -17,5 +17,5 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
-        source /opt/ros/noetic/setup.bash
+        source /opt/ros/$ROS_DISTRO/setup.bash
         catkin build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
