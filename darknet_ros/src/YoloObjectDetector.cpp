@@ -202,6 +202,7 @@ void YoloObjectDetector::checkForObjectsActionGoalCB() {
   if (cam_image) {
     {
       boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+      imageHeader_ = msg->header;  
       camImageCopy_ = cam_image->image.clone();
     }
     {
@@ -486,53 +487,64 @@ void YoloObjectDetector::yolo() {
   demoTime_ = what_time_is_it_now();
   // TODO: see issue of bounding boxes calculated multiple times per image: https://github.com/leggedrobotics/darknet_ros/issues/150
   // Fix0: keep track of what std_msgs::Header id this is (consecutively increasing)
-  int prevSeq_ = 0;
+  std::uint32_t prevSeq_ = 0;
+  bool newImageForDetection = false;
+  bool hasDetectionsReady = false;
   while (!demoDone_)
   {
-    buffIndex_ = (buffIndex_ + 1) % 3;
-    fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
+      buffIndex_ = (buffIndex_ + 1) % 3;
+      // Fix1: check this isn't an image already seen
+      newImageForDetection = (prevSeq_ != headerBuff_[(buffIndex_ + 2) % 3].seq);
 
-    // Fix1: check this isn't an image already seen
-    if (prevSeq_ != headerBuff_[buffIndex_].seq)
-    {
-      // Fix2: only detect if this is an image we haven't see before
-      detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+      fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
+      if (newImageForDetection)
+      {
+          // Fix2: only detect if this is an image we haven't see before
+          detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
+      }
 
-      if (!demoPrefix_)
+      // only publish bounding boxes if detection has been done in the last iteration
+      if (hasDetectionsReady)
       {
-        fps_ = 1. / (what_time_is_it_now() - demoTime_);
-        demoTime_ = what_time_is_it_now();
-        if (viewImage_)
-        {
-          displayInThread(0);
-        }
-        else
-        {
-          generate_image(buff_[(buffIndex_ + 1) % 3], ipl_);
-        }
-        publishInThread();
+          if (!demoPrefix_)
+          {
+              fps_ = 1. / (what_time_is_it_now() - demoTime_);
+              demoTime_ = what_time_is_it_now();
+              if (viewImage_)
+              {
+                  displayInThread(0);
+              }
+              else
+              {
+                  generate_image(buff_[(buffIndex_ + 1) % 3], ipl_);
+              }
+              publishInThread();
+          }
+          else
+          {
+              char name[256];
+              sprintf(name, "%s_%08d", demoPrefix_, count);
+              save_image(buff_[(buffIndex_ + 1) % 3], name);
+              ++count;
+          }
+          // state that the image has been published
+          hasDetectionsReady = false;
       }
-      else
+
+      fetch_thread.join();
+      if (newImageForDetection)
       {
-        char name[256];
-        sprintf(name, "%s_%08d", demoPrefix_, count);
-        save_image(buff_[(buffIndex_ + 1) % 3], name);
+          // Fix3: increment the new sequence number to avoid detecting more than once
+          prevSeq_ = headerBuff_[(buffIndex_ + 2) % 3].seq;
+          // Fix4: no detection made, so let thread execution complete so that it can be destroyed safely
+          detect_thread.join();
+          // only after the detect thread is joined, set this flag to true
+          hasDetectionsReady = true;
       }
-      // Fix3: increment the new sequence number to avoid detecting more than once
-      prevSeq_ = headerBuff_[buffIndex_].seq;
-      fetch_thread.join();
-      detect_thread.join();
-      ++count;
-    }
-    else
-    {
-      // Fix4: no detection made, so let thread execution complete so that it can be destroyed safely
-      fetch_thread.join();
-    }
-    if (!isNodeRunning())
-    {
-      demoDone_ = true;
-    }
+      if (!isNodeRunning())
+      {
+          demoDone_ = true;
+      }
   }
 }
 
