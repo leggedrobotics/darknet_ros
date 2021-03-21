@@ -191,8 +191,8 @@ TEST(ObjectDetection, DISABLED_DetectPerson) {
   pathToTestImage += "person";
   pathToTestImage += ".jpg";
 
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
-  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage, 1));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage, 2));
 
   // Evaluate if yolo was able to detect the person.
   bool detectedPerson = false;
