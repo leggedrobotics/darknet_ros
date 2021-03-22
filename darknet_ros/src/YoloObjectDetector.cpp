@@ -485,21 +485,20 @@ void YoloObjectDetector::yolo() {
   }
 
   demoTime_ = what_time_is_it_now();
-  // TODO: see issue of bounding boxes calculated multiple times per image: https://github.com/leggedrobotics/darknet_ros/issues/150
-  // Fix0: keep track of what std_msgs::Header id this is (consecutively increasing)
+  // keep track of what std_msgs::Header id this is (consecutively increasing)
   std::uint32_t prevSeq_ = 0;
   bool newImageForDetection = false;
   bool hasDetectionsReady = false;
   while (!demoDone_)
   {
       buffIndex_ = (buffIndex_ + 1) % 3;
-      // Fix1: check this isn't an image already seen
+      // check this isn't an image already seen
       newImageForDetection = (prevSeq_ != headerBuff_[(buffIndex_ + 2) % 3].seq);
 
       fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
       if (newImageForDetection)
       {
-          // Fix2: only detect if this is an image we haven't see before
+          // only detect if this is an image we haven't see before
           detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
       }
 
@@ -534,9 +533,9 @@ void YoloObjectDetector::yolo() {
       fetch_thread.join();
       if (newImageForDetection)
       {
-          // Fix3: increment the new sequence number to avoid detecting more than once
+          // increment the new sequence number to avoid detecting more than once
           prevSeq_ = headerBuff_[(buffIndex_ + 2) % 3].seq;
-          // Fix4: no detection made, so let thread execution complete so that it can be destroyed safely
+          // no detection made, so let thread execution complete so that it can be destroyed safely
           detect_thread.join();
           // only after the detect thread is joined, set this flag to true
           hasDetectionsReady = true;
