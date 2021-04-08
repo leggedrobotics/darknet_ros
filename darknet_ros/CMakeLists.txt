@@ -128,7 +128,7 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
     ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c
     ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c
-    ${DARKNET_PATH}/examples/go.c                 ${DARKNET_PATH}/examples/go.c
+    ${DARKNET_PATH}/examples/go.c
 )
 
 set(DARKNET_CUDA_FILES
