@@ -7,8 +7,11 @@ env:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        container: [ros:melodic, ros:noetic]
     runs-on: ubuntu-20.04
-    container: ros:melodic
+    container: ${{ matrix.container }}
 
     steps:
     - name: update git
