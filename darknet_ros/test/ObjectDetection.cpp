@@ -154,7 +154,8 @@ TEST(ObjectDetection, DetectANYmal) {
   pathToTestImage += "quadruped_anymal_and_person";
   pathToTestImage += ".JPG";
 
-  // Send dog image to yolo.
+  // Send ANYmal and person image to yolo.
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
   ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
   ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage));
 
