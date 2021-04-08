@@ -23,12 +23,7 @@ if (CUDA_FOUND)
     CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
     -O3
-    -gencode arch=compute_30,code=sm_30
-    -gencode arch=compute_35,code=sm_35
-    -gencode arch=compute_50,code=[sm_50,compute_50]
     -gencode arch=compute_52,code=[sm_52,compute_52]
-    -gencode arch=compute_61,code=sm_61
-    -gencode arch=compute_62,code=sm_62
   )
   add_definitions(-DGPU)
 else()
@@ -92,7 +87,7 @@ include_directories(
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.c
+    src/YoloObjectDetector.cpp                    src/image_interface.cpp
 )
 
 set(DARKNET_CORE_FILES
@@ -118,16 +113,17 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/src/gru_layer.c               ${DARKNET_PATH}/src/utils.c
     ${DARKNET_PATH}/src/upsample_layer.c          ${DARKNET_PATH}/src/logistic_layer.c
     ${DARKNET_PATH}/src/l2norm_layer.c            ${DARKNET_PATH}/src/yolo_layer.c
+    ${DARKNET_PATH}/src/iseg_layer.c              ${DARKNET_PATH}/src/image_opencv.cpp
 
     ${DARKNET_PATH}/examples/art.c                ${DARKNET_PATH}/examples/lsd.c
-    ${DARKNET_PATH}/examples/attention.c          ${DARKNET_PATH}/examples/nightmare.c
+    ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/instance-segmenter.c
     ${DARKNET_PATH}/examples/captcha.c            ${DARKNET_PATH}/examples/regressor.c
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
     ${DARKNET_PATH}/examples/coco.c               ${DARKNET_PATH}/examples/super.c
     ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c
     ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c
-    ${DARKNET_PATH}/examples/go.c
+    ${DARKNET_PATH}/examples/go.c                 ${DARKNET_PATH}/examples/go.c
 )
 
 set(DARKNET_CUDA_FILES
