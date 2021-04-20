@@ -469,7 +469,6 @@ void YoloObjectDetector::yolo() {
   disp_ = image_to_mat(buff_[0]);
 
   int count = 0;
-
   if (!demoPrefix_ && viewImage_) {
     cv::namedWindow("YOLO", cv::WINDOW_NORMAL);
     if (fullScreen_) {

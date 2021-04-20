@@ -158,6 +158,7 @@ TEST(ObjectDetection, DetectANYmal) {
   // Send dog image to yolo.
   ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage, 1));
   ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage, 2));
+  ASSERT_TRUE(sendImageToYolo(nodeHandle, pathToTestImage, 3));
 
   // Evaluate if yolo was able to detect the three objects: dog, bicycle and car.
   bool detectedPerson = false;
