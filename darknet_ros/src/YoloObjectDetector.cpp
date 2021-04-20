@@ -170,12 +170,12 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
 
   if (cam_image) {
     {
-      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_, boost::try_to_lock);
       imageHeader_ = cam_image->header;
       camImageCopy_ = cam_image->image.clone();
     }
     {
-      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_, boost::try_to_lock);
       imageStatus_ = true;
     }
     frameWidth_ = cam_image->image.size().width;
@@ -201,16 +201,16 @@ void YoloObjectDetector::checkForObjectsActionGoalCB() {
 
   if (cam_image) {
     {
-      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_, boost::try_to_lock);
       imageHeader_ = cam_image->header;  
       camImageCopy_ = cam_image->image.clone();
     }
     {
-      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexActionStatus_);
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexActionStatus_, boost::try_to_lock);
       actionId_ = imageActionPtr->id;
     }
     {
-      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_, boost::try_to_lock);
       imageStatus_ = true;
     }
     frameWidth_ = cam_image->image.size().width;
