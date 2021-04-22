@@ -1,7 +1,7 @@
 /*
  * YoloObjectDetector.cpp
  *
- *  Created on: Dec 19, 2016
+ *  Created on: Dec 19, 2016y
  *      Author: Marko Bjelonic
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
@@ -170,8 +170,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
 
   if (cam_image) {
     {
-      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_, boost::try_to_lock);
-      if (!lockImageCallback) return;
+      boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
       imageHeader_ = msg->header;
       camImageCopy_ = cam_image->image.clone();
     }
