@@ -369,6 +369,7 @@ void* YoloObjectDetector::fetchInThread() {
   {
     boost::shared_lock<boost::shared_mutex> lock(mutexImageCallback_);
     CvMatWithHeader_ imageAndHeader = getCvMatWithHeader();
+    free_image(buff_[buffIndex_]);
     buff_[buffIndex_] = mat_to_image(imageAndHeader.image);
     headerBuff_[buffIndex_] = imageAndHeader.header;
     buffId_[buffIndex_] = actionId_;
