@@ -11,7 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
   darknet_ros_share_dir = get_package_share_directory('darknet_ros')
 
-  image = LaunchConfiguration('image', default = '/camera/rgb/image_raw')
+  image = LaunchConfiguration('image', default = 'image_raw')
   yolo_weights_path = LaunchConfiguration('yolo_weights_path', default = darknet_ros_share_dir + '/yolo_network_config/weights')
   yolo_config_path = LaunchConfiguration('yolo_config_path', default = darknet_ros_share_dir + '/yolo_network_config/cfg')
   ros_param_file = LaunchConfiguration('ros_param_file', default = darknet_ros_share_dir + 'config/ros.yaml')
@@ -19,7 +19,7 @@ def generate_launch_description():
 
   declare_image_cmd = DeclareLaunchArgument(
     'image',
-    default_value = '/camera/rgb/image_raw',
+    default_value = '/image_raw',
     description = 'Image topic')
   declare_yolo_weights_path_cmd = DeclareLaunchArgument(
     'yolo_weights_path',

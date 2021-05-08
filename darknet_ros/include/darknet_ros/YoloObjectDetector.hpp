@@ -53,13 +53,29 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "darknet_ros/image_interface.h"
+#include "blas.h"
+#include "image_opencv.h"
+
+#include "image.h"
+// #include "demo.h"
+#include "darknet.h"
+
+#include "darknet_ros/image_interface.hpp"
+
 #include <sys/time.h>
 }
 
-extern "C" void ipl_into_image(IplImage* src, image im);
-extern "C" image ipl_to_image(IplImage* src);
-extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
+// extern "C" void ipl_into_image(IplImage* src, image im);
+// extern "C" image ipl_to_image(IplImage* src);
+// extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
+
+extern "C" cv::Mat image_to_mat(image im);
+extern "C" image mat_to_image(cv::Mat m);
+extern "C" void show_image(image p, const char* name);
+
+extern "C" void draw_detections_cv_v3(mat_cv* show_img, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
+
+extern "C" void generate_image(image p, cv::Mat& disp);
 
 namespace darknet_ros {
 
@@ -70,11 +86,16 @@ typedef struct
   int num, Class;
 } RosBox_;
 
-typedef struct
-{
-  IplImage* image;
+// typedef struct
+// {
+//   IplImage* image;
+//   std_msgs::msg::Header header;
+// } IplImageWithHeader_;
+
+typedef struct {
+  cv::Mat image;
   std_msgs::msg::Header header;
-} IplImageWithHeader_;
+} CvMatWithHeader;
 
 class YoloObjectDetector : public rclcpp::Node
 {
@@ -187,7 +208,8 @@ class YoloObjectDetector : public rclcpp::Node
   image buffLetter_[3];
   int buffId_[3];
   int buffIndex_ = 0;
-  IplImage * ipl_;
+  // IplImage * ipl_;
+  cv::Mat disp_;
   float fps_ = 0;
   float demoThresh_ = 0;
   float demoHier_ = .5;
@@ -249,13 +271,17 @@ class YoloObjectDetector : public rclcpp::Node
 
   void yolo();
 
-  IplImageWithHeader_ getIplImageWithHeader();
+  // IplImageWithHeader_ getIplImageWithHeader();
+  CvMatWithHeader getCvMatWithHeader();
 
   bool getImageStatus(void);
 
   bool isNodeRunning(void);
 
   void *publishInThread();
+
+  void generate_image(image p, cv::Mat& disp);
+  
 };
 
 } /* namespace darknet_ros*/
