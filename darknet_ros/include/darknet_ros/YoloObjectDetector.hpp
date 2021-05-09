@@ -60,7 +60,7 @@ extern "C" {
 // #include "demo.h"
 #include "darknet.h"
 
-#include "darknet_ros/image_interface.hpp"
+#include "image_interface.hpp"
 
 #include <sys/time.h>
 }
@@ -269,9 +269,7 @@ class YoloObjectDetector : public rclcpp::Node
   bool isNodeRunning(void);
 
   void *publishInThread();
-
-  void generate_image(image p, cv::Mat& disp);
-  
+  void generate_image_cp(image p, cv::Mat& disp);
 };
 
 } /* namespace darknet_ros*/

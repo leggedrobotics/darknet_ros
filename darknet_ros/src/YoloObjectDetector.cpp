@@ -614,8 +614,7 @@ void YoloObjectDetector::yolo()
       if (viewImage_) {
         displayInThread(0);
       } else {
-        // generate_image_cp(buff_[(buffIndex_ + 1)%3], ipl_);
-        generate_image(buff_[(buffIndex_ + 1) % 3], disp_);
+        generate_image_cp(buff_[(buffIndex_ + 1)%3], disp_);
       }
       publishInThread();
     } else {
@@ -726,7 +725,7 @@ void *YoloObjectDetector::publishInThread()
   return 0;
 }
 
-void YoloObjectDetector::generate_image(image p, cv::Mat& disp) {
+void YoloObjectDetector::generate_image_cp(image p, cv::Mat& disp) {
   int x, y, k;
   if (p.c == 3) rgbgr_image(p);
   // normalize_image(copy);
@@ -740,6 +739,5 @@ void YoloObjectDetector::generate_image(image p, cv::Mat& disp) {
     }
   }
 }
-
 
 } /* namespace darknet_ros*/
