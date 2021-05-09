@@ -6,14 +6,18 @@
  *   Institute: ETH Zurich, Robotic Systems Lab
  */
 
-#ifndef IMAGE_INTERFACE_H
-#define IMAGE_INTERFACE_H
+#ifndef IMAGE_INTERFACE_HPP
+#define IMAGE_INTERFACE_HPP
+
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv2/imgproc/imgproc_c.h"
+#include "opencv2/core/version.hpp"
 
 #include "image.h"
 #include "opencv2/opencv.hpp"
 
 static float get_pixel(image m, int x, int y, int c);
-image** load_alphabet_with_file(char* datafile);
+image **load_alphabet_with_file(char *datafile);
 void generate_image(image p, cv::Mat& disp);
 
 #endif

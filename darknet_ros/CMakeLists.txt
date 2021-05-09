@@ -1,10 +1,7 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.5)
 project(darknet_ros)
 
-# Set c++11 cmake flags
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_C_FLAGS "-Wall -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable -Wfatal-errors -fPIC ${CMAKE_C_FLAGS}")
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 17)
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -23,8 +20,8 @@ if (CUDA_FOUND)
     CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
     -O3
-    -gencode arch=compute_30,code=sm_30
-    -gencode arch=compute_35,code=sm_35
+    # -gencode arch=compute_30,code=sm_30
+    # -gencode arch=compute_35,code=sm_35
     -gencode arch=compute_50,code=[sm_50,compute_50]
     -gencode arch=compute_52,code=[sm_52,compute_52]
     -gencode arch=compute_61,code=sm_61
@@ -46,25 +43,42 @@ if ( X11_FOUND )
 endif ( X11_FOUND )
 
 # Find rquired packeges
-find_package(Boost REQUIRED COMPONENTS thread)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-find_package(catkin REQUIRED
-  COMPONENTS
-    cv_bridge
-    roscpp
-    rospy
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(darknet_ros_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+
+set(dependencies
+    rclcpp
+    rclpy
+    rclcpp_action
     std_msgs
-    actionlib
-    darknet_ros_msgs
     image_transport
+<<<<<<< HEAD
+    cv_bridge
+    sensor_msgs
+    darknet_ros_msgs
+    ament_index_cpp
+=======
     nodelet
+>>>>>>> origin/master
 )
 
 # Enable OPENCV in darknet
-add_definitions(-DOPENCV)
+# add_definitions(-DOPENCV)
 add_definitions(-O4 -g)
 
+<<<<<<< HEAD
+=======
 catkin_package(
   INCLUDE_DIRS
     include
@@ -83,16 +97,62 @@ catkin_package(
     Boost
 )
 
+>>>>>>> origin/master
 include_directories(
   ${DARKNET_PATH}/src
   ${DARKNET_PATH}/include
+  ${DARKNET_PATH}/3rdparty/stb/include
   include
-  ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
 set(PROJECT_LIB_FILES
     src/YoloObjectDetector.cpp                    src/image_interface.cpp
+<<<<<<< HEAD
+    src/yolo_object_detector_node.cpp
+)
+
+set(DARKNET_CORE_FILES
+
+    ${DARKNET_PATH}/src/activation_layer.c        ${DARKNET_PATH}/src/activations.c
+    ${DARKNET_PATH}/src/art.c                     ${DARKNET_PATH}/src/avgpool_layer.c
+    ${DARKNET_PATH}/src/batchnorm_layer.c         ${DARKNET_PATH}/src/blas.c
+    ${DARKNET_PATH}/src/box.c                     ${DARKNET_PATH}/src/captcha.c
+    ${DARKNET_PATH}/src/cifar.c                   ${DARKNET_PATH}/src/classifier.c
+    ${DARKNET_PATH}/src/coco.c                    ${DARKNET_PATH}/src/col2im.c
+    ${DARKNET_PATH}/src/compare.c                 ${DARKNET_PATH}/src/connected_layer.c
+    ${DARKNET_PATH}/src/conv_lstm_layer.c         ${DARKNET_PATH}/src/convolutional_layer.c
+    ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/cpu_gemm.c
+    ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/crop_layer.c
+    ${DARKNET_PATH}/src/dark_cuda.c               ${DARKNET_PATH}/src/darknet.c
+    ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/deconvolutional_layer.c
+    ${DARKNET_PATH}/src/demo.c                    ${DARKNET_PATH}/src/detection_layer.c
+    ${DARKNET_PATH}/src/detector.c                ${DARKNET_PATH}/src/dice.c
+    ${DARKNET_PATH}/src/dropout_layer.c           ${DARKNET_PATH}/src/gaussian_yolo_layer.c
+    ${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/getopt.c
+    ${DARKNET_PATH}/src/gettimeofday.c            ${DARKNET_PATH}/src/go.c
+    ${DARKNET_PATH}/src/gru_layer.c               ${DARKNET_PATH}/src/http_stream.cpp
+    ${DARKNET_PATH}/src/im2col.c                  ${DARKNET_PATH}/src/image.c
+    ${DARKNET_PATH}/src/image_opencv.cpp          ${DARKNET_PATH}/src/layer.c
+    ${DARKNET_PATH}/src/list.c                    ${DARKNET_PATH}/src/local_layer.c
+    ${DARKNET_PATH}/src/lstm_layer.c              ${DARKNET_PATH}/src/matrix.c
+    ${DARKNET_PATH}/src/maxpool_layer.c           ${DARKNET_PATH}/src/network.c
+    ${DARKNET_PATH}/src/nightmare.c               ${DARKNET_PATH}/src/normalization_layer.c
+    ${DARKNET_PATH}/src/option_list.c             ${DARKNET_PATH}/src/parser.c
+    ${DARKNET_PATH}/src/region_layer.c            ${DARKNET_PATH}/src/reorg_layer.c
+    ${DARKNET_PATH}/src/reorg_old_layer.c         ${DARKNET_PATH}/src/rnn.c
+    ${DARKNET_PATH}/src/rnn_layer.c               ${DARKNET_PATH}/src/rnn_vid.c
+    ${DARKNET_PATH}/src/route_layer.c             ${DARKNET_PATH}/src/sam_layer.c
+    ${DARKNET_PATH}/src/scale_channels_layer.c    ${DARKNET_PATH}/src/shortcut_layer.c
+    ${DARKNET_PATH}/src/softmax_layer.c           ${DARKNET_PATH}/src/super.c
+    ${DARKNET_PATH}/src/swag.c                    ${DARKNET_PATH}/src/tag.c
+    ${DARKNET_PATH}/src/tree.c                    ${DARKNET_PATH}/src/upsample_layer.c
+    ${DARKNET_PATH}/src/utils.c                   ${DARKNET_PATH}/src/voxel.c
+    ${DARKNET_PATH}/src/writing.c                 ${DARKNET_PATH}/src/yolo.c
+    ${DARKNET_PATH}/src/yolo_layer.c
+    # ${DARKNET_PATH}/src/yolo_v2_class.cpp 
+    # ${DARKNET_PATH}/src/yolo_console_dll.cpp 
+=======
 )
 
 set(DARKNET_CORE_FILES
@@ -129,15 +189,20 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/examples/darknet.c            ${DARKNET_PATH}/examples/tag.c
     ${DARKNET_PATH}/examples/detector.c           ${DARKNET_PATH}/examples/yolo.c
     ${DARKNET_PATH}/examples/go.c
+>>>>>>> origin/master
 )
 
 set(DARKNET_CUDA_FILES
-    ${DARKNET_PATH}/src/activation_kernels.cu     ${DARKNET_PATH}/src/crop_layer_kernels.cu
-    ${DARKNET_PATH}/src/avgpool_layer_kernels.cu  ${DARKNET_PATH}/src/deconvolutional_kernels.cu
-    ${DARKNET_PATH}/src/blas_kernels.cu           ${DARKNET_PATH}/src/dropout_layer_kernels.cu
-    ${DARKNET_PATH}/src/col2im_kernels.cu         ${DARKNET_PATH}/src/im2col_kernels.cu
-    ${DARKNET_PATH}/src/convolutional_kernels.cu  ${DARKNET_PATH}/src/maxpool_layer_kernels.cu
+
+    ${DARKNET_PATH}/src/activation_kernels.cu       ${DARKNET_PATH}/src/avgpool_layer_kernels.cu
+    ${DARKNET_PATH}/src/blas_kernels.cu             ${DARKNET_PATH}/src/col2im_kernels.cu
+    ${DARKNET_PATH}/src/convolutional_kernels.cu    ${DARKNET_PATH}/src/crop_layer_kernels.cu
+    ${DARKNET_PATH}/src/deconvolutional_kernels.cu  ${DARKNET_PATH}/src/dropout_layer_kernels.cu
+    ${DARKNET_PATH}/src/im2col_kernels.cu           ${DARKNET_PATH}/src/maxpool_layer_kernels.cu
+    ${DARKNET_PATH}/src/network_kernels.cu
 )
+
+set_source_files_properties(${PROJECT_LIB_FILES} PROPERTIES LANGUAGE CXX)
 
 if (CUDA_FOUND)
 
@@ -149,6 +214,8 @@ if (CUDA_FOUND)
     ${PROJECT_LIB_FILES} ${DARKNET_CORE_FILES}
     ${DARKNET_CUDA_FILES}
   )
+  
+  ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
 
   target_link_libraries(${PROJECT_NAME}_lib
     cuda
@@ -160,6 +227,8 @@ if (CUDA_FOUND)
   cuda_add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
   )
+  
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
   cuda_add_library(${PROJECT_NAME}_nodelet
     src/yolo_object_detector_nodelet.cpp
@@ -167,13 +236,20 @@ if (CUDA_FOUND)
 
 else()
 
-  add_library(${PROJECT_NAME}_lib
-    ${PROJECT_LIB_FILES} ${DARKNET_CORE_FILES}
+  add_library(${PROJECT_NAME}_core_lib
+    ${DARKNET_CORE_FILES}
   )
+
+  add_library(${PROJECT_NAME}_lib
+    ${PROJECT_LIB_FILES}
+  )
+  ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
+  target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
 
   add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
   )
+  ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
   add_library(${PROJECT_NAME}_nodelet
     src/yolo_object_detector_nodelet.cpp
@@ -185,16 +261,24 @@ target_link_libraries(${PROJECT_NAME}_lib
   m
   pthread
   stdc++
-  ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
+target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
 
 target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
+  # ${PROJECT_NAME}_core_lib
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DOPENCV)
 
+<<<<<<< HEAD
+install(TARGETS ${PROJECT_NAME}_lib ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+=======
 target_link_libraries(${PROJECT_NAME}_nodelet
   ${PROJECT_NAME}_lib
 )
@@ -207,16 +291,15 @@ install(TARGETS ${PROJECT_NAME}_lib
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+>>>>>>> origin/master
 )
 
-install(TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 install(
-  DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DIRECTORY include/
+  DESTINATION include/
   FILES_MATCHING PATTERN "*.h"
+  # FILES_MATCHING PATTERN "*.hpp"
 )
 
 install(DIRECTORY config launch yolo_network_config
@@ -240,11 +323,22 @@ if (NOT EXISTS "${FILE}")
   execute_process(COMMAND wget -q https://github.com/leggedrobotics/darknet_ros/releases/download/1.1.4/yolov3.weights -P ${PATH})
 endif()
 
+install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
+install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
+
+# Download yolov4.weights
+set(FILE "${PATH}/yolov4.weights")
+message(STATUS "Checking and downloading yolov4.weights if needed ...")
+if (NOT EXISTS "${FILE}")
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
+endif()
+
 #############
 ## Testing ##
 #############
 
-if(CATKIN_ENABLE_TESTING)
+if(BUILD_TESTING)
   # Download yolov2.weights
   set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
   set(FILE "${PATH}/yolov2.weights")
@@ -254,19 +348,30 @@ if(CATKIN_ENABLE_TESTING)
     execute_process(COMMAND wget -q https://github.com/leggedrobotics/darknet_ros/releases/download/1.1.4/yolov2.weights -P ${PATH})
   endif()
 
-  find_package(rostest REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 
-  # Object detection in images.
-  add_rostest_gtest(${PROJECT_NAME}_object_detection-test
-    test/object_detection.test
-    test/test_main.cpp
-    test/ObjectDetection.cpp
-  )
-  target_link_libraries(${PROJECT_NAME}_object_detection-test
-    ${catkin_LIBRARIES}
-  )
+  find_package(ament_cmake_gtest REQUIRED)
+  
+  #ament_add_gtest(${PROJECT_NAME}_object_detection-test
+  #  test/object_detection.test
+  #  test/test_main.cpp
+  #  test/ObjectDetection.cpp
+  #)
+  #target_link_libraries(${PROJECT_NAME}_object_detection-test
+  #  ${PROJECT_NAME}_lib
+  #)
 endif()
 
+<<<<<<< HEAD
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME}_lib)
+ament_export_libraries(${PROJECT_NAME}_core_lib)
+ament_export_dependencies(${dependencies})
+
+ament_package()
+=======
 #########################
 ###   CLANG TOOLING   ###
 #########################
@@ -280,3 +385,4 @@ if (cmake_clang_tools_FOUND)
     CF_WERROR
   )
 endif (cmake_clang_tools_FOUND)
+>>>>>>> origin/master
