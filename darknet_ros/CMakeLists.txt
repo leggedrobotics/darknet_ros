@@ -235,6 +235,14 @@ endif()
 install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
 
+# Download yolov4.weights
+set(FILE "${PATH}/yolov4.weights")
+message(STATUS "Checking and downloading yolov4.weights if needed ...")
+if (NOT EXISTS "${FILE}")
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
+endif()
+
 #############
 ## Testing ##
 #############

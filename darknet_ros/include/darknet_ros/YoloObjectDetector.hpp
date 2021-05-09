@@ -65,15 +65,11 @@ extern "C" {
 #include <sys/time.h>
 }
 
-// extern "C" void ipl_into_image(IplImage* src, image im);
-// extern "C" image ipl_to_image(IplImage* src);
-// extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
-
 extern "C" cv::Mat image_to_mat(image im);
 extern "C" image mat_to_image(cv::Mat m);
-extern "C" void show_image(image p, const char* name);
+// extern "C" void show_image(image p, const char* name);
 
-extern "C" void draw_detections_cv_v3(mat_cv* show_img, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
+// extern "C" void draw_detections_cv_v3(mat_cv* show_img, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
 
 extern "C" void generate_image(image p, cv::Mat& disp);
 
@@ -86,16 +82,10 @@ typedef struct
   int num, Class;
 } RosBox_;
 
-// typedef struct
-// {
-//   IplImage* image;
-//   std_msgs::msg::Header header;
-// } IplImageWithHeader_;
-
 typedef struct {
   cv::Mat image;
   std_msgs::msg::Header header;
-} CvMatWithHeader;
+} CvMatWithHeader_;
 
 class YoloObjectDetector : public rclcpp::Node
 {
@@ -272,7 +262,7 @@ class YoloObjectDetector : public rclcpp::Node
   void yolo();
 
   // IplImageWithHeader_ getIplImageWithHeader();
-  CvMatWithHeader getCvMatWithHeader();
+  CvMatWithHeader_ getCvMatWithHeader();
 
   bool getImageStatus(void);
 
