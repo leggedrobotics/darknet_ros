@@ -20,10 +20,10 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 
 namespace darknet_ros {
 
-char* cfg;
-char* weights;
-char* data;
-char** detectionNames;
+char *cfg;
+char *weights;
+char *data;
+char **detectionNames;
 
 YoloObjectDetector::YoloObjectDetector()
     : Node("darknet_ros"),
@@ -63,7 +63,8 @@ YoloObjectDetector::YoloObjectDetector()
   declare_parameter("actions.camera_reading.topic", std::string("check_for_objects"));
 }
 
-YoloObjectDetector::~YoloObjectDetector() {
+YoloObjectDetector::~YoloObjectDetector()
+{
   {
     std::unique_lock<std::shared_mutex> lockNodeStatus(mutexNodeStatus_);
     isNodeRunning_ = false;
@@ -71,7 +72,8 @@ YoloObjectDetector::~YoloObjectDetector() {
   yoloThread_.join();
 }
 
-bool YoloObjectDetector::readParameters() {
+bool YoloObjectDetector::readParameters()
+{
   // Load common parameters.
   get_parameter("image_view.enable_opencv", viewImage_);
   get_parameter("image_view.wait_key_delay", waitKeyDelay_);
@@ -137,14 +139,15 @@ void YoloObjectDetector::init()
   strcpy(data, dataPath.c_str());
 
   // Get classes.
-  detectionNames = (char**)realloc((void*)detectionNames, (numClasses_ + 1) * sizeof(char*));
+  detectionNames = (char**) realloc((void*) detectionNames, (numClasses_ + 1) * sizeof(char*));
   for (int i = 0; i < numClasses_; i++) {
     detectionNames[i] = new char[classLabels_[i].length() + 1];
     strcpy(detectionNames[i], classLabels_[i].c_str());
   }
 
   // Load network.
-  setupNetwork(cfg, weights, data, thresh, detectionNames, numClasses_, 0, 0, 1, 0.5, 0, 0, 0, 0);
+  setupNetwork(cfg, weights, data, thresh, detectionNames, numClasses_,
+                0, 0, 1, 0.5, 0, 0, 0, 0);
   yoloThread_ = std::thread(&YoloObjectDetector::yolo, this);
 
   // Initialize publisher and subscriber.
@@ -322,37 +325,39 @@ int YoloObjectDetector::sizeNetwork(network *net)
 {
   int i;
   int count = 0;
-  for (i = 0; i < net->n; ++i) {
+  for(i = 0; i < net->n; ++i){
     layer l = net->layers[i];
-    if (l.type == YOLO || l.type == REGION || l.type == DETECTION) {
+    if(l.type == YOLO || l.type == REGION || l.type == DETECTION){
       count += l.outputs;
     }
   }
   return count;
 }
 
-void YoloObjectDetector::rememberNetwork(network* net) {
+void YoloObjectDetector::rememberNetwork(network *net)
+{
   int i;
   int count = 0;
-  for (i = 0; i < net->n; ++i) {
+  for(i = 0; i < net->n; ++i){
     layer l = net->layers[i];
-    if (l.type == YOLO || l.type == REGION || l.type == DETECTION) {
+    if(l.type == YOLO || l.type == REGION || l.type == DETECTION){
       memcpy(predictions_[demoIndex_] + count, net->layers[i].output, sizeof(float) * l.outputs);
       count += l.outputs;
     }
   }
 }
 
-detection* YoloObjectDetector::avgPredictions(network* net, int* nboxes) {
+detection *YoloObjectDetector::avgPredictions(network *net, int *nboxes)
+{
   int i, j;
   int count = 0;
   fill_cpu(demoTotal_, 0, avg_, 1);
-  for (j = 0; j < demoFrame_; ++j) {
-    axpy_cpu(demoTotal_, 1. / demoFrame_, predictions_[j], 1, avg_, 1);
+  for(j = 0; j < demoFrame_; ++j){
+    axpy_cpu(demoTotal_, 1./demoFrame_, predictions_[j], 1, avg_, 1);
   }
-  for (i = 0; i < net->n; ++i) {
+  for(i = 0; i < net->n; ++i){
     layer l = net->layers[i];
-    if (l.type == YOLO || l.type == REGION || l.type == DETECTION) {
+    if(l.type == YOLO || l.type == REGION || l.type == DETECTION){
       memcpy(l.output, avg_ + count, sizeof(float) * l.outputs);
       count += l.outputs;
     }
@@ -362,7 +367,8 @@ detection* YoloObjectDetector::avgPredictions(network* net, int* nboxes) {
   return dets;
 }
 
-void* YoloObjectDetector::detectInThread() {
+void *YoloObjectDetector::detectInThread()
+{
   running_ = 1;
   float nms = .4;
   // mat_cv* show_img = NULL;
@@ -372,7 +378,7 @@ void* YoloObjectDetector::detectInThread() {
   float *prediction = network_predict(*net_, X);
 
   rememberNetwork(net_);
-  detection* dets = 0;
+  detection *dets = 0;
   int nboxes = 0;
   dets = avgPredictions(net_, &nboxes);
 
@@ -381,7 +387,7 @@ void* YoloObjectDetector::detectInThread() {
   if (enableConsoleOutput_) {
     printf("\033[2J");
     printf("\033[1;1H");
-    printf("\nFPS:%.1f\n", fps_);
+    printf("\nFPS:%.1f\n",fps_);
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_+2) % 3];
@@ -397,10 +403,14 @@ void* YoloObjectDetector::detectInThread() {
     float ymin = dets[i].bbox.y - dets[i].bbox.h / 2.;
     float ymax = dets[i].bbox.y + dets[i].bbox.h / 2.;
 
-    if (xmin < 0) xmin = 0;
-    if (ymin < 0) ymin = 0;
-    if (xmax > 1) xmax = 1;
-    if (ymax > 1) ymax = 1;
+    if (xmin < 0)
+      xmin = 0;
+    if (ymin < 0)
+      ymin = 0;
+    if (xmax > 1)
+      xmax = 1;
+    if (ymax > 1)
+      ymax = 1;
 
     // iterate through possible boxes and collect the bounding boxes
     for (j = 0; j < demoClasses_; ++j) {
@@ -453,6 +463,7 @@ void* YoloObjectDetector::fetchInThread() {
   return 0;
 }
 
+
 float get_pixel_cp(image m, int x, int y, int c)
 {
     assert(x < m.w && y < m.h && c < m.c);
@@ -465,6 +476,10 @@ void* YoloObjectDetector::displayInThread(void* ptr) {
   show_image_cv(buff_[(buffIndex_ + 1) % 3], "YOLO V4");
   int c = cv::waitKey(waitKeyDelay_);
   if (c != -1) c = c % 256;
+  if (c == 27) {
+    demoDone_ = 1;
+    return 0;
+  } else if (c == 82) {
     demoThresh_ += .02;
   } else if (c == 84) {
     demoThresh_ -= .02;
@@ -486,7 +501,8 @@ void *YoloObjectDetector::displayLoop(void *ptr)
   }
 }
 
-void* YoloObjectDetector::detectLoop(void* ptr) {
+void *YoloObjectDetector::detectLoop(void *ptr)
+{
   while (1) {
     detectInThread();
   }
@@ -527,12 +543,13 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
   demoThresh_ = thresh;
   demoHier_ = hier;
   fullScreen_ = fullscreen;
-  printf("YOLO\n");
+  printf("YOLO V3\n");
   net_ = load_network(cfgfile, weightfile, 0);
   set_batch_network(net_, 1);
 }
 
-void YoloObjectDetector::yolo() {
+void YoloObjectDetector::yolo()
+{
   const auto wait_duration = std::chrono::milliseconds(2000);
   while (!getImageStatus()) {
     printf("Waiting for image.\n");
@@ -549,14 +566,14 @@ void YoloObjectDetector::yolo() {
 
   int i;
   demoTotal_ = sizeNetwork(net_);
-  predictions_ = (float**)calloc(demoFrame_, sizeof(float*));
-  for (i = 0; i < demoFrame_; ++i) {
-    predictions_[i] = (float*)calloc(demoTotal_, sizeof(float));
+  predictions_ = (float **) calloc(demoFrame_, sizeof(float*));
+  for (i = 0; i < demoFrame_; ++i){
+      predictions_[i] = (float *) calloc(demoTotal_, sizeof(float));
   }
-  avg_ = (float*)calloc(demoTotal_, sizeof(float));
+  avg_ = (float *) calloc(demoTotal_, sizeof(float));
 
   layer l = net_->layers[net_->n - 1];
-  roiBoxes_ = (darknet_ros::RosBox_*)calloc(l.w * l.h * l.n, sizeof(darknet_ros::RosBox_));
+  roiBoxes_ = (darknet_ros::RosBox_ *) calloc(l.w * l.h * l.n, sizeof(darknet_ros::RosBox_));
 
   {
     std::shared_lock<std::shared_mutex> lock(mutexImageCallback_);
@@ -592,7 +609,7 @@ void YoloObjectDetector::yolo() {
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
-      fps_ = 1. / (what_time_is_it_now() - demoTime_);
+      fps_ = 1./(what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
       if (viewImage_) {
         displayInThread(0);
@@ -631,7 +648,8 @@ bool YoloObjectDetector::isNodeRunning(void)
   return isNodeRunning_;
 }
 
-void* YoloObjectDetector::publishInThread() {
+void *YoloObjectDetector::publishInThread()
+{
   // Publish image.
   // cv::Mat cvImage = cv::cvarrToMat(ipl_);
   cv::Mat cvImage = disp_;
