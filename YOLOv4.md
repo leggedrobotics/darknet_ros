@@ -8,15 +8,14 @@ Writer: [Ar-Ray](https://github.com/Ar-Ray-code)
 - CUDA 11.2
 - OpenCV4
 
-
-
 ## Installation
 
 ```bash
 $ cd
 $ mkdir -p ros2_ws/src
 $ cd ros2_ws/src
-$ git clone --branch foxy-v4 --recursive https://github.com/Ar-Ray-code/darknet_ros.git
+$ git clone --recursive https://github.com/Ar-Ray-code/darknet_ros.git
+$ darknet_ros/rm_darknet_CMakeLists.sh
 $ source /opt/ros/foxy/setup.bash
 $ cd ~/ros2_ws
 $ colcon build --symlink-install
