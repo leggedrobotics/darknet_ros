@@ -1,7 +1,7 @@
 ---
 name: ⁉️  Compilation and runtime issue
 about: Use this template if you're facing issues running or compiling darknet_ros.
-title: "[QUESTION] ..."
+title: ""
 labels: question
 assignees: ''
 
