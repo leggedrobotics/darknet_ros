@@ -30,14 +30,13 @@ if (CUDA_FOUND)
   add_definitions(-DGPU)
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../darknet/cmake/Modules/" ${CMAKE_MODULE_PATH})
 find_package(CUDNN)
 
 if(CUDNN_FOUND)
     set(ADDITIONAL_CXX_FLAGS "${ADDITIONAL_CXX_FLAGS} -DCUDNN")
 endif()
 
-# =========================================================
 set(CMAKE_CUDA_ARCHITECTURES 75)
 
 if ( 70 IN_LIST CMAKE_CUDA_ARCHITECTURES OR
