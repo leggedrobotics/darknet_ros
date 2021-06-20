@@ -179,7 +179,6 @@ if (CUDA_FOUND)
         cudart
         cublas
         curand
-        cudnn
         CuDNN::CuDNN
       )
       target_compile_definitions(${PROJECT_NAME}_lib PRIVATE
@@ -192,7 +191,6 @@ if (CUDA_FOUND)
         cudart
         cublas
         curand
-        cudnn
         CuDNN::CuDNN
       )
       target_compile_definitions(${PROJECT_NAME}_lib PRIVATE
