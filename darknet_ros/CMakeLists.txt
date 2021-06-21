@@ -25,9 +25,11 @@ message(STATUS "Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
 # Find CUDA ====================================================================
-find_package(CUDA QUIET AND CUDA_ENABLE)
+if(CUDA_ENABLE)
+  find_package(CUDA)
+endif()
+
 if (CUDA_FOUND)
-  find_package(CUDA REQUIRED)
   message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
   message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
   set(
@@ -337,20 +339,20 @@ install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
 ## Testing ##
 #############
 
-if(BUILD_TESTING)
-  # Download yolov2.weights
-  set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
-  set(FILE "${PATH}/yolov2.weights")
-  message(STATUS "Checking and downloading yolov2.weights if needed ...")
-  if (NOT EXISTS "${FILE}")
-    message(STATUS "... file does not exist. Downloading now ...")
-    execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2.weights -P ${PATH})
-  endif()
+# if(BUILD_TESTING)
+#   # Download yolov2.weights
+#   set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
+#   set(FILE "${PATH}/yolov2.weights")
+#   message(STATUS "Checking and downloading yolov2.weights if needed ...")
+#   if (NOT EXISTS "${FILE}")
+#     message(STATUS "... file does not exist. Downloading now ...")
+#     execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2.weights -P ${PATH})
+#   endif()
 
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+#   find_package(ament_lint_auto REQUIRED)
+#   ament_lint_auto_find_test_dependencies()
 
-  find_package(ament_cmake_gtest REQUIRED)
+#   find_package(ament_cmake_gtest REQUIRED)
   
   #ament_add_gtest(${PROJECT_NAME}_object_detection-test
   #  test/object_detection.test
@@ -360,7 +362,7 @@ if(BUILD_TESTING)
   #target_link_libraries(${PROJECT_NAME}_object_detection-test
   #  ${PROJECT_NAME}_lib
   #)
-endif()
+# endif()
 
 
 ament_export_include_directories(include)
