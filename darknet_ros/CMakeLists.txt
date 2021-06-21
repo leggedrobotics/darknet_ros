@@ -5,15 +5,27 @@ include(CMakeDependentOption)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Define path of darknet folder here.
+# USER SETTINGS =================================================================
+
+set(CUDA_ENABLE ON)
+set(CUDNN_ENABLE ON)
+set(FP16_ENABLE ON)
+
+# Jetson AGX Xavier & TITAN V is under version of Turing. So, please set manually.
+# Turing or Ampere GPUs, FP16 is automatically enabled.
+
+# set(CMAKE_CUDA_ARCHITECTURES 72)
+
+
+# Define path of darknet folder here. ===========================================
 find_path(DARKNET_PATH
   NAMES "README.md"
   HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../darknet/")
 message(STATUS "Darknet path dir = ${DARKNET_PATH}")
 add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
-# Find CUDA
-find_package(CUDA QUIET)
+# Find CUDA ====================================================================
+find_package(CUDA QUIET AND CUDA_ENABLE)
 if (CUDA_FOUND)
   find_package(CUDA REQUIRED)
   message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
@@ -25,19 +37,35 @@ if (CUDA_FOUND)
     -gencode arch=compute_50,code=[sm_50,compute_50]
     -gencode arch=compute_52,code=[sm_52,compute_52]
     -gencode arch=compute_61,code=[sm_61,compute_61]
+    # -gencode arch=compute_72,code=[sm_72,compute_72] # Jetson AGX Xavier or TITAN V
     -gencode arch=compute_75,code=[sm_75,compute_75]
+    # -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
   )
   add_definitions(-DGPU)
 endif()
 
+# Find CUDNN =======================================================================
+
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../darknet/cmake/Modules/" ${CMAKE_MODULE_PATH})
-find_package(CUDNN)
+
+if(CUDNN_ENABLE)
+  find_package(CUDNN)
+  message(STATUS "cuDNN Version: ${CUDNN_VERSION_STRINGS}")
+  message(STATUS "cuDNN Libararies: ${CUDNN_LIBRARIES}")
+endif()
 
 if(CUDNN_FOUND)
     set(ADDITIONAL_CXX_FLAGS "${ADDITIONAL_CXX_FLAGS} -DCUDNN")
 endif()
 
-set(CMAKE_CUDA_ARCHITECTURES 75)
+execute_process (
+    COMMAND bash -c "lspci | grep VGA | grep 06:00.0 | grep -e TU106 -e TU104 -e TU102 -e GA106 -e GA104 -e GA102"
+    OUTPUT_VARIABLE outVar
+)
+message ( STATUS " GPU (FP16): " ${outVar} )
+if(outVar AND FP16_ENABLE)
+  set(CMAKE_CUDA_ARCHITECTURES 75)
+endif()
 
 if ( 70 IN_LIST CMAKE_CUDA_ARCHITECTURES OR
      72 IN_LIST CMAKE_CUDA_ARCHITECTURES OR
@@ -55,7 +83,7 @@ endif()
 #   list(APPEND LIBRARIES "m")
 # endif()
 
-# Find X11
+# Find X11 ============================================================================
 message ( STATUS "Searching for X11..." )
 find_package ( X11 REQUIRED )
 if ( X11_FOUND )
@@ -197,7 +225,6 @@ if (CUDA_FOUND)
         -DCUDNN
       )
     endif()
-    
   else()
     target_link_libraries(${PROJECT_NAME}_lib
       cuda
@@ -263,12 +290,12 @@ install(
 
 # Download yolov2-tiny.weights
 set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
-set(FILE "${PATH}/yolov2-tiny.weights")
-message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
-if (NOT EXISTS "${FILE}")
-  message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
-endif()
+# set(FILE "${PATH}/yolov2-tiny.weights")
+# message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
+# if (NOT EXISTS "${FILE}")
+#   message(STATUS "... file does not exist. Downloading now ...")
+#   execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
+# endif()
 
 # # Download yolov3.weights
 # set(FILE "${PATH}/yolov3.weights")
@@ -286,6 +313,13 @@ endif()
 #   execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
 # endif()
 
+# Download yolov4-tiny.weights
+set(FILE "${PATH}/yolov4-tiny.weights")
+message(STATUS "Checking and downloading yolov4-tiny.weights if needed ...")
+if (NOT EXISTS "${FILE}")
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights -P ${PATH})
+endif()
 
 # Download yolov4-csp.weights
 set(FILE "${PATH}/yolov4-csp.weights")
@@ -295,13 +329,6 @@ if (NOT EXISTS "${FILE}")
   execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
 endif()
 
-# Download yolov4-tiny.weights
-set(FILE "${PATH}/yolov4-tiny.weights")
-message(STATUS "Checking and downloading yolov4-tiny.weights if needed ...")
-if (NOT EXISTS "${FILE}")
-  message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights -P ${PATH})
-endif()
 
 install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
