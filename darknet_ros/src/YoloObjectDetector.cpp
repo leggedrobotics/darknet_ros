@@ -225,7 +225,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::msg::Image::ConstShar
   cv_bridge::CvImagePtr cam_image;
 
   try {
-    cam_image = cv_bridge::toCvCopy(msg, "bgr8");
+    cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
   } catch (cv_bridge::Exception& e) {
     RCLCPP_ERROR(get_logger(), "cv_bridge exception: %s", e.what());
     return;
