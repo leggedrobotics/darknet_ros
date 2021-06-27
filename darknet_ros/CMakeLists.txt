@@ -26,7 +26,7 @@ add_definitions(-DDARKNET_FILE_PATH="${DARKNET_PATH}")
 
 # Find CUDA ====================================================================
 if(CUDA_ENABLE)
-  find_package(CUDA)
+  find_package(CUDA REQUIRED)
 endif()
 
 if (CUDA_FOUND)
