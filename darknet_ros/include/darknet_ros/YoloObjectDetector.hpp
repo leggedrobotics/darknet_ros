@@ -17,6 +17,9 @@
 #include <thread>
 #include <chrono>
 #include <shared_mutex>
+#include <numeric>
+#include <queue>
+#include <sstream>
 
 // ROS
 #include "rclcpp/rclcpp.hpp"
@@ -61,6 +64,8 @@ extern "C" {
 #include "darknet.h"
 
 #include "image_interface.hpp"
+
+#define START_COUNT 100
 
 #include <sys/time.h>
 }
@@ -201,6 +206,9 @@ class YoloObjectDetector : public rclcpp::Node
   // IplImage * ipl_;
   cv::Mat disp_;
   float fps_ = 0;
+  float max_fps = 0;
+  float min_fps = 10000;
+  std::stringstream ss_fps;
   float demoThresh_ = 0;
   float demoHier_ = .5;
   int running_ = 0;

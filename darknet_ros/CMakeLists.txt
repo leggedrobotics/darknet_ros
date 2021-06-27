@@ -61,7 +61,7 @@ if(CUDNN_FOUND)
 endif()
 
 execute_process (
-    COMMAND bash -c "lspci | grep VGA | grep 06:00.0 | grep -e TU106 -e TU104 -e TU102 -e GA106 -e GA104 -e GA102"
+    COMMAND bash -c "lspci | grep NVIDIA | grep -e TU106 -e TU104 -e TU102 -e GA106 -e GA104 -e GA102"
     OUTPUT_VARIABLE outVar
 )
 message ( STATUS " GPU (FP16): " ${outVar} )

@@ -387,7 +387,7 @@ void *YoloObjectDetector::detectInThread()
   if (enableConsoleOutput_) {
     printf("\033[2J");
     printf("\033[1;1H");
-    printf("\nFPS:%.1f\n",fps_);
+    printf("\nFPS:%.1f : ( %s )\n",fps_,ss_fps.str().c_str());
     printf("Objects:\n\n");
   }
   image display = buff_[(buffIndex_+2) % 3];
@@ -550,6 +550,7 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
 
 void YoloObjectDetector::yolo()
 {
+  static int start_count = 0;
   const auto wait_duration = std::chrono::milliseconds(2000);
   while (!getImageStatus()) {
     printf("Waiting for image.\n");
@@ -610,6 +611,19 @@ void YoloObjectDetector::yolo()
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);
     if (!demoPrefix_) {
       fps_ = 1./(what_time_is_it_now() - demoTime_);
+
+      if (start_count > START_COUNT) {
+        if (fps_ > max_fps)
+          max_fps = fps_;
+        else if (fps_ < min_fps)
+          min_fps = fps_;
+      }
+      else
+        start_count++;
+
+      ss_fps.str("");
+      ss_fps << "MAX:" << max_fps << " MIN:" << min_fps;
+
       demoTime_ = what_time_is_it_now();
       if (viewImage_) {
         displayInThread(0);
