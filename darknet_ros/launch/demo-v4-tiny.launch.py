@@ -15,7 +15,7 @@ def generate_launch_description():
   yolo_weights_path = LaunchConfiguration('yolo_weights_path', default = darknet_ros_share_dir + '/yolo_network_config/weights')
   yolo_config_path = LaunchConfiguration('yolo_config_path', default = darknet_ros_share_dir + '/yolo_network_config/cfg')
   ros_param_file = LaunchConfiguration('ros_param_file', default = darknet_ros_share_dir + 'config/ros.yaml')
-  network_param_file = LaunchConfiguration('network_param_file', default = darknet_ros_share_dir + 'config/yolov3.yaml')
+  network_param_file = LaunchConfiguration('network_param_file', default = darknet_ros_share_dir + 'config/yolov4-tiny.yaml')
 
   declare_image_cmd = DeclareLaunchArgument(
     'image',
@@ -35,7 +35,7 @@ def generate_launch_description():
     description = 'Path to file with ROS related config')  
   declare_network_param_file_cmd = DeclareLaunchArgument(
     'network_param_file',
-    default_value = darknet_ros_share_dir + '/config/yolov3.yaml',
+    default_value = darknet_ros_share_dir + '/config/yolov4-tiny.yaml',
     description = 'Path to file with network param file')  
 
   darknet_ros_cmd = Node(
@@ -50,6 +50,14 @@ def generate_launch_description():
       },
     ])
 
+  camera = Node(
+    package="v4l2_camera",
+    node_executable="v4l2_camera_node",
+    node_namespace="camera/rgb",
+    parameters=[
+      {'video_device'     : "/dev/video0"},
+    ])
+
   ld = LaunchDescription()
 
   ld.add_action(declare_image_cmd)
@@ -59,5 +67,6 @@ def generate_launch_description():
   ld.add_action(declare_network_param_file_cmd)
   
   ld.add_action(darknet_ros_cmd)
+  ld.add_action(camera)
 
   return ld

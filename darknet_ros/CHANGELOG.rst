@@ -2,6 +2,54 @@
 Changelog for package darknet_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.5 (2021-04-08)
+------------------
+* Merge pull request `#308 <https://github.com/leggedrobotics/darknet_ros/issues/308>`_ from leggedrobotics/noetic
+  Noetic
+* Minor fix in CMake.
+* Minor fix in test.
+* Updated readme.
+* Updated to newest darknet and fixed opencv on Ubuntu 20.04.
+* First changes in CMakeLists.
+* Merge pull request `#287 <https://github.com/leggedrobotics/darknet_ros/issues/287>`_ from leggedrobotics/feature/nodeletize
+  Feature/nodeletize
+* Small adjustments
+* Added pointer deletion in destructor and minor formatting
+* Minor formatting
+* Adding option to use nodelet
+* Add libxext
+* Add libxt-dev
+* Retrieve binaries from Github releases
+* Merge pull request `#232 <https://github.com/leggedrobotics/darknet_ros/issues/232>`_ from leggedrobotics/add-required-deps
+  Update package.xml dependencies
+* Don't require cmake-clang-tools
+* Update package.xml dependencies
+* Added clang tooling.
+* Merge pull request `#207 <https://github.com/leggedrobotics/darknet_ros/issues/207>`_ from umdlife/install_weights
+  Add install targets for configuration files
+* Add install targets for configuration files
+  Adds the `launch`, `config`, and `yolo_network_config` folders to the
+  install target for `darknet_ros` so they are available in the catkin
+  install directory.
+* Fixed linking of cuda libraries.
+* Merge branch 'kunaltyagi-cleanup'
+* Cleaned up CMakeLists.txt, used OpenCV C++ API for cpp file
+* Merge pull request `#189 <https://github.com/leggedrobotics/darknet_ros/issues/189>`_ from martinspedro/master
+  /darknet_ros/found_object uses custom msg with Header for improving synchronization
+* YOLO publishes Object Count with Time stamp using custom msg with Header
+* Merge pull request `#183 <https://github.com/leggedrobotics/darknet_ros/issues/183>`_ from kunaltyagi/id_num
+  Add numerical ID and launch param for image
+* Adding numerical ID and launch param for image
+* Merge pull request `#182 <https://github.com/leggedrobotics/darknet_ros/issues/182>`_ from leggedrobotics/fix/image_publisher
+  Fixed copy of image publisher.
+* Fixed copy of image publisher.
+* Merge branch 'kjbilton-master'
+* Increased scope of image acquisition mutex to prevent image overwriting
+* Merge branch 'utra-robosoccer-master'
+* Removed warnings caused by catkin builds
+* Added test_depend of wget to accomodate Jenkins.
+* Contributors: Jason Wang, Kunal Tyagi, Kyle Bilton, Marko Bjelonic, Pedro Martins, Tom Lankhorst, Tomas Gareau, timonh
+
 1.1.4 (2019-03-03)
 ------------------
 * Merge pull request `#141 <https://github.com/leggedrobotics/darknet_ros/issues/141>`_ from lorenwel/feature/launch_file_arg
