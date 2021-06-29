@@ -162,7 +162,17 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
   cv_bridge::CvImagePtr cam_image;
 
   try {
-    cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
+    if (msg->encoding == "mono8" || msg->encoding == "bgr8" || msg->encoding == "rgb8") {
+      cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
+    } else if ( msg->encoding == "bgra8") {
+      cam_image = cv_bridge::toCvCopy(msg, "bgr8");
+    } else if ( msg->encoding == "rgba8") {
+      cam_image = cv_bridge::toCvCopy(msg, "rgb8");
+    } else if ( msg->encoding == "mono16") {
+      cam_image = cv_bridge::toCvCopy(msg, "mono8");
+    } else {
+      ROS_ERROR("Image message encoding provided is not mono8, mono16, bgr8, bgra8, rgb8 or rgba8.");
+    }
   } catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
