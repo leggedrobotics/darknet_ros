@@ -169,6 +169,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
     } else if ( msg->encoding == "rgba8") {
       cam_image = cv_bridge::toCvCopy(msg, "rgb8");
     } else if ( msg->encoding == "mono16") {
+      ROS_WARN_ONCE("Converting mono16 images to mono8");
       cam_image = cv_bridge::toCvCopy(msg, "mono8");
     } else {
       ROS_ERROR("Image message encoding provided is not mono8, mono16, bgr8, bgra8, rgb8 or rgba8.");
