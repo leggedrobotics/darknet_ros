@@ -11,3 +11,8 @@ VOC data set (Yolo v2):
 Yolo v3:
   wget http://pjreddie.com/media/files/yolov3.weights
   wget http://pjreddie.com/media/files/yolov3-voc.weights
+
+COCO data set (Yolo v4)
+
+  wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
+  wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
