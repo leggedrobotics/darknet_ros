@@ -26,10 +26,8 @@ if (CUDA_FOUND)
   # Get CUDA Compute capability with modified script from internet
   set(CUDAFILE ${CMAKE_CURRENT_SOURCE_DIR}/scripts/check_cuda.cu)
   set(OUTPUTFILE ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cuda_check) 
-  # Compile script at compilation
-  if(NOT EXISTS "${OUTPUTFILE}")
-    execute_process(COMMAND nvcc -lcuda ${CUDAFILE} -o ${OUTPUTFILE})
-  endif()
+  # Compile cuda arch check script
+  execute_process(COMMAND nvcc -lcuda ${CUDAFILE} -o ${OUTPUTFILE})
   execute_process(COMMAND ${OUTPUTFILE}
                   RESULT_VARIABLE CUDA_RETURN_CODE
                   OUTPUT_VARIABLE GENCODE)
@@ -40,25 +38,26 @@ if (CUDA_FOUND)
     message(Warning"${GENCODE}. Forcing darknet_ros without CUDA")
     set(CUDA_SUCCESS "FALSE")
   endif()
+  #remove cuda_check binary
+  execute_process(COMMAND rm -f ${OUTPUTFILE})
   #Config CUDA
   if (${CUDA_SUCCESS})
-    message(STATUS "CUDA Architecture: ${GENCODE}")
-    message(STATUS "CUDA Version: ${CUDA_VERSION_STRING}")
-    message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
-    message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
     set(
       CUDA_NVCC_FLAGS
       ${CUDA_NVCC_FLAGS};
       -O3
       #-gencode arch=compute_30,code=sm_30  deprecated for CUDA9+
       #-gencode arch=compute_35,code=sm_35  deprecated for CUDA9+
-      -gencode arch=compute_50,code=[sm_50,compute_50]
-      -gencode arch=compute_52,code=[sm_52,compute_52]
-      -gencode arch=compute_61,code=sm_61
-      -gencode arch=compute_62,code=sm_62
+      # -gencode arch=compute_50,code=[sm_50,compute_50]
+      # -gencode arch=compute_52,code=[sm_52,compute_52]
+      # -gencode arch=compute_61,code=sm_61
+      # -gencode arch=compute_62,code=sm_62
       ${GENCODE}       # Force to compile to installed GPUs Architectures 
     )
-    message(WARNING "${CUDA_NVCC_FLAGS}")
+    message(STATUS "CUDA Architecture: ${GENCODE}")
+    message(STATUS "CUDA Version: ${CUDA_VERSION_STRING}")
+    message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
+    message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
     add_definitions(-DGPU)
   else()
     list(APPEND LIBRARIES "m")
