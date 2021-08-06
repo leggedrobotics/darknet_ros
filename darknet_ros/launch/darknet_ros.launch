@@ -3,7 +3,8 @@
 <launch>
   <!-- Console launch prefix -->
   <arg name="launch_prefix" default=""/>
-  <arg name="image" default="/camera/rgb/image_raw" />
+  <!--arg name="image" default="/camera/rgb/image_raw" /-->
+  <arg name="image" default="/zed2/zed_node/stereo/image_rect_color" />
 
   <!-- Config and weights folder. -->
   <arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
@@ -11,7 +12,7 @@
 
   <!-- ROS and network parameter files -->
   <arg name="ros_param_file"             default="$(find darknet_ros)/config/ros.yaml"/>
-  <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov2-tiny.yaml"/>
+  <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov3.yaml"/>
 
   <!-- Load parameters -->
   <rosparam command="load" ns="darknet_ros" file="$(arg ros_param_file)"/>
