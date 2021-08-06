@@ -14,5 +14,3 @@ yolo_model:
       - motorbike
       - bus
       - truck
-      - traffic light
-      - stop sign
