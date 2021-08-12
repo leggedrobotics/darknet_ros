@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CUDA_ENABLE ON)
 set(CUDNN_ENABLE OFF) #  set(CUDNN_ENABLE ON)
-set(FP16_ENABLE ON)
+set(FP16_ENABLE OFF)
 
 # Jetson AGX Xavier & TITAN V is under version of Turing. So, please set manually.
 # Turing or Ampere GPUs, FP16 is automatically enabled.
@@ -39,7 +39,7 @@ if (CUDA_FOUND)
     -gencode arch=compute_50,code=[sm_50,compute_50]
     -gencode arch=compute_52,code=[sm_52,compute_52]
     -gencode arch=compute_61,code=[sm_61,compute_61]
-    # -gencode arch=compute_72,code=[sm_72,compute_72] # Jetson AGX Xavier or TITAN V
+    -gencode arch=compute_72,code=[sm_72,compute_72] # Jetson AGX Xavier or TITAN V
     -gencode arch=compute_75,code=[sm_75,compute_75]
     # -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
   )
@@ -308,12 +308,12 @@ set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
 # endif()
 
 # # Download yolov4.weights
-# set(FILE "${PATH}/yolov4.weights")
-# message(STATUS "Checking and downloading yolov4.weights if needed ...")
-# if (NOT EXISTS "${FILE}")
-#   message(STATUS "... file does not exist. Downloading now ...")
-#   execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
-# endif()
+set(FILE "${PATH}/yolov4.weights")
+message(STATUS "Checking and downloading yolov4.weights if needed ...")
+if (NOT EXISTS "${FILE}")
+  message(STATUS "... file does not exist. Downloading now ...")
+  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
+endif()
 
 # Download yolov4-tiny.weights
 set(FILE "${PATH}/yolov4-tiny.weights")
@@ -324,12 +324,12 @@ if (NOT EXISTS "${FILE}")
 endif()
 
 # Download yolov4-csp.weights
-set(FILE "${PATH}/yolov4-csp.weights")
-message(STATUS "Checking and downloading yolov4-csp.weights if needed ...")
-if (NOT EXISTS "${FILE}")
-  message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
-endif()
+# set(FILE "${PATH}/yolov4-csp.weights")
+# message(STATUS "Checking and downloading yolov4-csp.weights if needed ...")
+# if (NOT EXISTS "${FILE}")
+#   message(STATUS "... file does not exist. Downloading now ...")
+#   execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
+# endif()
 
 
 install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)

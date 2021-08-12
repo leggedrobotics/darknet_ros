@@ -6,7 +6,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
   darknet_ros_share_dir = get_package_share_directory('darknet_ros')
-  network_param_file = darknet_ros_share_dir + '/config/yolov4-tiny.yaml'
+  network_param_file = darknet_ros_share_dir + '/config/yolov4.yaml'
 
   darknet_ros_launch = IncludeLaunchDescription(
     PythonLaunchDescriptionSource([darknet_ros_share_dir + '/launch/darknet_ros.launch.py']),
@@ -22,5 +22,6 @@ def generate_launch_description():
   
   return LaunchDescription([
     darknet_ros_launch,
-    # camera,
+    # if you want to disable camera node, remove the following line.
+    camera,
   ])
