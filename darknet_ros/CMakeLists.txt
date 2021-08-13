@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # USER SETTINGS =================================================================
 
-set(CUDA_ENABLE ON)
+set(CUDA_ENABLE OFF)
 set(CUDNN_ENABLE OFF) #  set(CUDNN_ENABLE ON)
 set(FP16_ENABLE OFF)
 
@@ -256,6 +256,13 @@ else()
   )
   ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
+endif()
+
+find_package(OpenMP)
+
+if (OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 target_link_libraries(${PROJECT_NAME}_lib
