@@ -244,12 +244,9 @@ ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
 else()
 
-  add_library(${PROJECT_NAME}_core_lib
-    ${DARKNET_CORE_FILES}
-  )
-
   add_library(${PROJECT_NAME}_lib
     ${PROJECT_LIB_FILES}
+    ${DARKNET_CORE_FILES}
   )
   ament_target_dependencies(${PROJECT_NAME}_lib ${dependencies})
   target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
@@ -273,7 +270,6 @@ target_compile_definitions(${PROJECT_NAME}_lib PRIVATE -DOPENCV)
 
 target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
-  # ${PROJECT_NAME}_core_lib
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE -DOPENCV)
 
@@ -367,7 +363,6 @@ install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME}_lib)
-ament_export_libraries(${PROJECT_NAME}_core_lib)
 ament_export_dependencies(${dependencies})
 
 ament_package()
