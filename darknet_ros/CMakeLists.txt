@@ -97,7 +97,7 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/normalization_layer.c
     ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/option_list.c
     ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/parser.c
-    ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/region_layer.c
+    ${DARKNET_PATH}/src/dark_cuda.c               ${DARKNET_PATH}/src/region_layer.c
     ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/reorg_layer.c
     ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/rnn_layer.c
     ${DARKNET_PATH}/src/demo.c                    ${DARKNET_PATH}/src/route_layer.c
