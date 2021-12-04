@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 # USER SETTINGS =================================================================
 
 set(CUDA_ENABLE ON)
-set(CUDNN_ENABLE OFF) #  set(CUDNN_ENABLE ON)
-set(FP16_ENABLE OFF)
+set(CUDNN_ENABLE ON)
+set(FP16_ENABLE ON)
 
 # Jetson AGX Xavier & TITAN V is under version of Turing. So, please set manually.
 # Turing or Ampere GPUs, FP16 is automatically enabled.
