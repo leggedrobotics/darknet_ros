@@ -8,8 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 # USER SETTINGS =================================================================
 
 set(CUDA_ENABLE ON)
-set(CUDNN_ENABLE OFF) #  set(CUDNN_ENABLE ON)
-set(FP16_ENABLE OFF)
+set(CUDNN_ENABLE ON) #  set(CUDNN_ENABLE ON)
+set(FP16_ENABLE ON)
+
+set(DOWNLOAD_YOLOV2_TINY ON)
+set(DOWNLOAD_YOLOV3 ON)
+set(DOWNLOAD_YOLOV4 ON)
+set(DOWNLOAD_YOLOV4_CSP OFF)
+set(DOWNLOAD_YOLOV4_TINY OFF)
+set(DOWNLOAD_YOLOV4_MISH OFF)
 
 # Jetson AGX Xavier & TITAN V is under version of Turing. So, please set manually.
 # Turing or Ampere GPUs, FP16 is automatically enabled.
@@ -295,44 +302,77 @@ install(
 
 # Download yolov2-tiny.weights
 set(PATH "${CMAKE_CURRENT_SOURCE_DIR}/yolo_network_config/weights")
-# set(FILE "${PATH}/yolov2-tiny.weights")
-# message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
-# if (NOT EXISTS "${FILE}")
-#   message(STATUS "... file does not exist. Downloading now ...")
-#   execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
-# endif()
 
-# # Download yolov3.weights
-# set(FILE "${PATH}/yolov3.weights")
-# message(STATUS "Checking and downloading yolov3.weights if needed ...")
-# if (NOT EXISTS "${FILE}")
-#   message(STATUS "... file does not exist. Downloading now ...")
-#   execute_process(COMMAND wget http://pjreddie.com/media/files/yolov3.weights -P ${PATH})
-# endif()
+if(DOWNLOAD_YOLOV2_TINY)
+  set(FILE "${PATH}/yolov2-tiny.weights")
+  message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    # yolov2-tiny.cfg is already in the repo.
+    execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
+endif()
 
-# # Download yolov4.weights
-set(FILE "${PATH}/yolov4.weights")
-message(STATUS "Checking and downloading yolov4.weights if needed ...")
-if (NOT EXISTS "${FILE}")
-  message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
+# Download yolov3.weights
+if(DOWNLOAD_YOLOV3)
+  set(FILE "${PATH}/yolov3.weights")
+  message(STATUS "Checking and downloading yolov3.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    # yolov3.cfg is already in the repo.
+    execute_process(COMMAND wget http://pjreddie.com/media/files/yolov3.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
+endif()
+
+# Download yolov4.weights
+if(DOWNLOAD_YOLOV4)
+  set(FILE "${PATH}/yolov4.weights")
+  message(STATUS "Checking and downloading yolov4.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
 endif()
 
 # Download yolov4-tiny.weights
-set(FILE "${PATH}/yolov4-tiny.weights")
-message(STATUS "Checking and downloading yolov4-tiny.weights if needed ...")
-if (NOT EXISTS "${FILE}")
-  message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights -P ${PATH})
+if(DOWNLOAD_YOLOV4_TINY)
+  set(FILE "${PATH}/yolov4-tiny.weights")
+  message(STATUS "Checking and downloading yolov4-tiny.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    # yolov4.cfg is already in the repo.
+    execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
 endif()
 
 # Download yolov4-csp.weights
-# set(FILE "${PATH}/yolov4-csp.weights")
-# message(STATUS "Checking and downloading yolov4-csp.weights if needed ...")
-# if (NOT EXISTS "${FILE}")
-#   message(STATUS "... file does not exist. Downloading now ...")
-#   execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
-# endif()
+if(DOWNLOAD_YOLOV4_CSP)
+  set(FILE "${PATH}/yolov4-csp.weights")
+  message(STATUS "Checking and downloading yolov4-csp.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget -q https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-csp.cfg -P ${PATH}/../cfg)
+    execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
+endif()
+
+# Download yolov4-mish.weights
+
+if(DOWNLOAD_YOLOV4_MISH)
+  set(FILE "${PATH}/yolov4-mish.weights")
+  message(STATUS "Checking and downloading yolov4-mish.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget -q https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4x-mish.cfg -P ${PATH}/../cfg)
+    execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4x-mish.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
+endif()
 
 
 install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
