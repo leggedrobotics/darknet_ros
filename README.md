@@ -54,7 +54,7 @@ URL: https://github.com/leggedrobotics/darknet_ros, 2018.
 
 ### Dependencies
 
-This software is built on the Robotic Operating System ([ROS]), which needs to be [installed](http://wiki.ros.org) first. Additionally, YOLO for ROS depends on following software:
+This software is built on the Robotic Operating System version([ROS]), which needs to be [installed](http://wiki.ros.org) first. Additionally, YOLO for ROS depends on following software:
 
 - [OpenCV](http://opencv.org/) (computer vision library),
 - [boost](http://www.boost.org/) (c++ library),
@@ -65,17 +65,14 @@ This software is built on the Robotic Operating System ([ROS]), which needs to b
 
 In order to install darknet_ros, clone the latest version using SSH (see [how to set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)) from this repository into your catkin workspace and compile the package using ROS.
 
-    cd catkin_workspace/src
+    cd colcon_workspace/src
     git clone --recursive git@github.com:leggedrobotics/darknet_ros.git
     cd ../
 
 To maximize performance, make sure to build in *Release* mode. You can specify the build type by setting
 
-    catkin_make -DCMAKE_BUILD_TYPE=Release
+    colcon build -DCMAKE_BUILD_TYPE=Release
 
-or using the [Catkin Command Line Tools](http://catkin-tools.readthedocs.io/en/latest/index.html#)
-
-    catkin build darknet_ros -DCMAKE_BUILD_TYPE=Release
 
 Darknet on the CPU is fast (approximately 1.5 seconds on an Intel Core i7-6700HQ CPU @ 2.60GHz × 8) but it's like 500 times faster on GPU! You'll have to have an Nvidia GPU and you'll have to install CUDA. The CMakeLists.txt file automatically detects if you have CUDA installed or not. CUDA is a parallel computing platform and application programming interface (API) model created by Nvidia. If you do not have CUDA on your System the build process will switch to the CPU version of YOLO. If you are compiling with CUDA, you might receive the following build error:
 
@@ -89,7 +86,7 @@ This means that you need to check the compute capability (version) of your GPU. 
 
 The yolo-voc.weights and tiny-yolo-voc.weights are downloaded automatically in the CMakeLists.txt file. If you need to download them again, go into the weights folder and download the two pre-trained weights from the COCO data set:
 
-    cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
+    cd colcon_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
     wget http://pjreddie.com/media/files/yolov2.weights
     wget http://pjreddie.com/media/files/yolov2-tiny.weights
 
@@ -109,24 +106,12 @@ There are more pre-trained weights from different data sets reported [here](http
 
 In order to use your own detection objects you need to provide your weights and your cfg file inside the directories:
 
-    catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
-    catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/cfg/
-
-In addition, you need to create your config file for ROS where you define the names of the detection objects. You need to include it inside:
-
-    catkin_workspace/src/darknet_ros/darknet_ros/config/
-
-Then in the launch file you have to point to your new config file in the line:
-
-    <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/your_config_file.yaml"/>
+    colcon_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
+    colcon_workspace/src/darknet_ros/darknet_ros/yolo_network_config/cfg/
 
 ### Unit Tests
 
-Run the unit tests using the [Catkin Command Line Tools](http://catkin-tools.readthedocs.io/en/latest/index.html#)
-
-    catkin build darknet_ros --no-deps --verbose --catkin-make-args run_tests
-
-You will see the image above popping up.
+** Currently disabled in ROS2 **
 
 ## Basic Usage
 
@@ -144,27 +129,27 @@ You can change the names and other parameters of the publishers, subscribers and
 
 #### Subscribed Topics
 
-* **`/camera_reading`** ([sensor_msgs/Image])
+* **`/camera_reading`** ([sensor_msgs/msg/Image])
 
     The camera measurements.
 
 #### Published Topics
 
-* **`object_detector`** ([std_msgs::Int8])
+* **`object_detector`** ([std_msgs/msg/Int8])
 
     Publishes the number of detected objects.
 
-* **`bounding_boxes`** ([darknet_ros_msgs::BoundingBoxes])
+* **`bounding_boxes`** ([darknet_ros_msgs/msg/BoundingBoxes])
 
     Publishes an array of bounding boxes that gives information of the position and size of the bounding box in pixel coordinates.
 
-* **`detection_image`** ([sensor_msgs::Image])
+* **`detection_image`** ([sensor_msgs/msg/Image])
 
     Publishes an image of the detection image including the bounding boxes.
 
 #### Actions
 
-* **`camera_reading`** ([sensor_msgs::Image])
+* **`camera_reading`** ([sensor_msgs/msg/Image])
 
     Sends an action with an image and the result is an array of bounding boxes.
 
