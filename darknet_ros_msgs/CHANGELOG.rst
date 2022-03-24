@@ -2,6 +2,16 @@
 Changelog for package darknet_ros_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.5 (2021-04-08)
+------------------
+* Merge pull request `#189 <https://github.com/leggedrobotics/darknet_ros/issues/189>`_ from martinspedro/master
+  /darknet_ros/found_object uses custom msg with Header for improving synchronization
+* std_msgs::Int8 with Header for Object Count
+* Merge pull request `#183 <https://github.com/leggedrobotics/darknet_ros/issues/183>`_ from kunaltyagi/id_num
+  Add numerical ID and launch param for image
+* Adding numerical ID and launch param for image
+* Contributors: Kunal Tyagi, Marko Bjelonic, Pedro Martins
+
 1.1.4 (2019-03-03)
 ------------------
 

@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5.1)
 project(darknet_ros)
 
 # Set c++11 cmake flags
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_FLAGS "-Wall -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-variable -Wfatal-errors -fPIC ${CMAKE_C_FLAGS}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -57,6 +58,7 @@ find_package(catkin REQUIRED
     actionlib
     darknet_ros_msgs
     image_transport
+    nodelet
 )
 
 # Enable OPENCV in darknet
@@ -76,6 +78,7 @@ catkin_package(
     std_msgs
     darknet_ros_msgs
     image_transport
+    nodelet
   DEPENDS
     Boost
 )
@@ -89,7 +92,7 @@ include_directories(
 )
 
 set(PROJECT_LIB_FILES
-    src/YoloObjectDetector.cpp                    src/image_interface.c
+    src/YoloObjectDetector.cpp                    src/image_interface.cpp
 )
 
 set(DARKNET_CORE_FILES
@@ -115,9 +118,10 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/src/gru_layer.c               ${DARKNET_PATH}/src/utils.c
     ${DARKNET_PATH}/src/upsample_layer.c          ${DARKNET_PATH}/src/logistic_layer.c
     ${DARKNET_PATH}/src/l2norm_layer.c            ${DARKNET_PATH}/src/yolo_layer.c
+    ${DARKNET_PATH}/src/iseg_layer.c              ${DARKNET_PATH}/src/image_opencv.cpp
 
     ${DARKNET_PATH}/examples/art.c                ${DARKNET_PATH}/examples/lsd.c
-    ${DARKNET_PATH}/examples/attention.c          ${DARKNET_PATH}/examples/nightmare.c
+    ${DARKNET_PATH}/examples/nightmare.c          ${DARKNET_PATH}/examples/instance-segmenter.c
     ${DARKNET_PATH}/examples/captcha.c            ${DARKNET_PATH}/examples/regressor.c
     ${DARKNET_PATH}/examples/cifar.c              ${DARKNET_PATH}/examples/rnn.c
     ${DARKNET_PATH}/examples/classifier.c         ${DARKNET_PATH}/examples/segmenter.c
@@ -157,6 +161,10 @@ if (CUDA_FOUND)
     src/yolo_object_detector_node.cpp
   )
 
+  cuda_add_library(${PROJECT_NAME}_nodelet
+    src/yolo_object_detector_nodelet.cpp
+  )
+
 else()
 
   add_library(${PROJECT_NAME}_lib
@@ -165,6 +173,10 @@ else()
 
   add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
+  )
+
+  add_library(${PROJECT_NAME}_nodelet
+    src/yolo_object_detector_nodelet.cpp
   )
 
 endif()
@@ -180,6 +192,10 @@ target_link_libraries(${PROJECT_NAME}_lib
 )
 
 target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_lib
+)
+
+target_link_libraries(${PROJECT_NAME}_nodelet
   ${PROJECT_NAME}_lib
 )
 
@@ -213,7 +229,7 @@ set(FILE "${PATH}/yolov2-tiny.weights")
 message(STATUS "Checking and downloading yolov2-tiny.weights if needed ...")
 if (NOT EXISTS "${FILE}")
   message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2-tiny.weights -P ${PATH})
+  execute_process(COMMAND wget -q https://github.com/leggedrobotics/darknet_ros/releases/download/1.1.4/yolov2-tiny.weights -P ${PATH})
 endif()
 
 # Download yolov3.weights
@@ -221,7 +237,7 @@ set(FILE "${PATH}/yolov3.weights")
 message(STATUS "Checking and downloading yolov3.weights if needed ...")
 if (NOT EXISTS "${FILE}")
   message(STATUS "... file does not exist. Downloading now ...")
-  execute_process(COMMAND wget http://pjreddie.com/media/files/yolov3.weights -P ${PATH})
+  execute_process(COMMAND wget -q https://github.com/leggedrobotics/darknet_ros/releases/download/1.1.4/yolov3.weights -P ${PATH})
 endif()
 
 #############
@@ -235,7 +251,7 @@ if(CATKIN_ENABLE_TESTING)
   message(STATUS "Checking and downloading yolov2.weights if needed ...")
   if (NOT EXISTS "${FILE}")
     message(STATUS "... file does not exist. Downloading now ...")
-    execute_process(COMMAND wget http://pjreddie.com/media/files/yolov2.weights -P ${PATH})
+    execute_process(COMMAND wget -q https://github.com/leggedrobotics/darknet_ros/releases/download/1.1.4/yolov2.weights -P ${PATH})
   endif()
 
   find_package(rostest REQUIRED)
@@ -250,3 +266,17 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 endif()
+
+#########################
+###   CLANG TOOLING   ###
+#########################
+find_package(cmake_clang_tools QUIET)
+if (cmake_clang_tools_FOUND)
+  message(STATUS "Run clang tooling")
+  add_clang_tooling(
+    TARGETS ${PROJECT_NAME}
+    SOURCE_DIRS ${CMAKE_CURRENT_LIST_DIR}/src ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_LIST_DIR}/test
+    CT_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/include
+    CF_WERROR
+  )
+endif (cmake_clang_tools_FOUND)
