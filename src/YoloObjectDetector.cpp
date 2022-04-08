@@ -35,6 +35,7 @@ YoloObjectDetector::YoloObjectDetector()
 
   declare_parameter("network.config_file", std::string("yolov4-tiny.cfg"));
   declare_parameter("config_path", std::string("/default"));
+  declare_parameter("video_stream", std::string(""));
 
 }
 
@@ -114,9 +115,15 @@ void YoloObjectDetector::init()
   detections_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>(
     "~/detections", 1);
 
+  std::string video_stream;
+  get_parameter("video_stream", video_stream);
+  std::cout << "video_stream: " << video_stream << std::endl;
+  std::string url_writer(this->get_namespace());
+  url_writer = "rtsp://127.0.0.1:8554"+url_writer;
+  std::cout << "url_writer: " << url_writer << std::endl;
   // Configure RTSP Streamer
-  rtsp_streamer_.on_configure_writer(1920, 1080);
-  rtsp_streamer_.on_configure_reader(std::bind(&YoloObjectDetector::on_image_callback, this, std::placeholders::_1), "rtsp://127.0.0.1:8554/drone");
+  rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, url_writer);
+  rtsp_streamer_.on_configure_reader(std::bind(&YoloObjectDetector::on_image_callback, this, std::placeholders::_1), video_stream);
 }
 
 void YoloObjectDetector::on_image_callback(const cv::Mat& image)
