@@ -12,7 +12,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>rclpy</depend>
+  <!-- <depend>rclpy</depend> -->
   <!-- <depend>rclcpp_action</depend> -->
   <!-- <depend>image_transport</depend> -->
   <depend>vision_msgs</depend>

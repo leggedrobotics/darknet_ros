@@ -4,6 +4,8 @@ project(darknet_ros)
 include(CMakeDependentOption)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_FLAGS "-Wno-error=format-security")
+set(CMAKE_CXX_FLAGS "-Wno-error=format-security")
 
 # USER SETTINGS =================================================================
 
@@ -39,17 +41,21 @@ endif()
 if (CUDA_FOUND)
   message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
   message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
-  set(
-    CUDA_NVCC_FLAGS
-    ${CUDA_NVCC_FLAGS};
-    -O3
-    # -gencode arch=compute_50,code=[sm_50,compute_50]
-    # -gencode arch=compute_52,code=[sm_52,compute_52]
-    # -gencode arch=compute_61,code=[sm_61,compute_61]
-    # -gencode arch=compute_72,code=[sm_72,compute_72] # Jetson AGX Xavier or TITAN V
-    -gencode arch=compute_75,code=[sm_75,compute_75] # GeForce GTX 1660 Ti
-    # -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
-  )
+  if (${CUDA_VERSION} EQUAL "11.0.3")
+    set(
+      CUDA_NVCC_FLAGS
+      ${CUDA_NVCC_FLAGS};
+      -O3
+      -gencode arch=compute_75,code=[sm_75,compute_75] # GeForce GTX 1660 Ti
+    )
+  elseif(${CUDA_VERSION} EQUAL "11.4.2")
+    set(
+      CUDA_NVCC_FLAGS
+      ${CUDA_NVCC_FLAGS};
+      -O3
+      -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
+    )
+  endif()
   add_definitions(-DGPU)
 endif()
 
@@ -110,7 +116,7 @@ find_package(umd_rtsp REQUIRED)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclpy REQUIRED)
+# find_package(rclpy REQUIRED)
 # find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
 # find_package(image_transport REQUIRED)
@@ -122,7 +128,7 @@ find_package(ament_index_cpp REQUIRED)
 
 set(dependencies
     rclcpp
-    rclpy
+    # rclpy
     # rclcpp_action
     std_msgs
     # image_transport
