@@ -15,7 +15,7 @@ def generate_launch_description():
 
   camera = Node(
     package="v4l2_camera",
-    node_executable="v4l2_camera_node",
+    executable="v4l2_camera_node",
     parameters=[
       {'video_device'     : "/dev/video0"},
     ])
