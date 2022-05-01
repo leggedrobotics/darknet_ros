@@ -40,8 +40,8 @@ def generate_launch_description():
 
   darknet_ros_cmd = Node(
     package='darknet_ros',
-    node_executable='darknet_ros',
-    node_name='darknet_ros',
+    executable='darknet_ros',
+    name='darknet_ros',
     output='screen',
     parameters=[ros_param_file, network_param_file,
       {

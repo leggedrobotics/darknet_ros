@@ -11,10 +11,10 @@ set(CUDA_ENABLE ON)
 set(CUDNN_ENABLE ON) #  set(CUDNN_ENABLE ON)
 set(FP16_ENABLE ON)
 
-set(DOWNLOAD_YOLOV2_TINY ON)
+set(DOWNLOAD_YOLOV2_TINY OFF)
 set(DOWNLOAD_YOLOV3 OFF)
-set(DOWNLOAD_YOLOV4 ON)
-set(DOWNLOAD_YOLOV4_CSP OFF)
+set(DOWNLOAD_YOLOV4 OFF)
+set(DOWNLOAD_YOLOV4_CSP ON)
 set(DOWNLOAD_YOLOV4_TINY ON)
 set(DOWNLOAD_YOLOV4_MISH OFF)
 
@@ -48,7 +48,9 @@ if (CUDA_FOUND)
     -gencode arch=compute_61,code=[sm_61,compute_61]
     -gencode arch=compute_72,code=[sm_72,compute_72] # Jetson AGX Xavier or TITAN V
     -gencode arch=compute_75,code=[sm_75,compute_75]
-    # -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
+    -gencode arch=compute_80,code=[sm_80,compute_80]
+    -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
+    -gencode arch=compute_87,code=[sm_87,compute_87]
   )
   add_definitions(-DGPU)
 endif()
