@@ -53,6 +53,7 @@ if (CUDA_FOUND)
       CUDA_NVCC_FLAGS
       ${CUDA_NVCC_FLAGS};
       -O3
+      -gencode arch=compute_75,code=[sm_75,compute_75]
       -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
     )
   endif()
