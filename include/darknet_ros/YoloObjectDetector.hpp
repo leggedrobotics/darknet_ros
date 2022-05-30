@@ -37,6 +37,10 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <cv_bridge/cv_bridge.h>
 
+// C++
+#include <iostream>
+#include <string>
+
 // Darknet.
 #ifdef GPU
 #include "cuda_runtime.h"

@@ -115,12 +115,17 @@ void YoloObjectDetector::init()
   detections_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>(
     "~/detections", 1);
 
-  std::string video_stream;
+  std::string video_stream, server_ip, rtsp_path;
   get_parameter("video_stream", video_stream);
   std::cout << "video_stream: " << video_stream << std::endl;
-  std::string url_writer(this->get_namespace());
-  url_writer = "rtsp://127.0.0.1:8554"+url_writer;
+  std::string robot_namespace(this->get_namespace());
+  std::cout << "robot_namespace: " << robot_namespace << std::endl;
+
+  // Parse mounting point from video stream URL
+  std::size_t mounting_path_slash = video_stream.find_last_of("/");
+  std::string url_writer = video_stream.substr(0, mounting_path_slash) + robot_namespace;
   std::cout << "url_writer: " << url_writer << std::endl;
+
   // Configure RTSP Streamer
   rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, url_writer);
   rtsp_streamer_.on_configure_reader(std::bind(&YoloObjectDetector::on_image_callback, this, std::placeholders::_1), video_stream);
@@ -262,7 +267,7 @@ image **load_alphabet_with_file_cp(char *datafile) {
   int i, j;
   const int nsize = 8;
   image **alphabets = (image**)calloc(nsize, sizeof(image));
-  char* labels = "/labels/%d_%d.png";
+  char* labels = (char *)"/labels/%d_%d.png";
   char * files = (char *) malloc(1 + strlen(datafile)+ strlen(labels) );
   strcpy(files, datafile);
   strcat(files, labels);
