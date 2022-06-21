@@ -26,7 +26,16 @@ char* data;
 char** detectionNames;
 
 YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
-    : nodeHandle_(nh), imageTransport_(nodeHandle_), numClasses_(0), classLabels_(0), rosBoxes_(0), rosBoxCounter_(0) {
+    : nodeHandle_(nh), 
+      imageTransport_(nodeHandle_), 
+      numClasses_(0), 
+      classLabels_(0), 
+      rosBoxes_(0), 
+      rosBoxCounter_(0),
+      imagergb_sub(imageTransport_,"/camera/rgb/image_raw",1),       //For depth inclusion
+      imagedepth_sub(imageTransport_,"/camera/depth/image_raw",1),   //For depth inclusion
+      sync_1(MySyncPolicy_1(5), imagergb_sub, imagedepth_sub)        //For depth inclusion
+  {
   ROS_INFO("[YoloObjectDetector] Node started.");
 
   // Read parameters from config file.
@@ -126,20 +135,36 @@ void YoloObjectDetector::init() {
   std::string detectionImageTopicName;
   int detectionImageQueueSize;
   bool detectionImageLatch;
+  std::string depthTopicName;  //For depth inclusion
+  int depthQueueSize;          //For depth inclusion
 
+  //RGB image
   nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/image_raw"));
   nodeHandle_.param("subscribers/camera_reading/queue_size", cameraQueueSize, 1);
+  
+  //Object Detector 
   nodeHandle_.param("publishers/object_detector/topic", objectDetectorTopicName, std::string("found_object"));
   nodeHandle_.param("publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
   nodeHandle_.param("publishers/object_detector/latch", objectDetectorLatch, false);
+  
+  // Bounding boxes topic
   nodeHandle_.param("publishers/bounding_boxes/topic", boundingBoxesTopicName, std::string("bounding_boxes"));
   nodeHandle_.param("publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
   nodeHandle_.param("publishers/bounding_boxes/latch", boundingBoxesLatch, false);
+  
+  // Detection topic
   nodeHandle_.param("publishers/detection_image/topic", detectionImageTopicName, std::string("detection_image"));
   nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
   nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
+  
+  // depth topic
+  nodeHandle_.param("subscribers/camera_depth/topic", depthTopicName, std::string("/depth/image_raw"));   //For depth inclusion
+  nodeHandle_.param("subscribers/camera_depth/queue_size", depthQueueSize, 1);                            //For depth inclusion
 
-  imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback, this);
+  // Replacing image callback with a approximately synchronized callback for depth and RGB images
+  // imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback, this);
+  sync_1.registerCallback(boost::bind(&YoloObjectDetector::cameraCallback,this,_1,_2));
+  
   objectPublisher_ =
       nodeHandle_.advertise<darknet_ros_msgs::ObjectCount>(objectDetectorTopicName, objectDetectorQueueSize, objectDetectorLatch);
   boundingBoxesPublisher_ =
@@ -156,31 +181,47 @@ void YoloObjectDetector::init() {
   checkForObjectsActionServer_->start();
 }
 
-void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
+void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::ImageConstPtr& msgdepth) 
+{
   ROS_DEBUG("[YoloObjectDetector] USB image received.");
 
   cv_bridge::CvImagePtr cam_image;
+  cv_bridge::CvImageConstPtr cam_depth; 
 
-  try {
-    if (msg->encoding == "mono8" || msg->encoding == "bgr8" || msg->encoding == "rgb8") {
-      cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
-    } else if ( msg->encoding == "bgra8") {
-      cam_image = cv_bridge::toCvCopy(msg, "bgr8");
-    } else if ( msg->encoding == "rgba8") {
-      cam_image = cv_bridge::toCvCopy(msg, "rgb8");
-    } else if ( msg->encoding == "mono16") {
-      ROS_WARN_ONCE("Converting mono16 images to mono8");
-      cam_image = cv_bridge::toCvCopy(msg, "mono8");
-    } else {
-      ROS_ERROR("Image message encoding provided is not mono8, mono16, bgr8, bgra8, rgb8 or rgba8.");
-    }
-  } catch (cv_bridge::Exception& e) {
+  try
+  {
+    cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8); 
+    cam_depth = cv_bridge::toCvCopy(msgdepth, sensor_msgs::image_encodings::TYPE_32FC1);
+    
+    imageHeader_ = msg->header; 
+  }
+  catch (cv_bridge::Exception& e)
+  {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
   }
 
+  // try {
+  //   if (msg->encoding == "mono8" || msg->encoding == "bgr8" || msg->encoding == "rgb8") {
+  //     cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
+  //   } else if ( msg->encoding == "bgra8") {
+  //     cam_image = cv_bridge::toCvCopy(msg, "bgr8");
+  //   } else if ( msg->encoding == "rgba8") {
+  //     cam_image = cv_bridge::toCvCopy(msg, "rgb8");
+  //   } else if ( msg->encoding == "mono16") {
+  //     ROS_WARN_ONCE("Converting mono16 images to mono8");
+  //     cam_image = cv_bridge::toCvCopy(msg, "mono8");
+  //   } else {
+  //     ROS_ERROR("Image message encoding provided is not mono8, mono16, bgr8, bgra8, rgb8 or rgba8.");
+  //   }
+  // } catch (cv_bridge::Exception& e) {
+  //   ROS_ERROR("cv_bridge exception: %s", e.what());
+  //   return;
+  // }
+
   if (cam_image) {
     {
+      ROS_INFO("Recieved RGB image");
       boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
       imageHeader_ = msg->header;
       camImageCopy_ = cam_image->image.clone();
@@ -192,6 +233,12 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
   }
+
+  if (cam_depth)
+    {
+      ROS_INFO("Recieved Depth Image");
+      depthImageCopy_ = cam_depth->image.clone();
+    }
   return;
 }
 

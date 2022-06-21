@@ -38,6 +38,14 @@
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 #include <darknet_ros_msgs/ObjectCount.h>
 
+// For depth-rgb image sync
+#include <message_filters/subscriber.h>                       //For depth inclusion
+#include <message_filters/synchronizer.h>                     //For depth inclusion
+#include <message_filters/time_synchronizer.h>                //For depth inclusion
+#include <message_filters/sync_policies/approximate_time.h>   //For depth inclusion
+#include <image_transport/subscriber_filter.h>                //For depth inclusion
+
+
 // Darknet.
 #ifdef GPU
 #include "cublas_v2.h"
@@ -104,7 +112,7 @@ class YoloObjectDetector {
    * Callback of camera.
    * @param[in] msg image pointer.
    */
-  void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
+  void cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::ImageConstPtr& msgdepth);
 
   /*!
    * Check for objects action goal callback.
@@ -144,6 +152,13 @@ class YoloObjectDetector {
 
   //! Advertise and subscribe to image topics.
   image_transport::ImageTransport imageTransport_;
+
+  // for synchronizing image messages - for depth inclusion
+  typedef image_transport::SubscriberFilter ImageSubscriberFilter;
+  ImageSubscriberFilter imagergb_sub;
+  ImageSubscriberFilter imagedepth_sub;
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy_1;
+  message_filters::Synchronizer<MySyncPolicy_1> sync_1; 
 
   //! ROS subscriber and publisher.
   image_transport::Subscriber imageSubscriber_;
@@ -201,6 +216,7 @@ class YoloObjectDetector {
 
   std_msgs::Header imageHeader_;
   cv::Mat camImageCopy_;
+  cv::Mat depthImageCopy_;
   boost::shared_mutex mutexImageCallback_;
 
   bool imageStatus_ = false;
