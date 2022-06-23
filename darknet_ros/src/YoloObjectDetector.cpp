@@ -290,7 +290,7 @@ bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage) {
   cv_bridge::CvImage cvImage;
   cvImage.header.stamp = ros::Time::now();
   cvImage.header.frame_id = "detection_image";
-  cvImage.encoding = sensor_msgs::image_encodings::BGR8;
+  cvImage.encoding = sensor_msgs::image_encodings::RGB8;
   cvImage.image = detectionImage;
   detectionImagePublisher_.publish(*cvImage.toImageMsg());
   ROS_DEBUG("Detection image has been published.");
@@ -661,6 +661,7 @@ void* YoloObjectDetector::publishInThread() {
 
 void YoloObjectDetector::associateDepth(const int &obj_id, const int &xmin, const int &xmax, const int &ymin, const int &ymax)
 {
+  //Depth image ROS REP : https://www.ros.org/reps/rep-0118.html
   //camImageCopy_ and depthImageCopy_ are cv::Mat type
   try
   {
@@ -681,18 +682,16 @@ void YoloObjectDetector::associateDepth(const int &obj_id, const int &xmin, cons
     int y_center = static_cast<int>((ymin+ymax)/2);
 
 
-    //getting center depth-value
-    float center_depth = 0; 
+    //getting center depth-valuefloat center_depth = 0; 
     try{
       // center_depth = static_cast<float>(depthImageCopy_.at<float>(y_center, x_center)); //FOR 32FC1
-      center_depth = static_cast<float>((depthImageCopy_.at<u_int16_t>(y_center, x_center)));  //FOR 16UC1 
+      auto center_depth =0.001*depthImageCopy_.at<u_int16_t>(y_center, x_center);  //FOR 16UC1 (valkues in mm)
+      std::cout << className << "@("<<x_center<<","<<y_center << ") : " << center_depth << std::endl;
     }
     catch(...) 
     {
-      center_depth = 14031996; 
+      auto center_depth = 14031996; 
     }
-    
-    std::cout << className << "@("<<x_center<<","<<y_center << ") : " << center_depth << std::endl;
   }
   catch(...) 
   {
