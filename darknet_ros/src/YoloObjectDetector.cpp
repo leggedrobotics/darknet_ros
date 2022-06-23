@@ -8,6 +8,7 @@
 
 // yolo object detector
 #include "darknet_ros/YoloObjectDetector.hpp"
+#include <typeinfo>
 
 // Check for xServer
 #include <X11/Xlib.h>
@@ -32,8 +33,8 @@ YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
       classLabels_(0), 
       rosBoxes_(0), 
       rosBoxCounter_(0),
-      imagergb_sub(imageTransport_,"/camera/rgb/image_raw",1),       //For depth inclusion
-      imagedepth_sub(imageTransport_,"/camera/depth/image_raw",1),   //For depth inclusion
+      imagergb_sub(imageTransport_,"/camera/color/image_raw",1),       //For depth inclusion
+      imagedepth_sub(imageTransport_,"/camera/aligned_depth_to_color/image_raw",1),   //For depth inclusion
       sync_1(MySyncPolicy_1(5), imagergb_sub, imagedepth_sub)        //For depth inclusion
   {
   ROS_INFO("[YoloObjectDetector] Node started.");
@@ -183,16 +184,14 @@ void YoloObjectDetector::init() {
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::ImageConstPtr& msgdepth) 
 {
-  ROS_DEBUG("[YoloObjectDetector] USB image received.");
-
+  // ROS_INFO("[YoloObjectDetector] DARKNET --> Camera image received.");
   cv_bridge::CvImagePtr cam_image;
   cv_bridge::CvImageConstPtr cam_depth; 
 
   try
   {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8); 
-    cam_depth = cv_bridge::toCvCopy(msgdepth, sensor_msgs::image_encodings::TYPE_32FC1);
-    
+    cam_depth = cv_bridge::toCvCopy(msgdepth, sensor_msgs::image_encodings::TYPE_16UC1);
     imageHeader_ = msg->header; 
   }
   catch (cv_bridge::Exception& e)
@@ -220,25 +219,26 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg, c
   // }
 
   if (cam_image) {
+    // ROS_INFO("Recieved CAM-RGB image");
     {
-      ROS_INFO("Recieved RGB image");
       boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
       imageHeader_ = msg->header;
       camImageCopy_ = cam_image->image.clone();
     }
     {
-      boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
-      imageStatus_ = true;
+    boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+    imageStatus_ = true;
     }
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
   }
 
   if (cam_depth)
-    {
-      ROS_INFO("Recieved Depth Image");
-      depthImageCopy_ = cam_depth->image.clone();
-    }
+  {
+    // ROS_INFO("Recieved Depth Image");
+    depthImageCopy_ = cam_depth->image.clone();
+  }
+
   return;
 }
 
@@ -611,11 +611,15 @@ void* YoloObjectDetector::publishInThread() {
       if (rosBoxCounter_[i] > 0) {
         darknet_ros_msgs::BoundingBox boundingBox;
 
-        for (int j = 0; j < rosBoxCounter_[i]; j++) {
+        for (int j = 0; j < rosBoxCounter_[i]; j++) 
+        {
           int xmin = (rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2) * frameWidth_;
           int ymin = (rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2) * frameHeight_;
           int xmax = (rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2) * frameWidth_;
           int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
+
+          //For depth inclusion
+          associateDepth(i, xmin, ymin, xmax, ymax);
 
           boundingBox.Class = classLabels_[i];
           boundingBox.id = i;
@@ -654,5 +658,71 @@ void* YoloObjectDetector::publishInThread() {
 
   return 0;
 }
+
+void YoloObjectDetector::associateDepth(const int &obj_id, const int &xmin, const int &xmax, const int &ymin, const int &ymax)
+{
+  //camImageCopy_ and depthImageCopy_ are cv::Mat type
+  try
+  {
+    //class name 
+    std::string className = static_cast<std::string>(classLabels_[obj_id].c_str());
+
+    //getting mat type
+    // std::string camType = type2str(camImageCopy_.type()); 
+    // std::string depthType = type2str(depthImageCopy_.type());
+    // std::cout << camType << depthType << std::endl;
+
+    //calculating center
+    if((xmin == 0 && xmax == 0) || (ymin == 0 && ymax == 0))
+    {
+      return;
+    }
+    int x_center = static_cast<int>((xmin+xmax)/2); 
+    int y_center = static_cast<int>((ymin+ymax)/2);
+
+
+    //getting center depth-value
+    float center_depth = 0; 
+    try{
+      // center_depth = static_cast<float>(depthImageCopy_.at<float>(y_center, x_center)); //FOR 32FC1
+      center_depth = static_cast<float>((depthImageCopy_.at<u_int16_t>(y_center, x_center)));  //FOR 16UC1 
+    }
+    catch(...) 
+    {
+      center_depth = 14031996; 
+    }
+    
+    std::cout << className << "@("<<x_center<<","<<y_center << ") : " << center_depth << std::endl;
+  }
+  catch(...) 
+  {
+    ROS_ERROR("Some Error occurred!");
+  }
+
+}
+
+std::string YoloObjectDetector::type2str(int type) {
+  std::string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch ( depth ) {
+    case CV_8U:  r = "8U"; break;
+    case CV_8S:  r = "8S"; break;
+    case CV_16U: r = "16U"; break;
+    case CV_16S: r = "16S"; break;
+    case CV_32S: r = "32S"; break;
+    case CV_32F: r = "32F"; break;
+    case CV_64F: r = "64F"; break;
+    default:     r = "User"; break;
+  }
+
+  r += "C";
+  r += (chans+'0');
+
+  return r;
+}
+
 
 } /* namespace darknet_ros*/

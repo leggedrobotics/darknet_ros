@@ -2,7 +2,7 @@
 
 <launch>
   <!-- Console launch prefix -->
-  <arg name="launch_prefix" default=""/>
+  <arg name="launch_prefix" default=""/>  <!-- gdb -ex run  dash dash args -->
   <arg name="image" default="/camera/rgb/image_raw" />
 
   <!-- Config and weights folder. -->

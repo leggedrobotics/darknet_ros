@@ -258,6 +258,10 @@ class YoloObjectDetector {
   bool isNodeRunning(void);
 
   void* publishInThread();
+
+  void associateDepth(const int &objID, const int &xmin, const int &ymin, const int &xmax, const int &ymax);
+
+  std::string type2str(int type);
 };
 
 } /* namespace darknet_ros*/
