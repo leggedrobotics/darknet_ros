@@ -37,6 +37,9 @@
 #include <darknet_ros_msgs/BoundingBoxes.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 #include <darknet_ros_msgs/ObjectCount.h>
+#include <darknet_ros_msgs/ObjDepth.h>    //For depth inclusion
+#include <darknet_ros_msgs/FrameDepth.h>  //For depth inclusion
+
 
 // For depth-rgb image sync
 #include <message_filters/subscriber.h>                       //For depth inclusion
@@ -83,6 +86,19 @@ typedef struct {
   cv::Mat image;
   std_msgs::Header header;
 } CvMatWithHeader_;
+
+// typedef struct {
+//   int objID;
+//   std::string className, classType; 
+//   float objDepth, objX, objY;
+// } objDepth; 
+
+// typedef struct { 
+//   std_msgs::Header header; 
+//   std::string frame; 
+//   cv::Mat markedImage; 
+//   std::vector<objDepth> frameDepthInfo;
+// } frameDepth; 
 
 class YoloObjectDetector {
  public:
@@ -160,10 +176,15 @@ class YoloObjectDetector {
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy_1;
   message_filters::Synchronizer<MySyncPolicy_1> sync_1; 
 
+  //  Depth variables 
+  darknet_ros_msgs::FrameDepth DepthMsg_;
+
+
   //! ROS subscriber and publisher.
   image_transport::Subscriber imageSubscriber_;
   ros::Publisher objectPublisher_;
   ros::Publisher boundingBoxesPublisher_;
+  ros::Publisher sceneDepthPublisher_;
 
   //! Detected objects.
   std::vector<std::vector<RosBox_> > rosBoxes_;
@@ -259,7 +280,7 @@ class YoloObjectDetector {
 
   void* publishInThread();
 
-  void associateDepth(const int &objID, const int &xmin, const int &ymin, const int &xmax, const int &ymax);
+  darknet_ros_msgs::ObjDepth associateDepth(const darknet_ros_msgs::BoundingBox& bbox, darknet_ros_msgs::ObjDepth ObjDepthMsg);
 
   std::string type2str(int type);
 };

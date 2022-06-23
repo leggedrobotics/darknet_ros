@@ -18,6 +18,8 @@ add_message_files(
     BoundingBox.msg
     BoundingBoxes.msg
     ObjectCount.msg
+    ObjDepth.msg
+    FrameDepth.msg
 )
 
 add_action_files(
