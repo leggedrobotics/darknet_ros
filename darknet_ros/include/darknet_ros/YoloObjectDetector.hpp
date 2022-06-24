@@ -4,6 +4,10 @@
  *  Created on: Dec 19, 2016
  *      Author: Marko Bjelonic
  *   Institute: ETH Zurich, Robotic Systems Lab
+ * 
+ *  Modified: 
+ *      Bhooshan Deshpande
+ *      Wavemaker Labs, Inc
  */
 
 #pragma once
@@ -24,6 +28,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/CameraInfo.h>
 #include <std_msgs/Header.h>
 
 // OpenCv
@@ -41,10 +46,9 @@
 #include <darknet_ros_msgs/FrameDepth.h>  //For depth inclusion
 
 
-// For depth-rgb image sync
+// For depth-rgb image sync includes
 #include <message_filters/subscriber.h>                       //For depth inclusion
 #include <message_filters/synchronizer.h>                     //For depth inclusion
-#include <message_filters/time_synchronizer.h>                //For depth inclusion
 #include <message_filters/sync_policies/approximate_time.h>   //For depth inclusion
 #include <image_transport/subscriber_filter.h>                //For depth inclusion
 
@@ -76,7 +80,7 @@ extern "C" int show_image(image p, const char* name, int ms);
 
 namespace darknet_ros {
 
-//! Bounding box of the detected object.
+// Bounding box of the detected object.
 typedef struct {
   float x, y, w, h, prob;
   int num, Class;
@@ -86,19 +90,6 @@ typedef struct {
   cv::Mat image;
   std_msgs::Header header;
 } CvMatWithHeader_;
-
-// typedef struct {
-//   int objID;
-//   std::string className, classType; 
-//   float objDepth, objX, objY;
-// } objDepth; 
-
-// typedef struct { 
-//   std_msgs::Header header; 
-//   std::string frame; 
-//   cv::Mat markedImage; 
-//   std::vector<objDepth> frameDepthInfo;
-// } frameDepth; 
 
 class YoloObjectDetector {
  public:
@@ -125,10 +116,16 @@ class YoloObjectDetector {
   void init();
 
   /*!
-   * Callback of camera.
-   * @param[in] msg image pointer.
+   * Synchronized callback of RGB camera and Depth Camera.
+   * @param[in] msg image pointer for RGB and Depth Camera Image.
    */
   void cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::ImageConstPtr& msgdepth);
+
+  /*!
+   * Callback of Depth camera info.
+   * @param[in] msg of camera info msg pointer.
+   */
+  void cameraDepthInfoCallback(const sensor_msgs::CameraInfoPtr& depthInfoMsg);
 
   /*!
    * Check for objects action goal callback.
@@ -152,50 +149,50 @@ class YoloObjectDetector {
    */
   bool publishDetectionImage(const cv::Mat& detectionImage);
 
-  //! Using.
+  // Using.
   using CheckForObjectsActionServer = actionlib::SimpleActionServer<darknet_ros_msgs::CheckForObjectsAction>;
   using CheckForObjectsActionServerPtr = std::shared_ptr<CheckForObjectsActionServer>;
 
-  //! ROS node handle.
+  // ROS node handle.
   ros::NodeHandle nodeHandle_;
 
-  //! Class labels.
+  // Class labels.
   int numClasses_;
   std::vector<std::string> classLabels_;
 
-  //! Check for objects action server.
+  // Check for objects action server.
   CheckForObjectsActionServerPtr checkForObjectsActionServer_;
 
-  //! Advertise and subscribe to image topics.
+  // Advertise and subscribe to image topics.
   image_transport::ImageTransport imageTransport_;
 
-  // for synchronizing image messages - for depth inclusion
+  // Approximate Depth Sync Policy objects
   typedef image_transport::SubscriberFilter ImageSubscriberFilter;
   ImageSubscriberFilter imagergb_sub;
   ImageSubscriberFilter imagedepth_sub;
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy_1;
   message_filters::Synchronizer<MySyncPolicy_1> sync_1; 
 
-  //  Depth variables 
-  darknet_ros_msgs::FrameDepth DepthMsg_;
-
-
-  //! ROS subscriber and publisher.
+  // ROS subscriber and publisher.
   image_transport::Subscriber imageSubscriber_;
+  ros::Subscriber cameraDepthInfoSubscriber_; 
   ros::Publisher objectPublisher_;
   ros::Publisher boundingBoxesPublisher_;
   ros::Publisher sceneDepthPublisher_;
 
-  //! Detected objects.
+  // Detected objects.
   std::vector<std::vector<RosBox_> > rosBoxes_;
   std::vector<int> rosBoxCounter_;
   darknet_ros_msgs::BoundingBoxes boundingBoxesResults_;
+  darknet_ros_msgs::FrameDepth DepthMsg_;
 
-  //! Camera related parameters.
+  // Camera related parameters.
   int frameWidth_;
   int frameHeight_;
+  std::string depth_frame_ = "camera_color_optical_frame";
+  float intrin_cx_ = 0 , intrin_cy_ = 0 , intrin_fx_ = 1, intrin_fy_ = 1; 
 
-  //! Publisher of the bounding box image.
+  // Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
 
   // Yolo running on thread.
@@ -249,7 +246,6 @@ class YoloObjectDetector {
   int actionId_;
   boost::shared_mutex mutexActionStatus_;
 
-  // double getWallTime();
 
   int sizeNetwork(network* net);
 
@@ -282,7 +278,6 @@ class YoloObjectDetector {
 
   darknet_ros_msgs::ObjDepth associateDepth(const darknet_ros_msgs::BoundingBox& bbox, darknet_ros_msgs::ObjDepth ObjDepthMsg);
 
-  std::string type2str(int type);
 };
 
 } /* namespace darknet_ros*/

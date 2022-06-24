@@ -4,13 +4,15 @@
  *  Created on: Dec 19, 2016
  *      Author: Marko Bjelonic
  *   Institute: ETH Zurich, Robotic Systems Lab
+ * 
+ *  Modified: 
+ *      Bhooshan Deshpande
+ *      Wavemaker Labs, Inc
  */
 
 // yolo object detector
 #include "darknet_ros/YoloObjectDetector.hpp"
 #include <typeinfo>
-
-// Check for xServer
 #include <X11/Xlib.h>
 
 #ifdef DARKNET_FILE_PATH
@@ -33,9 +35,9 @@ YoloObjectDetector::YoloObjectDetector(ros::NodeHandle nh)
       classLabels_(0), 
       rosBoxes_(0), 
       rosBoxCounter_(0),
-      imagergb_sub(imageTransport_,"/camera/color/image_raw",1),       //For depth inclusion
+      imagergb_sub(imageTransport_,"/camera/color/image_raw",1),                      //For depth inclusion
       imagedepth_sub(imageTransport_,"/camera/aligned_depth_to_color/image_raw",1),   //For depth inclusion
-      sync_1(MySyncPolicy_1(5), imagergb_sub, imagedepth_sub)        //For depth inclusion
+      sync_1(MySyncPolicy_1(5), imagergb_sub, imagedepth_sub)                         //For depth inclusion
   {
   ROS_INFO("[YoloObjectDetector] Node started.");
 
@@ -136,37 +138,48 @@ void YoloObjectDetector::init() {
   std::string detectionImageTopicName;
   int detectionImageQueueSize;
   bool detectionImageLatch;
-  std::string depthTopicName;  //For depth inclusion
-  int sceneDepthQueueSize;          //For depth inclusion
+  std::string depthTopicName;  
+  //For depth inclusion
+  int sceneDepthQueueSize;          
   std::string sceneDepthTopicName;
   bool sceneDepthLatch;
+  int cameraDepthInfoQueueSize; 
+  std::string cameraDepthInfoTopicName;
 
-  //RGB image
-  nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/image_raw"));
+
+
+
+  //RGB image [SUB]
+  nodeHandle_.param("subscribers/camera_reading/topic", cameraTopicName, std::string("/camera/color/image_raw"));
   nodeHandle_.param("subscribers/camera_reading/queue_size", cameraQueueSize, 1);
-  
-  //Object Detector 
+
+  // depth camera info topic [SUB]
+  nodeHandle_.param("subscribers/depth_cam_info/topic", cameraDepthInfoTopicName, std::string("/camera/aligned_depth_to_color/camera_info"));   //For depth inclusion
+  nodeHandle_.param("subscribers/depth_cam_info/queue_size", cameraDepthInfoQueueSize, 1);                                                      //For depth inclusion
+
+  //Object Detector [PUB]
   nodeHandle_.param("publishers/object_detector/topic", objectDetectorTopicName, std::string("found_object"));
   nodeHandle_.param("publishers/object_detector/queue_size", objectDetectorQueueSize, 1);
   nodeHandle_.param("publishers/object_detector/latch", objectDetectorLatch, false);
   
-  // Bounding boxes topic
+  // Bounding boxes topic [PUB]
   nodeHandle_.param("publishers/bounding_boxes/topic", boundingBoxesTopicName, std::string("bounding_boxes"));
   nodeHandle_.param("publishers/bounding_boxes/queue_size", boundingBoxesQueueSize, 1);
   nodeHandle_.param("publishers/bounding_boxes/latch", boundingBoxesLatch, false);
   
-  // Detection topic
+  // Detection topic [PUB]
   nodeHandle_.param("publishers/detection_image/topic", detectionImageTopicName, std::string("detection_image"));
   nodeHandle_.param("publishers/detection_image/queue_size", detectionImageQueueSize, 1);
   nodeHandle_.param("publishers/detection_image/latch", detectionImageLatch, true);
   
-  // depth topic
+  // depth topic [PUB]
   nodeHandle_.param("publishers/object_depth/topic", sceneDepthTopicName, std::string("/object_depth/scene_depth_info"));   //For depth inclusion
-  nodeHandle_.param("publishers/object_depth/queue_size", sceneDepthQueueSize, 1);                            //For depth inclusion
-  nodeHandle_.param("publishers/object_depth/latch", sceneDepthLatch, true);
+  nodeHandle_.param("publishers/object_depth/queue_size", sceneDepthQueueSize, 1);                                          //For depth inclusion
+  nodeHandle_.param("publishers/object_depth/latch", sceneDepthLatch, true);                                                //For depth inclusion
+
 
   // Replacing image callback with a approximately synchronized callback for depth and RGB images
-  // imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize, &YoloObjectDetector::cameraCallback, this);
+  cameraDepthInfoSubscriber_ = nodeHandle_.subscribe(cameraDepthInfoTopicName, 10, &YoloObjectDetector::cameraDepthInfoCallback, this);
   sync_1.registerCallback(boost::bind(&YoloObjectDetector::cameraCallback,this,_1,_2));
   
   objectPublisher_ =
@@ -207,7 +220,6 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg, c
   }
 
   if (cam_image) {
-    // ROS_INFO("Recieved CAM-RGB image");
     {
       boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
       imageHeader_ = msg->header;
@@ -223,7 +235,6 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg, c
 
   if (cam_depth)
   {
-    // ROS_INFO("Recieved Depth Image");
     depthImageCopy_ = cam_depth->image.clone();
   }
 
@@ -621,7 +632,7 @@ void* YoloObjectDetector::publishInThread() {
 
     //DepthFrame Message Wrapper 
     DepthMsg_.header.stamp = ros::Time::now(); 
-    DepthMsg_.header.frame_id = "camera_xyz";
+    DepthMsg_.header.frame_id = depth_frame_;
     DepthMsg_.objCount = msg.count;
     sceneDepthPublisher_.publish(DepthMsg_);
     DepthMsg_.objDepths.clear();
@@ -651,47 +662,36 @@ void* YoloObjectDetector::publishInThread() {
 
 darknet_ros_msgs::ObjDepth YoloObjectDetector::associateDepth(const darknet_ros_msgs::BoundingBox& bbox, darknet_ros_msgs::ObjDepth ObjDepthMsg)
 {
-  //Depth image ROS REP : https://www.ros.org/reps/rep-0118.html
-  //camImageCopy_ and depthImageCopy_ are cv::Mat type
-  ObjDepthMsg.objID = bbox.id;
+  /*
+  Depth image ROS REP : https://www.ros.org/reps/rep-0118.html
+
+  Formula for calculating X,Y in camera frame (Z in front (Depth), X is up, y is right (toward USB-C))
+  Xreal = (u - cx) * Z / fx;
+  Yreal = (v - cy) * Z / fy; 
+  Zreal = Z
+
+  u, v   = Desired pixel values
+  cx, cy = Intrinsic camera parameter (Principal points)
+  fx, fy = Intrinsic camera parameter (Focal lengths)
+  Z      = Depth of (u, v) from camera
+
+  */
+
   try
   {
-    //class name 
-    // std::string className = static_cast<std::string>(classLabels_[obj_id].c_str());
+
+    int u = static_cast<int>((bbox.xmin+bbox.xmax)/2); 
+    int v = static_cast<int>((bbox.ymin+bbox.ymax)/2);
+    float Z =static_cast<float>(0.001*depthImageCopy_.at<u_int16_t>(v, u));  //FOR 16UC1 (values in m)
+
+    //class name, type
+    ObjDepthMsg.objID = bbox.id;
     ObjDepthMsg.className = bbox.Class;
     ObjDepthMsg.classType = "To be decided";
+    ObjDepthMsg.objDepth = Z; 
+    ObjDepthMsg.objX = (u - intrin_cx_) * Z / intrin_fx_; 
+    ObjDepthMsg.objY = (v - intrin_cy_) * Z / intrin_fy_;
 
-    //getting mat type
-    // std::string camType = type2str(camImageCopy_.type()); 
-    // std::string depthType = type2str(depthImageCopy_.type());
-    // std::cout << camType << depthType << std::endl;
-
-    //calculating center
-    if((bbox.xmin == 0 && bbox.xmax == 0) || (bbox.ymin == 0 && bbox.ymax == 0))
-    {
-      ObjDepthMsg.objDepth = 7777777777.77; 
-      ObjDepthMsg.objX = 7777777777.77; 
-      ObjDepthMsg.objY = 7777777777.77;
-      return ObjDepthMsg;
-    }
-
-    int x_center = static_cast<int>((bbox.xmin+bbox.xmax)/2); 
-    int y_center = static_cast<int>((bbox.ymin+bbox.ymax)/2);
-
-
-    //getting center depth-valuefloat center_depth = 0; 
-    try{
-      // center_depth = static_cast<float>(depthImageCopy_.at<float>(y_center, x_center)); //FOR 32FC1
-      float center_depth =static_cast<float>(0.001*depthImageCopy_.at<u_int16_t>(y_center, x_center));  //FOR 16UC1 (values in m)
-      std::cout << bbox.Class << "@("<<x_center<<","<<y_center << ") : " << center_depth << std::endl;
-      ObjDepthMsg.objDepth = center_depth; 
-      ObjDepthMsg.objX = 0.0; 
-      ObjDepthMsg.objY = 0.0;
-    }
-    catch(...) 
-    {
-      ROS_ERROR("Some Error occurred!");
-    }
   }
   catch(...) 
   {
@@ -702,27 +702,16 @@ darknet_ros_msgs::ObjDepth YoloObjectDetector::associateDepth(const darknet_ros_
 
 }
 
-std::string YoloObjectDetector::type2str(int type) {
-  std::string r;
-
-  uchar depth = type & CV_MAT_DEPTH_MASK;
-  uchar chans = 1 + (type >> CV_CN_SHIFT);
-
-  switch ( depth ) {
-    case CV_8U:  r = "8U"; break;
-    case CV_8S:  r = "8S"; break;
-    case CV_16U: r = "16U"; break;
-    case CV_16S: r = "16S"; break;
-    case CV_32S: r = "32S"; break;
-    case CV_32F: r = "32F"; break;
-    case CV_64F: r = "64F"; break;
-    default:     r = "User"; break;
+void YoloObjectDetector::cameraDepthInfoCallback(const sensor_msgs::CameraInfoPtr& depthInfoMsg)
+{
+  if (depthInfoMsg->distortion_model == "plumb_bob") //RS has a plumb_bob model 
+  {
+    depth_frame_ = depthInfoMsg->header.frame_id;
+    intrin_fx_   = depthInfoMsg->K[0];
+    intrin_fy_   = depthInfoMsg->K[4];
+    intrin_cx_   = depthInfoMsg->K[2];
+    intrin_cy_   = depthInfoMsg->K[5];
   }
-
-  r += "C";
-  r += (chans+'0');
-
-  return r;
 }
 
 
