@@ -33,6 +33,13 @@ publishers:
   object_depth:
     topic: /object_depth/scene_depth_info
     queue_size: 1
+    latch: true
+
+  detection_depth_image:
+    topic: /object_depth/detection_depth_image
+    queue_size: 1
+    latch: true
+
 
 image_view:
 

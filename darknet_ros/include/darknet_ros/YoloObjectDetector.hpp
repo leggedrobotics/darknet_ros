@@ -194,6 +194,7 @@ class YoloObjectDetector {
 
   // Publisher of the bounding box image.
   ros::Publisher detectionImagePublisher_;
+  ros::Publisher depthTaggedDetectionImagePublisher_;
 
   // Yolo running on thread.
   std::thread yoloThread_;
@@ -277,6 +278,8 @@ class YoloObjectDetector {
   void* publishInThread();
 
   darknet_ros_msgs::ObjDepth associateDepth(const darknet_ros_msgs::BoundingBox& bbox, darknet_ros_msgs::ObjDepth ObjDepthMsg);
+
+  bool publishDepthTaggedDetectionImage(const cv::Mat& detectionImage,const darknet_ros_msgs::FrameDepth& frameDepthMsg);
 
 };
 
