@@ -197,6 +197,8 @@ class YoloObjectDetector : public rclcpp::Node
   image **demoAlphabet_;
   int demoClasses_;
 
+  std::string windowName_;
+
   network *net_;
   std_msgs::msg::Header headerBuff_[3];
   image buff_[3];

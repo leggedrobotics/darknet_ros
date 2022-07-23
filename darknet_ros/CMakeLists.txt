@@ -17,6 +17,7 @@ set(DOWNLOAD_YOLOV4 OFF)
 set(DOWNLOAD_YOLOV4_CSP ON)
 set(DOWNLOAD_YOLOV4_TINY ON)
 set(DOWNLOAD_YOLOV4_MISH OFF)
+set(DOWNLOAD_YOLOV7_TINY ON)
 
 # Jetson AGX Xavier & TITAN V is under version of Turing. So, please set manually.
 # Turing or Ampere GPUs, FP16 is automatically enabled.
@@ -184,7 +185,9 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/src/tree.c                    ${DARKNET_PATH}/src/upsample_layer.c
     ${DARKNET_PATH}/src/utils.c                   ${DARKNET_PATH}/src/voxel.c
     ${DARKNET_PATH}/src/writing.c                 ${DARKNET_PATH}/src/yolo.c
-    ${DARKNET_PATH}/src/yolo_layer.c
+    ${DARKNET_PATH}/src/yolo_layer.c              ${DARKNET_PATH}/src/representation_layer.c
+
+    
 )
 
 set(DARKNET_CUDA_FILES
@@ -357,7 +360,6 @@ if(DOWNLOAD_YOLOV4_CSP)
   message(STATUS "Checking and downloading yolov4-csp.weights if needed ...")
   if (NOT EXISTS "${FILE}")
     message(STATUS "... file does not exist. Downloading now ...")
-    # execute_process(COMMAND wget -q https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-csp.cfg -P ${PATH}/../cfg)
     execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights -P ${PATH})
   endif()
   message(STATUS "Done.")
@@ -370,12 +372,20 @@ if(DOWNLOAD_YOLOV4_MISH)
   message(STATUS "Checking and downloading yolov4-mish.weights if needed ...")
   if (NOT EXISTS "${FILE}")
     message(STATUS "... file does not exist. Downloading now ...")
-    execute_process(COMMAND wget -q https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4x-mish.cfg -P ${PATH}/../cfg)
     execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4x-mish.weights -P ${PATH})
   endif()
   message(STATUS "Done.")
 endif()
 
+if(DOWNLOAD_YOLOV7_TINY)
+  set(FILE "${PATH}/yolov7-tiny.weights")
+  message(STATUS "Checking and downloading yolov7-tiny.weights if needed ...")
+  if (NOT EXISTS "${FILE}")
+    message(STATUS "... file does not exist. Downloading now ...")
+    execute_process(COMMAND wget -q https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov7-tiny.weights -P ${PATH})
+  endif()
+  message(STATUS "Done.")
+endif()
 
 install(DIRECTORY yolo_network_config/cfg yolo_network_config/weights DESTINATION share/${PROJECT_NAME}/yolo_network_config/)
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
@@ -398,7 +408,7 @@ install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME}/)
 #   ament_lint_auto_find_test_dependencies()
 
 #   find_package(ament_cmake_gtest REQUIRED)
-  
+
   #ament_add_gtest(${PROJECT_NAME}_object_detection-test
   #  test/object_detection.test
   #  test/test_main.cpp

@@ -59,6 +59,7 @@ YoloObjectDetector::YoloObjectDetector()
   declare_parameter("publishers.detection_image.topic", std::string("detection_image"));
   declare_parameter("publishers.detection_image.queue_size", 1);
   declare_parameter("publishers.detection_image.latch", true);
+  declare_parameter("yolo_model.window_name", std::string("YOLO"));
 
   declare_parameter("actions.camera_reading.topic", std::string("check_for_objects"));
 }
@@ -78,6 +79,8 @@ bool YoloObjectDetector::readParameters()
   get_parameter("image_view.enable_opencv", viewImage_);
   get_parameter("image_view.wait_key_delay", waitKeyDelay_);
   get_parameter("image_view.enable_console_output", enableConsoleOutput_);
+
+  get_parameter("yolo_model.window_name", windowName_);
 
   // Check if Xserver is running on Linux.
   if (XOpenDisplay(NULL)) {
@@ -473,7 +476,7 @@ float get_pixel_cp(image m, int x, int y, int c)
 int windows = 0;
 
 void* YoloObjectDetector::displayInThread(void* ptr) {
-  show_image_cv(buff_[(buffIndex_ + 1) % 3], "YOLO V4");
+  show_image_cv(buff_[(buffIndex_ + 1) % 3], windowName_.c_str());
   int c = cv::waitKey(waitKeyDelay_);
   if (c != -1) c = c % 256;
   if (c == 27) {
@@ -594,12 +597,12 @@ void YoloObjectDetector::yolo()
 
   int count = 0;
   if (!demoPrefix_ && viewImage_) {
-    cv::namedWindow("YOLO V4", cv::WINDOW_NORMAL);
+    cv::namedWindow(windowName_.c_str(), cv::WINDOW_NORMAL);
     if (fullScreen_) {
-      cv::setWindowProperty("YOLO V4", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+      cv::setWindowProperty(windowName_.c_str(), cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     } else {
-      cv::moveWindow("YOLO V4", 0, 0);
-      cv::resizeWindow("YOLO V4", 640, 480);
+      cv::moveWindow(windowName_.c_str(), 0, 0);
+      cv::resizeWindow(windowName_.c_str(), 640, 480);
     }
   }
 
