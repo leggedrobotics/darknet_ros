@@ -23,5 +23,5 @@ def generate_launch_description():
   return LaunchDescription([
     darknet_ros_launch,
     # if you want to disable camera node, remove the following line.
-    # camera,
+    camera,
   ])
