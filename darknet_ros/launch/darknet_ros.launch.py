@@ -11,20 +11,20 @@ from launch_ros.actions import Node
 def generate_launch_description():
   darknet_ros_share_dir = get_package_share_directory('darknet_ros')
 
-  image = LaunchConfiguration('image', default = '/camera/rgb/image_raw')
+  image = LaunchConfiguration('image', default = 'image_raw')
   yolo_weights_path = LaunchConfiguration('yolo_weights_path', default = darknet_ros_share_dir + '/yolo_network_config/weights')
   yolo_config_path = LaunchConfiguration('yolo_config_path', default = darknet_ros_share_dir + '/yolo_network_config/cfg')
   ros_param_file = LaunchConfiguration('ros_param_file', default = darknet_ros_share_dir + 'config/ros.yaml')
-  network_param_file = LaunchConfiguration('network_param_file', default = darknet_ros_share_dir + 'config/yolov2-tiny.yaml')
+  network_param_file = LaunchConfiguration('network_param_file', default = darknet_ros_share_dir + 'config/yolov4-tiny.yaml')
 
   declare_image_cmd = DeclareLaunchArgument(
     'image',
-    default_value = '/camera/rgb/image_raw',
+    default_value = 'image_raw',
     description = 'Image topic')
   declare_yolo_weights_path_cmd = DeclareLaunchArgument(
     'yolo_weights_path',
     default_value = darknet_ros_share_dir + '/yolo_network_config/weights',
-    description = 'Path to yolo weights') 
+    description = 'Path to yolo weights')
   declare_yolo_config_path_cmd = DeclareLaunchArgument(
     'yolo_config_path',
     default_value = darknet_ros_share_dir + '/yolo_network_config/cfg',
@@ -35,13 +35,13 @@ def generate_launch_description():
     description = 'Path to file with ROS related config')  
   declare_network_param_file_cmd = DeclareLaunchArgument(
     'network_param_file',
-    default_value = darknet_ros_share_dir + '/config/yolov2-tiny.yaml',
-    description = 'Path to file with network param file')  
+    default_value = darknet_ros_share_dir + '/config/yolov4-tiny.yaml',
+    description = 'Path to file with network param file')
 
   darknet_ros_cmd = Node(
     package='darknet_ros',
-    node_executable='darknet_ros',
-    node_name='darknet_ros',
+    executable='darknet_ros',
+    name='darknet_ros',
     output='screen',
     parameters=[ros_param_file, network_param_file,
       {

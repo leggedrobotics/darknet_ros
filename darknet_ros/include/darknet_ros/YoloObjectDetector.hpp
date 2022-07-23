@@ -17,6 +17,9 @@
 #include <thread>
 #include <chrono>
 #include <shared_mutex>
+#include <numeric>
+#include <queue>
+#include <sstream>
 
 // ROS
 #include "rclcpp/rclcpp.hpp"
@@ -53,13 +56,27 @@ extern "C" {
 #include "utils.h"
 #include "parser.h"
 #include "box.h"
-#include "darknet_ros/image_interface.h"
+#include "blas.h"
+#include "image_opencv.h"
+
+#include "image.h"
+// #include "demo.h"
+#include "darknet.h"
+
+#include "image_interface.hpp"
+
+#define START_COUNT 100
+
 #include <sys/time.h>
 }
 
-extern "C" void ipl_into_image(IplImage* src, image im);
-extern "C" image ipl_to_image(IplImage* src);
-extern "C" void show_image_cv(image p, const char *name, IplImage *disp);
+extern "C" cv::Mat image_to_mat(image im);
+extern "C" image mat_to_image(cv::Mat m);
+// extern "C" void show_image(image p, const char* name);
+
+// extern "C" void draw_detections_cv_v3(mat_cv* show_img, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
+
+extern "C" void generate_image(image p, cv::Mat& disp);
 
 namespace darknet_ros {
 
@@ -70,11 +87,10 @@ typedef struct
   int num, Class;
 } RosBox_;
 
-typedef struct
-{
-  IplImage* image;
+typedef struct {
+  cv::Mat image;
   std_msgs::msg::Header header;
-} IplImageWithHeader_;
+} CvMatWithHeader_;
 
 class YoloObjectDetector : public rclcpp::Node
 {
@@ -181,14 +197,20 @@ class YoloObjectDetector : public rclcpp::Node
   image **demoAlphabet_;
   int demoClasses_;
 
+  std::string windowName_;
+
   network *net_;
   std_msgs::msg::Header headerBuff_[3];
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
   int buffIndex_ = 0;
-  IplImage * ipl_;
+  // IplImage * ipl_;
+  cv::Mat disp_;
   float fps_ = 0;
+  float max_fps = 0;
+  float min_fps = 10000;
+  std::stringstream ss_fps;
   float demoThresh_ = 0;
   float demoHier_ = .5;
   int running_ = 0;
@@ -249,13 +271,15 @@ class YoloObjectDetector : public rclcpp::Node
 
   void yolo();
 
-  IplImageWithHeader_ getIplImageWithHeader();
+  // IplImageWithHeader_ getIplImageWithHeader();
+  CvMatWithHeader_ getCvMatWithHeader();
 
   bool getImageStatus(void);
 
   bool isNodeRunning(void);
 
   void *publishInThread();
+  void generate_image_cp(image p, cv::Mat& disp);
 };
 
 } /* namespace darknet_ros*/

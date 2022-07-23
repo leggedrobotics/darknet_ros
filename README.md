@@ -2,9 +2,11 @@
 
 ## Overview
 
-This is a ROS package developed for object detection in camera images. You only look once (YOLO) is a state-of-the-art, real-time object detection system. In the following ROS package you are able to use YOLO (V3) on GPU and CPU. The pre-trained model of the convolutional neural network is able to detect pre-trained classes including the data set from VOC and COCO, or you can also create a network with your own detection objects. For more information about YOLO, Darknet, available training data and training YOLO see the following link: [YOLO: Real-Time Object Detection](http://pjreddie.com/darknet/yolo/).
+This is a ROS package developed for **object detection in camera images**. You only look once (YOLO) is a state-of-the-art, real-time object detection system. In the following ROS package you are able to use **YOLO (V3) on GPU and CPU**. The pre-trained model of the convolutional neural network is able to detect pre-trained classes including the data set from VOC and COCO, or you can also create a network with your own detection objects. For more information about YOLO, Darknet, available training data and training YOLO see the following link: [YOLO: Real-Time Object Detection](http://pjreddie.com/darknet/yolo/).
 
-The YOLO packages have been tested under ROS Foxy, Ubuntu 20.04 and OpenCV 4.2.0. This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
+The YOLO packages have been tested under **ROS Noetic** and **Ubuntu 20.04**. Note: We also provide branches that work under **ROS Melodic**, **ROS Foxy** and **ROS2**.
+
+This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
 
 **Author: [Marko Bjelonic](https://www.markobjelonic.com), marko.bjelonic@mavt.ethz.ch**
 
@@ -113,7 +115,7 @@ In order to use your own detection objects you need to provide your weights and 
 
 ## Basic Usage
 
-In order to get YOLO ROS: Real-Time Object Detection for ROS to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darkned_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
+In order to get YOLO ROS: Real-Time Object Detection for ROS to run with your robot, you will need to adapt a few parameters. It is the easiest if duplicate and adapt all the parameter files that you need to change from the `darknet_ros` package. These are specifically the parameter files in `config` and the launch file from the `launch` folder.
 
 ## Nodes
 
@@ -123,7 +125,7 @@ This is the main YOLO ROS: Real-Time Object Detection for ROS node. It uses the 
 
 ### ROS related parameters
 
-You can change the names and other parameters of the publishers, subscribers and actions inside `darkned_ros/config/ros.yaml`.
+You can change the names and other parameters of the publishers, subscribers and actions inside `darknet_ros/config/ros.yaml`.
 
 #### Subscribed Topics
 
@@ -153,7 +155,7 @@ You can change the names and other parameters of the publishers, subscribers and
 
 ### Detection related parameters
 
-You can change the parameters that are related to the detection by adding a new config file that looks similar to `darkned_ros/config/yolo.yaml`.
+You can change the parameters that are related to the detection by adding a new config file that looks similar to `darknet_ros/config/yolo.yaml`.
 
 * **`image_view/enable_opencv`** (bool)
 
@@ -165,11 +167,11 @@ You can change the parameters that are related to the detection by adding a new 
 
 * **`yolo_model/config_file/name`** (string)
 
-    Name of the cfg file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/cfg/`.
+    Name of the cfg file of the network that is used for detection. The code searches for this name inside `darknet_ros/yolo_network_config/cfg/`.
 
 * **`yolo_model/weight_file/name`** (string)
 
-    Name of the weights file of the network that is used for detection. The code searches for this name inside `darkned_ros/yolo_network_config/weights/`.
+    Name of the weights file of the network that is used for detection. The code searches for this name inside `darknet_ros/yolo_network_config/weights/`.
 
 * **`yolo_model/threshold/value`** (float)
 
@@ -177,4 +179,4 @@ You can change the parameters that are related to the detection by adding a new 
 
 * **`yolo_model/detection_classes/names`** (array of strings)
 
-    Detection names of the network used by the cfg and weights file inside `darkned_ros/yolo_network_config/`.
+    Detection names of the network used by the cfg and weights file inside `darknet_ros/yolo_network_config/`.

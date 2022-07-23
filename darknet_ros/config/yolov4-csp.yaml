@@ -1,11 +1,10 @@
 darknet_ros:
   ros__parameters:
     yolo_model:
-
       config_file:
-        name: yolov2.cfg
+        name: yolov4-csp.cfg
       weight_file:
-        name: yolov2.weights
+        name: yolov4-csp.weights
       threshold:
         value: 0.3
       detection_classes:
