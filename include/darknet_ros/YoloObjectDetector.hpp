@@ -74,6 +74,22 @@ extern "C" image mat_to_image(cv::Mat m);
 extern "C" void generate_image(image p, cv::Mat& disp);
 
 namespace darknet_ros {
+namespace utility
+{
+/**
+ * @brief Retrieve the value of an environment variable
+ * safely. Return 'true' if successful, or 'false' if not.
+ * NOTE: The value of 'var' will not be modified if it is
+ * not possible to read the environment variable.
+ *
+ * @param name Name of the environment variable
+ * @param var Value of the environment variable
+ * @return true
+ * @return false
+ */
+bool
+safe_getenv(const std::string& name, std::string& var);
+}  // namespace utility
 
 //! Bounding box of the detected object.
 // typedef struct

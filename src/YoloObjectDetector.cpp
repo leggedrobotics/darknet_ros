@@ -19,6 +19,23 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #endif
 
 namespace darknet_ros {
+namespace utility
+{
+bool
+safe_getenv(const std::string& name, std::string& var)
+{
+  const char* value = std::getenv(name.c_str());
+  if (!value)
+  {
+    return false;
+  }
+  else
+  {
+    var = std::string(value);
+    return true;
+  }
+}
+}  // namespace utility
 
 YoloObjectDetector::YoloObjectDetector()
     : Node("darknet_ros"),
@@ -118,16 +135,19 @@ void YoloObjectDetector::init()
   std::string video_stream, server_ip, rtsp_path;
   get_parameter("video_stream", video_stream);
   std::cout << "video_stream: " << video_stream << std::endl;
-  std::string robot_namespace(this->get_namespace());
-  std::cout << "robot_namespace: " << robot_namespace << std::endl;
-
-  // Parse mounting point from video stream URL
-  std::size_t mounting_path_slash = video_stream.find_last_of("/");
-  std::string url_writer = video_stream.substr(0, mounting_path_slash) + robot_namespace;
-  std::cout << "url_writer: " << url_writer << std::endl;
-
-  // Configure RTSP Streamer
-  rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, url_writer);
+  std::string darknet_namespace(this->get_namespace());
+  std::string server_ip, server_url;
+  // Try to read the RTSP server IP as an environment variable
+  if (safe_getenv("RTSP_SERVER_IP", server_ip))
+  {
+    server_url = "rtsp://" + server_ip + ":8554/" + darknet_namespace;
+  }
+  else
+  {
+    server_url = "rtsp://127.0.0.1:8554/" + darknet_namespace;
+  }
+  std::cout << "UL-VA streaming on this URL: " << server_url << std::endl;
+  rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, server_url);
   rtsp_streamer_.on_configure_reader(std::bind(&YoloObjectDetector::on_image_callback, this, std::placeholders::_1), video_stream);
 }
 
