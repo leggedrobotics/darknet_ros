@@ -132,13 +132,13 @@ void YoloObjectDetector::init()
   detections_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>(
     "~/detections", 1);
 
-  std::string video_stream, server_ip, rtsp_path;
+  std::string video_stream;
   get_parameter("video_stream", video_stream);
   std::cout << "video_stream: " << video_stream << std::endl;
   std::string darknet_namespace(this->get_namespace());
   std::string server_ip, server_url;
   // Try to read the RTSP server IP as an environment variable
-  if (safe_getenv("RTSP_SERVER_IP", server_ip))
+  if (utility::safe_getenv("RTSP_SERVER_IP", server_ip))
   {
     server_url = "rtsp://" + server_ip + ":8554/" + darknet_namespace;
   }
