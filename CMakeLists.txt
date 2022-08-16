@@ -288,6 +288,9 @@ target_link_libraries(${PROJECT_NAME}_lib
   stdc++
   umd_rtsp
   umd_lib_http
+  -lcrypto
+  -lssl
+  -lcpprest
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
