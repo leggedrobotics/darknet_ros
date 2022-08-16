@@ -113,7 +113,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(umd_rtsp REQUIRED)
-
+find_package(umd_lib_http REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 # find_package(rclpy REQUIRED)
@@ -287,6 +287,7 @@ target_link_libraries(${PROJECT_NAME}_lib
   pthread
   stdc++
   umd_rtsp
+  umd_lib_http
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
