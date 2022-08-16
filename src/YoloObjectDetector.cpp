@@ -140,11 +140,11 @@ void YoloObjectDetector::init()
   // Try to read the RTSP server IP as an environment variable
   if (utility::safe_getenv("RTSP_SERVER_IP", server_ip))
   {
-    server_url = "rtsp://" + server_ip + ":8554/" + darknet_namespace;
+    server_url = "rtsp://" + server_ip + ":8554" + darknet_namespace;
   }
   else
   {
-    server_url = "rtsp://127.0.0.1:8554/" + darknet_namespace;
+    server_url = "rtsp://127.0.0.1:8554" + darknet_namespace;
   }
   std::cout << "UL-VA streaming on this URL: " << server_url << std::endl;
   rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, server_url);
