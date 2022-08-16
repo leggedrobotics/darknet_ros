@@ -54,6 +54,7 @@ YoloObjectDetector::YoloObjectDetector()
   declare_parameter("config_path", std::string("/default"));
   declare_parameter("video_stream", std::string(""));
 
+  declare_parameter("gstreamer_writer_pipeline", std::string("default"));
 }
 
 YoloObjectDetector::~YoloObjectDetector()
@@ -135,19 +136,30 @@ void YoloObjectDetector::init()
   std::string video_stream;
   get_parameter("video_stream", video_stream);
   std::cout << "video_stream: " << video_stream << std::endl;
-  std::string darknet_namespace(this->get_namespace());
-  std::string server_ip, server_url;
-  // Try to read the RTSP server IP as an environment variable
-  if (utility::safe_getenv("RTSP_SERVER_IP", server_ip))
+  // Check whether a GStreamer pipeline has been provided
+  std::string gstreamer_pipeline;
+  get_parameter("gstreamer_writer_pipeline", gstreamer_pipeline);
+  std::cout << "gstreamer_writer_pipeline: " << gstreamer_pipeline << std::endl;
+  if (gstreamer_pipeline != "default")
   {
-    server_url = "rtsp://" + server_ip + ":8554" + darknet_namespace;
+    rtsp_streamer_.on_configure_writer(gstreamer_pipeline, 1920, 1080);
   }
   else
   {
-    server_url = "rtsp://127.0.0.1:8554" + darknet_namespace;
+    std::string darknet_namespace(this->get_namespace());
+    std::string server_ip, server_url;
+    // Try to read the RTSP server IP as an environment variable
+    if (utility::safe_getenv("RTSP_SERVER_IP", server_ip))
+    {
+      server_url = "rtsp://" + server_ip + ":8554" + darknet_namespace;
+    }
+    else
+    {
+      server_url = "rtsp://127.0.0.1:8554" + darknet_namespace;
+    }
+    std::cout << "UL-VA streaming URL: " << server_url << std::endl;
+    rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, server_url);
   }
-  std::cout << "UL-VA streaming on this URL: " << server_url << std::endl;
-  rtsp_streamer_.on_configure_writer(1920, 1080, 30, 9000, server_url);
   rtsp_streamer_.on_configure_reader(std::bind(&YoloObjectDetector::on_image_callback, this, std::placeholders::_1), video_stream);
 }
 
