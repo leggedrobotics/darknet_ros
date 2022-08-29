@@ -41,22 +41,23 @@ endif()
 if (CUDA_FOUND)
   message(STATUS "CUDA Version: ${CUDA_VERSION_STRINGS}")
   message(STATUS "CUDA Libararies: ${CUDA_LIBRARIES}")
-  if (${CUDA_VERSION} EQUAL "11.0.3")
+  # if (${CUDA_VERSION} EQUAL "11.7.1")
     set(
       CUDA_NVCC_FLAGS
       ${CUDA_NVCC_FLAGS};
       -O3
       -gencode arch=compute_75,code=[sm_75,compute_75] # GeForce GTX 1660 Ti
-    )
-  elseif(${CUDA_VERSION} EQUAL "11.4.2")
-    set(
-      CUDA_NVCC_FLAGS
-      ${CUDA_NVCC_FLAGS};
-      -O3
-      -gencode arch=compute_75,code=[sm_75,compute_75]
       -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
     )
-  endif()
+  # elseif(${CUDA_VERSION} EQUAL "11.4.2")
+  #   set(
+  #     CUDA_NVCC_FLAGS
+  #     ${CUDA_NVCC_FLAGS};
+  #     -O3
+  #     -gencode arch=compute_75,code=[sm_75,compute_75]
+  #     -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
+  #   )
+  # endif()
   add_definitions(-DGPU)
 endif()
 
@@ -193,7 +194,7 @@ set(DARKNET_CORE_FILES
     ${DARKNET_PATH}/src/tree.c                    ${DARKNET_PATH}/src/upsample_layer.c
     ${DARKNET_PATH}/src/utils.c                   ${DARKNET_PATH}/src/voxel.c
     ${DARKNET_PATH}/src/writing.c                 ${DARKNET_PATH}/src/yolo.c
-    ${DARKNET_PATH}/src/yolo_layer.c
+    ${DARKNET_PATH}/src/yolo_layer.c              ${DARKNET_PATH}/src/representation_layer.c
 )
 
 set(DARKNET_CUDA_FILES
