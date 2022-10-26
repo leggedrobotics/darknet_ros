@@ -172,6 +172,7 @@ class YoloObjectDetector : public rclcpp::Node
   double demoTime_;
 
   umd_rtsp::RTSPStreamer rtsp_streamer_;
+  bool writer_configured_ = false;
 
   char *demoPrefix_;
 

@@ -176,6 +176,15 @@ void YoloObjectDetector::on_image_callback(const cv::Mat& image)
     }
     frameWidth_ = image.cols;
     frameHeight_ = image.rows;
+    if (!writer_configured_)
+    {
+      std::string url_writer(this->get_namespace());
+      url_writer = "rtsp://127.0.0.1:8554"+url_writer;
+      std::cout << "url_writer: " << url_writer << std::endl;
+      // Configure RTSP Streamer
+      rtsp_streamer_.on_configure_writer(frameWidth_, frameHeight_, 30, 9000, url_writer);
+      writer_configured_ = true;
+    }
   }
 }
 
@@ -242,7 +251,7 @@ void *YoloObjectDetector::detectInThread()
 
   image display = buff_[(buffIndex_+2) % 3];
   
-  draw_detections_v3(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_, false);
+  draw_detections_v3(display, dets, nboxes, demoThresh_, demoNames_, demoAlphabet_, demoClasses_, 0);
   // extract the bounding boxes and send them to ROS
   vision_msgs::msg::Detection2DArray detections_array_msg;
   detections_array_msg.detections.reserve(nboxes);
@@ -250,8 +259,8 @@ void *YoloObjectDetector::detectInThread()
   {
     detections_array_msg.detections.emplace_back();
     auto & detection_msg = detections_array_msg.detections.back();
-    detection_msg.bbox.center.x = dets[i].bbox.x;
-    detection_msg.bbox.center.y = dets[i].bbox.y;
+    detection_msg.bbox.center.position.x = dets[i].bbox.x;
+    detection_msg.bbox.center.position.y = dets[i].bbox.y;
     detection_msg.bbox.size_x = dets[i].bbox.w;
     detection_msg.bbox.size_y = dets[i].bbox.h;
 
@@ -264,9 +273,9 @@ void *YoloObjectDetector::detectInThread()
       }
     }
     detection_msg.results.emplace_back();
-    auto & hypothesis = detection_msg.results.back();
-    hypothesis.id = max_class;
-    hypothesis.score = max_score;
+    auto & result = detection_msg.results.back();
+    result.hypothesis.class_id = max_class;
+    result.hypothesis.score = max_score;
   }
   detections_array_msg.header.stamp = rclcpp::Time(0);
   detections_pub_->publish(detections_array_msg);
@@ -279,8 +288,8 @@ void *YoloObjectDetector::detectInThread()
 
 void* YoloObjectDetector::fetchInThread() {
   {
-    free_image(buff_[buffIndex_]);
     std::shared_lock<std::shared_mutex> lock(mutexImageCallback_);
+    free_image(buff_[buffIndex_]);
     buff_[buffIndex_] = mat_to_image(camImageCopy_);
   }
   rgbgr_image(buff_[buffIndex_]);
