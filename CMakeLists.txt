@@ -286,7 +286,7 @@ target_link_libraries(${PROJECT_NAME}_lib
   m
   pthread
   stdc++
-  umd_rtsp
+  umd_rtsp::umd_rtsp
   umd_lib_http
   -lcrypto
   -lssl
