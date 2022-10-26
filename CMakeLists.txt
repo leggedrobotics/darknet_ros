@@ -116,6 +116,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(umd_rtsp REQUIRED)
 find_package(umd_lib_http REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 # find_package(rclpy REQUIRED)
@@ -290,6 +291,7 @@ target_link_libraries(${PROJECT_NAME}_lib
   stdc++
   umd_rtsp::umd_rtsp
   umd_lib_http::umd_lib_http
+  nlohmann_json::nlohmann_json
   -lcrypto
   -lssl
   -lcpprest
