@@ -22,6 +22,7 @@
   <depend>ament_index_cpp</depend>
   <!-- <depend>darknet_ros_msgs</depend> -->
   <depend>umd_rtsp</depend>
+  <depend>umd_lib_http</depend>
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>

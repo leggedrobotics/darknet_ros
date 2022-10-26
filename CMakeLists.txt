@@ -289,7 +289,7 @@ target_link_libraries(${PROJECT_NAME}_lib
   pthread
   stdc++
   umd_rtsp::umd_rtsp
-  umd_lib_http
+  umd_lib_http::umd_lib_http
   -lcrypto
   -lssl
   -lcpprest
