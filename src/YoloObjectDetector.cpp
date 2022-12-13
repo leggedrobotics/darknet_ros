@@ -19,6 +19,23 @@ std::string darknetFilePath_ = DARKNET_FILE_PATH;
 #endif
 
 namespace darknet_ros {
+namespace utility
+{
+bool
+safe_getenv(const std::string& name, std::string& var)
+{
+  const char* value = std::getenv(name.c_str());
+  if (!value)
+  {
+    return false;
+  }
+  else
+  {
+    var = std::string(value);
+    return true;
+  }
+}
+}  // namespace utility
 
 YoloObjectDetector::YoloObjectDetector()
     : Node("darknet_ros"),
@@ -37,6 +54,7 @@ YoloObjectDetector::YoloObjectDetector()
   declare_parameter("config_path", std::string("/default"));
   declare_parameter("video_stream", std::string(""));
 
+  declare_parameter("gstreamer_writer_pipeline", std::string("default"));
 }
 
 YoloObjectDetector::~YoloObjectDetector()
@@ -136,11 +154,30 @@ void YoloObjectDetector::on_image_callback(const cv::Mat& image)
     frameHeight_ = image.rows;
     if (!writer_configured_)
     {
-      std::string url_writer(this->get_namespace());
-      url_writer = "rtsp://127.0.0.1:8554"+url_writer;
-      std::cout << "url_writer: " << url_writer << std::endl;
-      // Configure RTSP Streamer
-      rtsp_streamer_.on_configure_writer(frameWidth_, frameHeight_, 30, 9000, url_writer);
+      // Check whether a GStreamer pipeline has been provided
+      std::string gstreamer_pipeline;
+      get_parameter("gstreamer_writer_pipeline", gstreamer_pipeline);
+      std::cout << "gstreamer_writer_pipeline: " << gstreamer_pipeline << std::endl;
+      if (gstreamer_pipeline != "default")
+      {
+        rtsp_streamer_.on_configure_writer(gstreamer_pipeline, frameWidth_, frameHeight_);
+      }
+      else
+      {
+        std::string darknet_namespace(this->get_namespace());
+        std::string server_ip, server_url;
+        // Try to read the RTSP server IP as an environment variable
+        if (utility::safe_getenv("RTSP_SERVER_IP", server_ip))
+        {
+          server_url = "rtsp://" + server_ip + ":8554" + darknet_namespace;
+        }
+        else
+        {
+          server_url = "rtsp://127.0.0.1:8554" + darknet_namespace;
+        }
+        std::cout << "UL-VA streaming URL: " << server_url << std::endl;
+        rtsp_streamer_.on_configure_writer(frameWidth_, frameHeight_, 30, 9000, server_url);
+      }
       writer_configured_ = true;
     }
   }
@@ -266,7 +303,7 @@ image **load_alphabet_with_file_cp(char *datafile) {
   int i, j;
   const int nsize = 8;
   image **alphabets = (image**)calloc(nsize, sizeof(image));
-  char* labels = "/labels/%d_%d.png";
+  char* labels = (char *)"/labels/%d_%d.png";
   char * files = (char *) malloc(1 + strlen(datafile)+ strlen(labels) );
   strcpy(files, datafile);
   strcat(files, labels);
