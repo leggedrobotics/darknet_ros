@@ -48,6 +48,7 @@ if (CUDA_FOUND)
       -O3
       -gencode arch=compute_75,code=[sm_75,compute_75] # GeForce GTX 1660 Ti
       -gencode arch=compute_86,code=[sm_86,compute_86] # GeForce RTX 3000 Series
+      -gencode arch=compute_70,code=[sm_70,compute_70] # Tesla V100 server Series
     )
   # elseif(${CUDA_VERSION} EQUAL "11.4.2")
   #   set(
