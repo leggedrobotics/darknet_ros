@@ -9,6 +9,7 @@
   <url type="website">https://github.com/leggedrobotics/darknet_ros</url>
   <author email="marko.bjelonic@mavt.ethz.ch">Marko Bjelonic</author>
   
+  
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
@@ -24,6 +25,10 @@
   <depend>umd_rtsp</depend>
   <depend>umd_http</depend>
   <depend>nlohmann_json</depend>
+  <build_depend>rcl</build_depend>
+  
+  <exec_depend>rcl</exec_depend>
+
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>
